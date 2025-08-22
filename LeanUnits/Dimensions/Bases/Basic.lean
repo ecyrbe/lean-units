@@ -16,6 +16,10 @@ namespace Bases
 def Sorted : Bases → Prop := List.Pairwise (·.name < ·.name)
 def Nodup : Bases → Prop := List.Pairwise (·.name ≠ ·.name)
 
+/--
+Get the exponent of a base with a given name in a list of bases.
+If the base is not present, return 0.
+-/
 def exponentOf (name : String) (l : Bases) : ℚ :=
   match l.find? (fun b => b.name = name) with
   | none => 0

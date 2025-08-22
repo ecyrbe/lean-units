@@ -32,14 +32,17 @@ theorem eq_iff_elements_eq (d₁ d₂ : Dimension) :
 def dimensionless : Dimension :=
   {
     elements := [],
-    is_sorted := by exact List.Pairwise.nil
+    is_sorted := Bases.Sorted.nil
+  }
+
+def ofBase (b : Base) : Dimension :=
+  {
+    elements := [b],
+    is_sorted := Bases.Sorted.singleton b
   }
 
 def ofString (b : String) : Dimension :=
-  {
-    elements := [Base.ofString b],
-    is_sorted := by exact List.pairwise_singleton (·.name < ·.name) (Base.ofString b)
-  }
+  ofBase (Base.ofString b)
 
 def mul (d₁ d₂ : Dimension) : Dimension :=
   {

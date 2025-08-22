@@ -21,6 +21,12 @@ theorem cons {b : Base} {l : Bases} :
   unfold Sorted
   exact List.pairwise_cons
 
+theorem singleton (b : Base) : Sorted [b] := by
+  rw [cons]
+  constructor
+  · intro b' h; cases h
+  · exact nil
+
 theorem nodup (l : Bases) : Sorted l → Nodup l := by
   unfold Sorted Nodup
   intro h
