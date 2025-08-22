@@ -21,6 +21,11 @@ theorem cons {b : Base} {l : Bases} :
   unfold Sorted
   exact List.pairwise_cons
 
+theorem nodup (l : Bases) : Sorted l → Nodup l := by
+  unfold Sorted Nodup
+  intro h
+  exact List.Pairwise.imp ne_of_lt h
+
 end Sorted
 
 
@@ -36,18 +41,13 @@ theorem name_eq_imp_sorted_iff_sorted {a b : Base} (l : Bases) :
   unfold Sorted
   simp only [List.pairwise_cons, h_eq]
 
-theorem base_neq_imp_nodup (l : Bases) :
+theorem name_neq_imp_nodup (l : Bases) :
   (∀ a b : Base, a ∈ l → b ∈ l → a.name ≠ b.name) → Nodup l := by
   intro h
   unfold Nodup
   induction l with
   | nil => trivial
   | cons x xs xh => simp_all
-
-theorem sorted_imp_nodup (l : Bases) : Sorted l → Nodup l := by
-  unfold Sorted Nodup
-  intro h
-  exact List.Pairwise.imp ne_of_lt h
 
 theorem base_eq_iff_sorted_name_eq {l : Bases} (h_sorted : Sorted l) (b₁ b₂ : Base) :
   b₁ ∈ l → b₂ ∈ l → (b₁ = b₂ ↔ b₁.name = b₂.name) := by
@@ -133,7 +133,9 @@ theorem eq_of_sorted_of_same_elements {l1 l2 : Bases} (h1 : Sorted l1) (h2 : Sor
             · simpa [h_x_eq_y.symm,h_bx] using h
           exact xh h1.2 h2.2 h_xs_ys
 
-theorem exponentOf_eq_exp {l : Bases} (h_sorted : Sorted l) (b : Base)
+namespace exponentOf
+
+theorem eq_exp {l : Bases} (h_sorted : Sorted l) (b : Base)
   (h_mem : b ∈ l) : exponentOf b.name l = b.exponent := by
   induction l with
   | nil => cases h_mem
@@ -152,7 +154,8 @@ theorem exponentOf_eq_exp {l : Bases} (h_sorted : Sorted l) (b : Base)
       unfold exponentOf at h_tail ⊢
       simp only [List.find?, hxne, decide_false, h_tail]
 
-theorem exponentOf_eq_zero {l : Bases} (name : String)
+
+theorem eq_zero {l : Bases} (name : String)
   (h : ∀ b ∈ l, b.name ≠ name) : exponentOf name l = 0 := by
   induction l with
   | nil =>
@@ -167,7 +170,7 @@ theorem exponentOf_eq_zero {l : Bases} (name : String)
       Bool.false_eq_true, List.find?_cons_of_neg]
     exact ih
 
-theorem exponentOf_eq_zero_iff {l : Bases} (name : String) :
+theorem eq_zero_iff {l : Bases} (name : String) :
   exponentOf name l = 0 ↔ ∀ b ∈ l, b.name ≠ name := by
   constructor
   · intro h
@@ -190,32 +193,25 @@ theorem exponentOf_eq_zero_iff {l : Bases} (name : String) :
         | inr hb =>
             exact ih h_tail b hb
   · intro h
-    exact exponentOf_eq_zero name h
+    exact eq_zero name h
 
-theorem exponentOf_neq_zero_iff {l : Bases} (name : String) (h_sorted : Sorted l) :
+theorem neq_zero_iff {l : Bases} (name : String) (h_sorted : Sorted l) :
   exponentOf name l ≠ 0 ↔ ∃ b ∈ l, b.name = name := by
   constructor
   · intro h
     have : ¬ (∀ b ∈ l, b.name ≠ name) := by
       intro all
       have hz : exponentOf name l = 0 :=
-        (exponentOf_eq_zero_iff (l:=l) name).mpr all
+        (eq_zero_iff (l:=l) name).mpr all
       contradiction
     push_neg at this
     assumption
   · intro ⟨b, hb_mem, hb_name⟩
-    have hb' := exponentOf_eq_exp h_sorted b hb_mem
+    have hb' := eq_exp h_sorted b hb_mem
     have : exponentOf name l = b.exponent := by simpa [hb_name] using hb'
     simpa [this] using b.not_zero
 
-theorem exponentOf_head {xs : Bases} {x : Base} (name : String) (h_sorted : Sorted (x::xs))
-  (h : x.name = name) : exponentOf name (x::xs) = x.exponent := by
-  have x_in_x_xs : x ∈ x :: xs := by simp
-  have h_exp := exponentOf_eq_exp h_sorted x x_in_x_xs
-  rw [h] at h_exp
-  exact h_exp
-
-theorem exponentOf_eq_imp_mem (l : Bases) (h_sorted : Sorted l) (b : Base)
+theorem eq_imp_mem (l : Bases) (h_sorted : Sorted l) (b : Base)
   (h : exponentOf b.name l = b.exponent) : b ∈ l := by
   induction l with
   | nil =>
@@ -233,7 +229,7 @@ theorem exponentOf_eq_imp_mem (l : Bases) (h_sorted : Sorted l) (b : Base)
     · have hb_tail : b ∈ xs := ih h_tail_sorted h
       exact List.mem_cons_of_mem x hb_tail
 
-theorem exponentOf_eq_iff (l₁ l₂ : Bases) (h₁ : Sorted l₁) (h₂ : Sorted l₂) :
+theorem eq_iff (l₁ l₂ : Bases) (h₁ : Sorted l₁) (h₂ : Sorted l₂) :
   (∀ name , exponentOf name l₁ = exponentOf name l₂) ↔ l₁ = l₂ := by
   constructor
   · intro h
@@ -241,60 +237,64 @@ theorem exponentOf_eq_iff (l₁ l₂ : Bases) (h₁ : Sorted l₁) (h₂ : Sorte
     intro b
     constructor
     · intro h_mem
-      have : exponentOf b.name l₁ = b.exponent := exponentOf_eq_exp h₁ b h_mem
+      have : exponentOf b.name l₁ = b.exponent := eq_exp h₁ b h_mem
       rw [h b.name] at this
-      exact exponentOf_eq_imp_mem l₂ h₂ b this
+      exact eq_imp_mem l₂ h₂ b this
     · intro h_mem
-      have : exponentOf b.name l₂ = b.exponent := exponentOf_eq_exp h₂ b h_mem
+      have : exponentOf b.name l₂ = b.exponent := eq_exp h₂ b h_mem
       rw [← h b.name] at this
-      exact exponentOf_eq_imp_mem l₁ h₁ b this
+      exact eq_imp_mem l₁ h₁ b this
   · intro h
     subst h
     intro name
     rfl
 
 @[simp]
-theorem exponentOf_cons_eq (x : Base) (xs : Bases) (name : String) (h : x.name = name) :
+theorem cons_eq (x : Base) (xs : Bases) (name : String) (h : x.name = name) :
   exponentOf name (x::xs) = x.exponent := by
   simp only [exponentOf, List.find?, h, decide_true]
 
 @[simp]
-theorem exponentOf_cons_neq (x : Base) (xs : Bases) (name : String) (h : x.name ≠ name) :
+theorem cons_neq (x : Base) (xs : Bases) (name : String) (h : x.name ≠ name) :
   exponentOf name (x::xs) = exponentOf name xs := by
   simp only [exponentOf, List.find?, h, decide_false]
 
+end exponentOf
+
+namespace merge
+
 /-- empty merge is identity -/
 @[simp]
-theorem merge_nil_self_eq_self (l : Bases) : merge [] l = l := by
+theorem nil_self_eq_self (l : Bases) : merge [] l = l := by
   simp only [merge]
 
 /-- merge with empty list is identity -/
 @[simp]
-theorem merge_self_nil_eq_self (l : Bases) : merge l [] = l := by
+theorem self_nil_eq_self (l : Bases) : merge l [] = l := by
   unfold merge
   aesop
 
-theorem merge_cons_no_dup (b₁ b₂ l₁ l₂) (h_no_dup : b₁.name ≠ b₂.name) : merge (b₁::l₁) (b₂::l₂) =
+theorem cons_no_dup (b₁ b₂ l₁ l₂) (h_no_dup : b₁.name ≠ b₂.name) : merge (b₁::l₁) (b₂::l₂) =
   if b₁.name < b₂.name then b₁ :: merge l₁ (b₂::l₂) else b₂ :: merge (b₁::l₁) l₂ := by
   simp only [merge, ↓reduceIte, h_no_dup]
 
 @[simp]
-theorem merge_cons_lower (b₁ b₂ l₁ l₂)
+theorem cons_lower (b₁ b₂ l₁ l₂)
   (h_no_dup : b₁.name ≠ b₂.name)
   (h_lower : b₁.name < b₂.name) :
   merge (b₁::l₁) (b₂::l₂) = b₁ :: merge l₁ (b₂::l₂) := by
-  rw [merge_cons_no_dup, if_pos h_lower]
+  rw [cons_no_dup, if_pos h_lower]
   exact h_no_dup
 
 @[simp]
-theorem merge_cons_upper (b₁ b₂ l₁ l₂)
+theorem cons_upper (b₁ b₂ l₁ l₂)
   (h_no_dup : b₁.name ≠ b₂.name)
   (h_upper : ¬ b₁.name < b₂.name) :
   merge (b₁::l₁) (b₂::l₂) = b₂ :: merge (b₁::l₁) l₂ := by
-  rw [merge_cons_no_dup, if_neg h_upper]
+  rw [cons_no_dup, if_neg h_upper]
   exact h_no_dup
 
-theorem merge_one_cons (b₁ b₂ l₂) (h_no_dup : b₁.name ≠ b₂.name) :
+theorem one_cons (b₁ b₂ l₂) (h_no_dup : b₁.name ≠ b₂.name) :
   merge [b₁] (b₂::l₂) =
     if b₁.name < b₂.name then
       b₁ :: b₂ :: l₂
@@ -302,7 +302,7 @@ theorem merge_one_cons (b₁ b₂ l₂) (h_no_dup : b₁.name ≠ b₂.name) :
       b₂ :: merge [b₁] l₂ := by
   simp only [merge, ↓reduceIte, h_no_dup]
 
-theorem merge_mem (l₁ l₂ : Bases) (b : Base) :
+theorem mem (l₁ l₂ : Bases) (b : Base) :
   b ∈ merge l₁ l₂ →
     (∃ b', (b' ∈ l₁ ∨ b' ∈ l₂) ∧ b'.exponent = b.exponent ∧
     b'.name = b.name)
@@ -481,15 +481,15 @@ theorem merge_mem (l₁ l₂ : Bases) (b : Base) :
                 · exact h_sum
 
 /-- lemma about membership of merged bases, to handle sorted proof -/
-theorem merge_mem_name (l₁ l₂ : Bases) (b : Base) :
+theorem mem_name (l₁ l₂ : Bases) (b : Base) :
   b ∈ merge l₁ l₂ → ∃ b', (b' ∈ l₁ ∨ b' ∈ l₂) ∧ b'.name = b.name := by
-  have h := merge_mem l₁ l₂ b
+  have h := mem l₁ l₂ b
   intro h_b
   specialize h h_b
   aesop
 
 /-- Two merges of sorted exponent list are sorted -/
-theorem merge_sorted (l₁ l₂ : Bases) (h₁ : Sorted l₁) (h₂ : Sorted l₂) : Sorted (merge l₁ l₂) := by
+theorem sorted (l₁ l₂ : Bases) (h₁ : Sorted l₁) (h₂ : Sorted l₂) : Sorted (merge l₁ l₂) := by
   induction l₁ generalizing l₂ with
   | nil => simp_all only [merge]
   | cons x xs xh =>
@@ -528,7 +528,7 @@ theorem merge_sorted (l₁ l₂ : Bases) (h₁ : Sorted l₁) (h₂ : Sorted l�
           rw [List.pairwise_cons] at ⊢ h₃ h₄
           constructor
           · intro b h_b
-            apply merge_mem_name at h_b
+            apply mem_name at h_b
             obtain ⟨b', h_b', h_name⟩ := h_b
             cases h_b' with
             | inl h_b'_in_xs =>
@@ -545,7 +545,7 @@ theorem merge_sorted (l₁ l₂ : Bases) (h₁ : Sorted l₁) (h₂ : Sorted l�
           rw [Sorted.cons]
           constructor
           · intro b h_b
-            apply merge_mem_name at h_b
+            apply mem_name at h_b
             obtain ⟨b', h_b', h_name⟩ := h_b
             cases h_b' with
             | inl h_b'_in_xs =>
@@ -573,7 +573,7 @@ theorem merge_sorted (l₁ l₂ : Bases) (h₁ : Sorted l₁) (h₂ : Sorted l�
           rw [Sorted.cons]
           constructor
           · intro b h_b
-            apply merge_mem_name at h_b
+            apply mem_name at h_b
             obtain ⟨b', h_b', h_name⟩ := h_b
             cases h_b' with
             | inl h_b'_in_x_xs =>
@@ -599,8 +599,8 @@ theorem merge_sorted (l₁ l₂ : Bases) (h₁ : Sorted l₁) (h₂ : Sorted l�
             exact yh h₂.2
 
 /-- Merge of two base lists are nodup -/
-theorem merge_nodup (l₁ l₂ : Bases) (h₁ : Sorted l₁) (h₂ : Sorted l₂) : Nodup (merge l₁ l₂) :=
-  sorted_imp_nodup (merge l₁ l₂) (merge_sorted l₁ l₂ h₁ h₂)
+theorem nodup (l₁ l₂ : Bases) (h₁ : Sorted l₁) (h₂ : Sorted l₂) : Nodup (merge l₁ l₂) :=
+  (sorted l₁ l₂ h₁ h₂).nodup
 
 /--
 If two lists of bases have no duplicated base names inter-between them,
@@ -608,7 +608,7 @@ then all their members are preserved when merging them.
 This is not true in general, as merging two lists with the same base name
 will result in a single base with the sum of their exponents.
 -/
-theorem merge_mem_no_dup (l₁ l₂ : Bases) (b : Base)
+theorem mem_no_dup (l₁ l₂ : Bases) (b : Base)
  (no_dup : ∀ b₁ b₂ : Base, b₁∈l₁ → b₂∈l₂ → b₁.name ≠ b₂.name) :
   b ∈ l₁ ∨ b ∈ l₂ ↔ b ∈ merge l₁ l₂ := by
   induction l₁ generalizing l₂ with
@@ -619,12 +619,12 @@ theorem merge_mem_no_dup (l₁ l₂ : Bases) (b : Base)
       | cons y ys yh =>
         have x_ne_y : x.name ≠ y.name := by simp [no_dup]
         specialize xh (y::ys)
-        rw [merge_cons_no_dup x y xs ys x_ne_y]
+        rw [cons_no_dup x y xs ys x_ne_y]
         aesop
 
 
 /-- Merges are commutative -/
-theorem merge_comm (l₁ l₂ : Bases) : merge l₁ l₂ = merge l₂ l₁ := by
+theorem comm (l₁ l₂ : Bases) : merge l₁ l₂ = merge l₂ l₁ := by
   induction l₁ generalizing l₂ with
    | nil => simp
    | cons x xs xh =>
@@ -643,15 +643,13 @@ theorem merge_comm (l₁ l₂ : Bases) : merge l₁ l₂ = merge l₂ l₁ := by
 /--
 Used to simplify proofs about merge associativity.
 -/
-theorem exponentOf_merge (l₁ l₂ : Bases) (h₁ : Sorted l₁) (h₂ : Sorted l₂) (name : String) :
+theorem exp_eq (l₁ l₂ : Bases) (h₁ : Sorted l₁) (h₂ : Sorted l₂) (name : String) :
     exponentOf name (merge l₁ l₂) = exponentOf name l₁ + exponentOf name l₂ := by
   induction l₁ generalizing l₂ with
-  | nil =>
-    simp [exponentOf]
+  | nil => simp [exponentOf]
   | cons x xs IHxs =>
     induction l₂ with
-    | nil =>
-      simp [exponentOf]
+    | nil => simp [exponentOf]
     | cons y ys IHys =>
       obtain ⟨hx_min, hx_sorted⟩ := Sorted.cons.mp h₁
       obtain ⟨hy_min, hy_sorted⟩ := Sorted.cons.mp h₂
@@ -662,25 +660,25 @@ theorem exponentOf_merge (l₁ l₂ : Bases) (h₁ : Sorted l₁) (h₂ : Sorted
           simp only [h, if_pos,h_merge]
           by_cases h_x_name : name = x.name
           · have h_y_name : name = y.name := by rw [h] at h_x_name; exact h_x_name
-            rw [exponentOf_cons_eq x xs name h_x_name.symm]
-            rw [exponentOf_cons_eq y ys name h_y_name.symm]
+            rw [exponentOf.cons_eq x xs name h_x_name.symm]
+            rw [exponentOf.cons_eq y ys name h_y_name.symm]
             rw [IHxs ys hx_sorted hy_sorted]
             have h_exp_xs_eq_zero: exponentOf name xs = 0 := by
-              apply exponentOf_eq_zero
+              apply exponentOf.eq_zero
               intro b hb_in_xs
               have : x.name < b.name := hx_min b hb_in_xs
               rw [←h_x_name] at this
               exact Ne.symm (ne_of_lt this)
             have h_exp_ys_eq_zero: exponentOf name ys = 0 := by
-              apply exponentOf_eq_zero
+              apply exponentOf.eq_zero
               intro b hb_in_ys
               have : y.name < b.name := hy_min b hb_in_ys
               rw [←h_y_name] at this
               exact Ne.symm (ne_of_lt this)
             rw [h_exp_xs_eq_zero, h_exp_ys_eq_zero, add_zero]
             exact Eq.symm ((Base.merge.eq_none_iff y.name x.exponent y.exponent).mp h_merge)
-          · rw [exponentOf_cons_neq x xs name (Ne.symm h_x_name)]
-            rw [exponentOf_cons_neq y ys name (by rw [←h]; exact Ne.symm h_x_name)]
+          · rw [exponentOf.cons_neq x xs name (Ne.symm h_x_name)]
+            rw [exponentOf.cons_neq y ys name (by rw [←h]; exact Ne.symm h_x_name)]
             exact IHxs ys hx_sorted hy_sorted
         | some z =>
           simp only [h, if_pos,h_merge]
@@ -691,26 +689,26 @@ theorem exponentOf_merge (l₁ l₂ : Bases) (h₁ : Sorted l₁) (h₂ : Sorted
           by_cases h_x_name : name = x.name
           · have h_y_name : name = y.name := by rw [h] at h_x_name; exact h_x_name
             have h_z_name : name = z.name := by rw [h_x_name]; exact z_eq_x.symm
-            rw [exponentOf_cons_eq x xs name h_x_name.symm]
-            rw [exponentOf_cons_eq y ys name h_y_name.symm]
-            rw [exponentOf_cons_eq z (merge xs ys) name h_z_name.symm]
+            rw [exponentOf.cons_eq x xs name h_x_name.symm]
+            rw [exponentOf.cons_eq y ys name h_y_name.symm]
+            rw [exponentOf.cons_eq z (merge xs ys) name h_z_name.symm]
             exact Base.merge.eq_some_imp_exponent_eq_add y.name x.exponent y.exponent z h_merge
-          · rw [exponentOf_cons_neq x xs name (Ne.symm h_x_name)]
-            rw [exponentOf_cons_neq y ys name (by rw [←h]; exact Ne.symm h_x_name)]
+          · rw [exponentOf.cons_neq x xs name (Ne.symm h_x_name)]
+            rw [exponentOf.cons_neq y ys name (by rw [←h]; exact Ne.symm h_x_name)]
             rw [← z_eq_x] at h_x_name
-            rw [exponentOf_cons_neq z (merge xs ys) name (Ne.symm h_x_name)]
+            rw [exponentOf.cons_neq z (merge xs ys) name (Ne.symm h_x_name)]
             exact IHxs ys hx_sorted hy_sorted
       · by_cases hlt : x.name < y.name
         · simp [h, hlt]
           by_cases h_x_name : name = x.name
-          · rw [exponentOf_cons_eq x xs name h_x_name.symm]
+          · rw [exponentOf.cons_eq x xs name h_x_name.symm]
             have h_neq_y : name ≠ y.name := by
               rw [h_x_name]
               exact h
-            rw [exponentOf_cons_neq y ys name h_neq_y.symm]
-            rw [exponentOf_cons_eq x (merge xs (y::ys)) name h_x_name.symm]
+            rw [exponentOf.cons_neq y ys name h_neq_y.symm]
+            rw [exponentOf.cons_eq x (merge xs (y::ys)) name h_x_name.symm]
             have h_exp_ys_eq_zero: exponentOf name ys = 0 := by
-              apply exponentOf_eq_zero
+              apply exponentOf.eq_zero
               intro b hb_in_ys
               have : name < b.name := by
                 calc name = x.name := h_x_name
@@ -718,19 +716,19 @@ theorem exponentOf_merge (l₁ l₂ : Bases) (h₁ : Sorted l₁) (h₂ : Sorted
                   _ < b.name := hy_min b hb_in_ys
               exact Ne.symm (ne_of_lt this)
             rw [h_exp_ys_eq_zero, add_zero]
-          · rw [exponentOf_cons_neq x xs name (Ne.symm h_x_name)]
-            rw [exponentOf_cons_neq x (merge xs (y::ys)) name (Ne.symm h_x_name)]
+          · rw [exponentOf.cons_neq x xs name (Ne.symm h_x_name)]
+            rw [exponentOf.cons_neq x (merge xs (y::ys)) name (Ne.symm h_x_name)]
             exact IHxs (y::ys) hx_sorted (Sorted.cons.mpr ⟨hy_min, hy_sorted⟩)
         · simp [h, hlt]
           by_cases h_y_name : name = y.name
-          · rw [exponentOf_cons_eq y ys name h_y_name.symm]
+          · rw [exponentOf.cons_eq y ys name h_y_name.symm]
             have h_neq_x : name ≠ x.name := by
               rw [h_y_name]
               exact Ne.symm h
-            rw [exponentOf_cons_neq x xs name h_neq_x.symm]
-            rw [exponentOf_cons_eq y (merge (x::xs) ys) name h_y_name.symm]
+            rw [exponentOf.cons_neq x xs name h_neq_x.symm]
+            rw [exponentOf.cons_eq y (merge (x::xs) ys) name h_y_name.symm]
             have h_exp_xs_eq_zero: exponentOf name xs = 0 := by
-              apply exponentOf_eq_zero
+              apply exponentOf.eq_zero
               intro b hb_in_xs
               have : name < b.name := by
                 calc name = y.name := h_y_name
@@ -738,26 +736,28 @@ theorem exponentOf_merge (l₁ l₂ : Bases) (h₁ : Sorted l₁) (h₂ : Sorted
                   _ < b.name := hx_min b hb_in_xs
               exact Ne.symm (ne_of_lt this)
             rw [h_exp_xs_eq_zero, zero_add]
-          · rw [exponentOf_cons_neq y ys name (Ne.symm h_y_name)]
-            rw [exponentOf_cons_neq y (merge (x::xs) ys) name (Ne.symm h_y_name)]
+          · rw [exponentOf.cons_neq y ys name (Ne.symm h_y_name)]
+            rw [exponentOf.cons_neq y (merge (x::xs) ys) name (Ne.symm h_y_name)]
             exact IHys hy_sorted
 
 /-- Merges are associative for sorted lists. -/
-theorem merge_assoc (l₁ l₂ l₃ : Bases)
+theorem assoc (l₁ l₂ l₃ : Bases)
     (h₁ : Sorted l₁) (h₂ : Sorted l₂) (h₃ : Sorted l₃) :
     merge (merge l₁ l₂) l₃ = merge l₁ (merge l₂ l₃) := by
-  have sorted12 := merge_sorted l₁ l₂ h₁ h₂
-  have sorted23 := merge_sorted l₂ l₃ h₂ h₃
-  have left_sorted := merge_sorted (merge l₁ l₂) l₃ sorted12 h₃
-  have right_sorted := merge_sorted l₁ (merge l₂ l₃) h₁ sorted23
-  apply (exponentOf_eq_iff (merge (merge l₁ l₂) l₃) (merge l₁ (merge l₂ l₃))
+  have sorted12 := sorted l₁ l₂ h₁ h₂
+  have sorted23 := sorted l₂ l₃ h₂ h₃
+  have left_sorted := sorted (merge l₁ l₂) l₃ sorted12 h₃
+  have right_sorted := sorted l₁ (merge l₂ l₃) h₁ sorted23
+  apply (exponentOf.eq_iff (merge (merge l₁ l₂) l₃) (merge l₁ (merge l₂ l₃))
         left_sorted right_sorted).mp
   intro name
-  have h_left := exponentOf_merge (merge l₁ l₂) l₃ sorted12 h₃ name
-  have h_right := exponentOf_merge l₁ (merge l₂ l₃) h₁ sorted23 name
-  rw [exponentOf_merge l₁ l₂ h₁ h₂ name] at h_left
-  rw [exponentOf_merge l₂ l₃ h₂ h₃ name] at h_right
+  have h_left := exp_eq (merge l₁ l₂) l₃ sorted12 h₃ name
+  have h_right := exp_eq l₁ (merge l₂ l₃) h₁ sorted23 name
+  rw [exp_eq l₁ l₂ h₁ h₂ name] at h_left
+  rw [exp_eq l₂ l₃ h₂ h₃ name] at h_right
   rw [h_left, h_right]
   rw [add_assoc]
+
+end merge
 
 end Units.Dimension.Bases

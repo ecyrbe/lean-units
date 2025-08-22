@@ -80,7 +80,7 @@ def mul (d₁ d₂ : Dimension) : Dimension :=
   {
     elements := Bases.merge d₁.elements d₂.elements,
     is_sorted := by
-      apply Bases.merge_sorted
+      apply Bases.merge.sorted
       · exact d₁.is_sorted
       · exact d₂.is_sorted
   }
@@ -117,7 +117,7 @@ instance : Pow Dimension ℚ where
 theorem one_mul' (d : Dimension) : mul dimensionless d = d := by
   unfold mul dimensionless
   rw [eq_iff_elements_eq]
-  apply Bases.merge_nil_self_eq_self
+  apply Bases.merge.nil_self_eq_self
 
 theorem one_mul (d : Dimension) : 1 * d = d := by
   exact one_mul' d
@@ -125,7 +125,7 @@ theorem one_mul (d : Dimension) : 1 * d = d := by
 theorem mul_one' (d : Dimension) : mul d dimensionless = d := by
   unfold mul dimensionless
   rw [eq_iff_elements_eq]
-  apply Bases.merge_self_nil_eq_self
+  apply Bases.merge.self_nil_eq_self
 
 theorem mul_one (d : Dimension) : d * 1 = d := by
   exact mul_one' d
@@ -133,7 +133,7 @@ theorem mul_one (d : Dimension) : d * 1 = d := by
 theorem mul_comm' (d₁ d₂ : Dimension) : mul d₁ d₂ = mul d₂ d₁ := by
   unfold mul
   rw [eq_iff_elements_eq]
-  apply Bases.merge_comm d₁.elements d₂.elements
+  apply Bases.merge.comm d₁.elements d₂.elements
 
 theorem mul_comm (d₁ d₂ : Dimension) : d₁ * d₂ = d₂ * d₁ := by
   exact mul_comm' d₁ d₂
