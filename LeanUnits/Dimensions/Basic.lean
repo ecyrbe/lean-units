@@ -28,41 +28,6 @@ theorem eq_iff_elements_eq (d₁ d₂ : Dimension) :
   · intro h
     exact Dimension.ext h
 
-/--
-Merges two sorted lists of `Base` elements, removing duplicates and summing exponents.
-If summed exponents are zero, they are also removed
-
-This means that if b ∈ l₁ ∨ b ∈ l₂ we can't conclude that b ∈ merge l₁ l₂ and vice versa
-But we have :
-• a ∈ l₁, b ∈ l₂, a.name ≠ b.name → a ∈ merge l₁ l₂ ∧ b ∈ merge l₁ l₂
--/
-def mulExponents (l : Bases) (n : ℚ) : Bases :=
-  if n_ne_zero: n = 0 then
-    []
-  else if n = 1 then
-    l
-  else
-    l.map fun e => {
-      name := e.name,
-      exponent := e.exponent * n,
-      not_zero := by
-        rw [mul_ne_zero_iff]
-        constructor
-        · exact e.not_zero
-        · exact n_ne_zero
-    }
-
-theorem mulExponents_sorted (l : Bases) (n : ℚ) (h : Bases.Sorted l) :
-  Bases.Sorted (mulExponents l n) := by
-  unfold mulExponents
-  split
-  · exact List.Pairwise.nil
-  · split
-    · exact h
-    · apply List.Pairwise.map
-      · intro a b h_lt
-        exact h_lt
-      · exact h
 
 def dimensionless : Dimension :=
   {
@@ -87,14 +52,17 @@ def mul (d₁ d₂ : Dimension) : Dimension :=
 
 def pow (d : Dimension) (n : ℚ) : Dimension :=
   {
-    elements := mulExponents d.elements n,
+    elements := Bases.qmul d.elements n,
     is_sorted := by
-      apply mulExponents_sorted
+      apply Bases.qmul.sorted
       exact d.is_sorted
   }
 
+def inv (d : Dimension) : Dimension :=
+  pow d (-1)
+
 def div (d₁ d₂ : Dimension) : Dimension :=
-  mul d₁ (pow d₂ (-1))
+  mul d₁ (inv d₂)
 
 instance : Inhabited Dimension where
   default := dimensionless
@@ -113,6 +81,9 @@ instance : Div Dimension where
 
 instance : Pow Dimension ℚ where
   pow := Dimension.pow
+
+instance : Inv Dimension where
+  inv d := pow d (-1)
 
 theorem one_mul' (d : Dimension) : mul dimensionless d = d := by
   unfold mul dimensionless
@@ -138,15 +109,35 @@ theorem mul_comm' (d₁ d₂ : Dimension) : mul d₁ d₂ = mul d₂ d₁ := by
 theorem mul_comm (d₁ d₂ : Dimension) : d₁ * d₂ = d₂ * d₁ := by
   exact mul_comm' d₁ d₂
 
--- theorem mul_inv' (d : Dimension) : mul d (pow d (-1)) = 1 := by sorry
+theorem mul_assoc' (d₁ d₂ d₃ : Dimension) : mul (mul d₁ d₂) d₃ = mul d₁ (mul d₂ d₃) := by
+  unfold mul
+  rw [eq_iff_elements_eq]
+  apply Bases.merge.assoc d₁.elements d₂.elements d₃.elements d₁.is_sorted d₂.is_sorted d₃.is_sorted
 
--- theorem mul_inv (d : Dimension) : d * d ^ (-1:ℚ) = 1 := by
---   exact mul_inv' d
+theorem mul_assoc (d₁ d₂ d₃ : Dimension) : (d₁ * d₂) * d₃ = d₁ * (d₂ * d₃) := by
+  exact mul_assoc' d₁ d₂ d₃
 
--- theorem inv_mul' (d : Dimension) : mul (pow d (-1)) d = 1 := by sorry
+theorem mul_inv_cancel' (d : Dimension) : mul d (pow d (-1)) = 1 := by
+  unfold mul pow
+  rw [eq_iff_elements_eq]
+  apply Bases.merge_qmul_inv d.elements d.is_sorted
 
--- theorem inv_mul (d : Dimension) : d ^ (-1:ℚ) * d = 1 := by
---   exact inv_mul' d
+theorem mul_inv_cancel (d : Dimension) : d * d ^ (-1:ℚ) = 1 := by
+  exact mul_inv_cancel' d
+
+theorem inv_mul_cancel' (d : Dimension) : mul (pow d (-1)) d = 1 := by
+  rw [mul_comm', mul_inv_cancel']
+
+theorem inv_mul_cancel (d : Dimension) : d ^ (-1:ℚ) * d = 1 := by
+  exact inv_mul_cancel' d
+
+instance instCommGroup : CommGroup Dimension where
+  mul_assoc := mul_assoc
+  one_mul := one_mul
+  mul_one := mul_one
+  mul_comm := mul_comm
+  inv := inv
+  inv_mul_cancel := inv_mul_cancel
 
 instance : Repr Dimension where
   reprPrec d _ :=

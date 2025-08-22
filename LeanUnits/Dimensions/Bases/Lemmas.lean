@@ -760,4 +760,52 @@ theorem assoc (l₁ l₂ l₃ : Bases)
 
 end merge
 
+namespace qmul
+
+theorem sorted (l : Bases) (n : ℚ) (h : Bases.Sorted l) :
+  Bases.Sorted ( l.qmul n) := by
+  unfold qmul
+  split
+  · exact List.Pairwise.nil
+  · split
+    · exact h
+    · apply List.Pairwise.map
+      · intro a b h_lt
+        exact h_lt
+      · exact h
+
+theorem exp_eq_mul (l : Bases) (n : ℚ) (name : String) :
+  exponentOf name (l.qmul n) = n * exponentOf name l := by
+  induction l with
+  | nil =>
+      by_cases h0 : n = 0
+      · simp [qmul, h0, exponentOf]
+      · by_cases h1 : n = 1
+        · simp [qmul, h1, exponentOf]
+        · simp [qmul, h0, h1, exponentOf]
+  | cons x xs ih =>
+      by_cases h0 : n = 0
+      · simp [qmul, h0, exponentOf]
+      · by_cases h1 : n = 1
+        · simp [qmul, h1, exponentOf]
+        · by_cases hx : x.name = name
+          · simp [qmul, h0, h1, hx, mul_comm]
+          · simpa [qmul, h0, h1, hx] using ih
+
+end qmul
+
+theorem merge_qmul_inv (l : Bases) (h_sorted : Sorted l) :
+  merge l (l.qmul (-1)) = [] := by
+  have hq := qmul.sorted l (-1) h_sorted
+  have hleft := merge.sorted l (l.qmul (-1)) h_sorted hq
+  apply (exponentOf.eq_iff (merge l (l.qmul (-1))) [] hleft Sorted.nil).mp
+  intro name
+  have h1 := merge.exp_eq_add l (l.qmul (-1)) h_sorted hq name
+  have h2 := qmul.exp_eq_mul l (-1) name
+  calc
+    exponentOf name (merge l (l.qmul (-1))) =
+        exponentOf name l + exponentOf name (l.qmul (-1)) := by rw [h1]
+    _ = exponentOf name l + (-1) * exponentOf name l := by rw [h2]
+    _ = exponentOf name [] := by simp [exponentOf]
+
 end Units.Dimension.Bases
