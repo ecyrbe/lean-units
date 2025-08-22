@@ -779,33 +779,38 @@ theorem exp_eq_mul (l : Bases) (n : ℚ) (name : String) :
   induction l with
   | nil =>
       by_cases h0 : n = 0
-      · simp [qmul, h0, exponentOf]
+      · simp only [exponentOf, qmul, h0, ↓reduceDIte, List.find?_nil, mul_zero]
       · by_cases h1 : n = 1
-        · simp [qmul, h1, exponentOf]
-        · simp [qmul, h0, h1, exponentOf]
+        · simp only [exponentOf, qmul, h1, one_ne_zero, ↓reduceDIte, ↓reduceIte, List.find?_nil,
+          mul_zero]
+        · simp only [exponentOf, qmul, h0, ↓reduceDIte, h1, ↓reduceIte, List.map_nil,
+          List.find?_nil, mul_zero]
   | cons x xs ih =>
       by_cases h0 : n = 0
-      · simp [qmul, h0, exponentOf]
+      · simp only [exponentOf, qmul, h0, ↓reduceDIte, List.find?_nil, zero_mul]
       · by_cases h1 : n = 1
-        · simp [qmul, h1, exponentOf]
+        · simp only [exponentOf, qmul, h1, one_ne_zero, ↓reduceDIte, ↓reduceIte, one_mul]
         · by_cases hx : x.name = name
-          · simp [qmul, h0, h1, hx, mul_comm]
-          · simpa [qmul, h0, h1, hx] using ih
+          · simp only [qmul, h0, ↓reduceDIte, h1, ↓reduceIte, mul_comm, List.map_cons, hx,
+            exponentOf.cons_eq]
+          · simpa only [qmul, h0, ↓reduceDIte, h1, ↓reduceIte, List.map_cons,
+            ne_eq, hx, not_false_eq_true, exponentOf.cons_neq] using ih
+
 
 end qmul
 
 theorem merge_qmul_inv (l : Bases) (h_sorted : Sorted l) :
   merge l (l.qmul (-1)) = [] := by
-  have hq := qmul.sorted l (-1) h_sorted
-  have hleft := merge.sorted l (l.qmul (-1)) h_sorted hq
+  have hq_sorted := qmul.sorted l (-1) h_sorted
+  have hleft := merge.sorted l (l.qmul (-1)) h_sorted hq_sorted
   apply (exponentOf.eq_iff (merge l (l.qmul (-1))) [] hleft Sorted.nil).mp
   intro name
-  have h1 := merge.exp_eq_add l (l.qmul (-1)) h_sorted hq name
-  have h2 := qmul.exp_eq_mul l (-1) name
   calc
     exponentOf name (merge l (l.qmul (-1))) =
-        exponentOf name l + exponentOf name (l.qmul (-1)) := by rw [h1]
-    _ = exponentOf name l + (-1) * exponentOf name l := by rw [h2]
-    _ = exponentOf name [] := by simp [exponentOf]
+    exponentOf name l + exponentOf name (l.qmul (-1)) :=
+      by rw [merge.exp_eq_add l (l.qmul (-1)) h_sorted hq_sorted name]
+    _ = exponentOf name l + (-1) * exponentOf name l := by rw [qmul.exp_eq_mul l (-1) name]
+    _ = exponentOf name [] := by simp only [exponentOf, neg_mul, one_mul, add_neg_cancel,
+      List.find?_nil]
 
 end Units.Dimension.Bases
