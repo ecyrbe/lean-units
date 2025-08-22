@@ -712,9 +712,10 @@ theorem exponentOf_merge (l₁ l₂ : Bases) (h₁ : Sorted l₁) (h₂ : Sorted
             have h_exp_ys_eq_zero: exponentOf name ys = 0 := by
               apply exponentOf_eq_zero
               intro b hb_in_ys
-              have : y.name < b.name := hy_min b hb_in_ys
-              have : x.name < b.name := lt_trans hlt this
-              rw [←h_x_name] at this
+              have : name < b.name := by
+                calc name = x.name := h_x_name
+                  _ < y.name := hlt
+                  _ < b.name := hy_min b hb_in_ys
               exact Ne.symm (ne_of_lt this)
             rw [h_exp_ys_eq_zero, add_zero]
           · rw [exponentOf_cons_neq x xs name (Ne.symm h_x_name)]
@@ -731,10 +732,10 @@ theorem exponentOf_merge (l₁ l₂ : Bases) (h₁ : Sorted l₁) (h₂ : Sorted
             have h_exp_xs_eq_zero: exponentOf name xs = 0 := by
               apply exponentOf_eq_zero
               intro b hb_in_xs
-              have hxlt : x.name < b.name := hx_min b hb_in_xs
-              have hyle : y.name ≤ x.name := le_of_not_gt hlt
-              have hylt : y.name < b.name := lt_of_le_of_lt hyle hxlt
-              have : name < b.name := by simpa [h_y_name] using hylt
+              have : name < b.name := by
+                calc name = y.name := h_y_name
+                  _ ≤ x.name := le_of_not_gt hlt
+                  _ < b.name := hx_min b hb_in_xs
               exact Ne.symm (ne_of_lt this)
             rw [h_exp_xs_eq_zero, zero_add]
           · rw [exponentOf_cons_neq y ys name (Ne.symm h_y_name)]
