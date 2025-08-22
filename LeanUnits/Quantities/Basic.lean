@@ -1,4 +1,4 @@
-import LeanUnits.Dimensions.Normal
+import LeanUnits.Dimensions.Basic
 import LeanUnits.Math
 
 namespace Units

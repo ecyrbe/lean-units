@@ -18,7 +18,7 @@ theorem neq_iff (b₁ b₂ : Base) : b₁ ≠ b₂ ↔ b₁.name ≠ b₂.name �
     rw [not_and_or] at h_eq
     exact h_eq
 
-theorem merge.eq_some (b : String) (e₁ e₂ : ℚ) : (merge b e₁ e₂).isSome ↔ e₁ + e₂ ≠ 0 := by
+theorem merge.eq_some_iff (b : String) (e₁ e₂ : ℚ) : (merge b e₁ e₂).isSome ↔ e₁ + e₂ ≠ 0 := by
   unfold merge
   constructor
   · intro h_eq
@@ -27,6 +27,15 @@ theorem merge.eq_some (b : String) (e₁ e₂ : ℚ) : (merge b e₁ e₂).isSom
     split
     · contradiction
     · simp
+
+theorem merge.eq_none_iff (b : String) (e₁ e₂ : ℚ) : merge b e₁ e₂ = none ↔ e₁ + e₂ = 0 := by
+  unfold merge
+  constructor
+  · intro h_eq
+    simp at h_eq
+    exact h_eq
+  · intro h
+    simp [h]
 
 theorem merge.eq_some_imp_name_eq (b : String) (e₁ e₂ : ℚ) :
   ∀ z, merge b e₁ e₂ = some z → z.name = b := by
