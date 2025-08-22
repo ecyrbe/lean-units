@@ -755,9 +755,8 @@ theorem merge_assoc (l₁ l₂ l₃ : Bases)
   intro name
   have h_left := exponentOf_merge (merge l₁ l₂) l₃ sorted12 h₃ name
   have h_right := exponentOf_merge l₁ (merge l₂ l₃) h₁ sorted23 name
-  have h12 := exponentOf_merge l₁ l₂ h₁ h₂ name
-  have h23 := exponentOf_merge l₂ l₃ h₂ h₃ name
-  simp [h12, h23] at h_left h_right
+  rw [exponentOf_merge l₁ l₂ h₁ h₂ name] at h_left
+  rw [exponentOf_merge l₂ l₃ h₂ h₃ name] at h_right
   rw [h_left, h_right]
   rw [add_assoc]
 
