@@ -55,6 +55,40 @@ theorem sorted_imp_nodup (l : Bases) : Sorted l → Nodup l := by
   intro h
   exact List.Pairwise.imp ne_of_lt h
 
+theorem base_eq_iff_sorted_name_eq {l : Bases} (h_sorted : Sorted l) (b₁ b₂ : Base) :
+  b₁ ∈ l → b₂ ∈ l → (b₁ = b₂ ↔ b₁.name = b₂.name) := by
+  intro h_b1 h_b2
+  constructor
+  · intro h_eq; rw [h_eq]
+  · intro h_name_eq
+    induction l with
+    | nil => cases h_b1
+    | cons x xs ih =>
+      rw [Sorted.cons] at h_sorted
+      have hxlt : ∀ b' ∈ xs, x.name < b'.name := h_sorted.1
+      have hs : Sorted xs := h_sorted.2
+      simp [List.mem_cons] at h_b1 h_b2
+      cases h_b1 with
+      | inl hb1eq =>
+        subst hb1eq
+        cases h_b2 with
+        | inl hb2eq =>
+          subst hb2eq
+          rfl
+        | inr hb2in =>
+          have : b₁.name < b₂.name := hxlt b₂ hb2in
+          have : b₁.name < b₁.name := by rw [← h_name_eq] at this; assumption
+          exact False.elim ((lt_irrefl _) this)
+      | inr hb1in =>
+        cases h_b2 with
+        | inl hb2eq =>
+          subst hb2eq
+          have : b₂.name < b₁.name := hxlt b₁ hb1in
+          have : b₂.name < b₂.name := by rw [h_name_eq] at this; assumption
+          exact False.elim ((lt_irrefl _) this)
+        | inr hb2in =>
+          exact ih hs hb1in hb2in
+
 theorem eq_of_sorted_of_same_elements {l1 l2 : Bases} (h1 : Sorted l1) (h2 : Sorted l2)
     (h : ∀ b, b ∈ l1 ↔ b ∈ l2) : l1 = l2 := by
   induction l1 generalizing l2 with
@@ -282,113 +316,14 @@ theorem merge_one_cons (b₁ b₂ l₂) (h_no_dup : b₁.name ≠ b₂.name) :
       b₂ :: merge [b₁] l₂ := by
   simp only [merge, ↓reduceIte, h_no_dup]
 
-/-- lemma about membership of merged bases, to handle sorted proof -/
-theorem merge_mem_name (l₁ l₂ : Bases) (b : Base) :
-  b ∈ merge l₁ l₂ → ∃ b', (b' ∈ l₁ ∨ b' ∈ l₂) ∧ b'.name = b.name := by
-  induction l₁ generalizing l₂ with
-  | nil => aesop
-  | cons x xs xh =>
-    induction l₂ with
-    | nil => aesop
-    | cons y ys yh =>
-      unfold merge
-      by_cases h : x.name = y.name
-      -- x.name = y.name
-      · cases h_base_merge: Base.merge x.name x.exponent y.exponent with
-        | none =>
-          specialize xh ys
-          aesop
-        | some z =>
-          have z_eq_x : z.name = x.name := by
-            apply Base.merge.eq_some_imp_name_eq x.name x.exponent y.exponent
-            exact h_base_merge
-          rw [if_pos h, List.mem_cons]
-          intro h_b
-          cases h_b with
-          | inl h_b_eq_z =>
-            rw [h_b_eq_z]
-            use x
-            aesop
-          | inr h_b_in_merge =>
-            specialize xh ys
-            apply xh at h_b_in_merge
-            obtain ⟨b', h_b', h_name⟩ := h_b_in_merge
-            rw [←h_name]
-            use b'
-            cases h_b' with
-            | inl b'_in_xs =>
-              constructor
-              · left
-                exact List.mem_cons_of_mem x b'_in_xs
-              · rfl
-            | inr b'_in_ys =>
-              constructor
-              · right
-                exact List.mem_cons_of_mem y b'_in_ys
-              · rfl
-      -- x.name ≠ y.name
-      · by_cases h_lt : x.name < y.name
-        -- x.name < y.name
-        · rw [if_pos h_lt]
-          simp only [h, if_false, List.mem_cons]
-          intro h_b
-          cases h_b with
-          | inl h_b_eq_x =>
-            rw [h_b_eq_x]
-            use x
-            constructor
-            · left; left; rfl
-            · rfl
-          | inr h_b_in_merge =>
-            specialize xh (y :: ys)
-            apply xh at h_b_in_merge
-            obtain ⟨b', h_b', h_name⟩ := h_b_in_merge
-            rw [←h_name]
-            use b'
-            cases h_b' with
-            | inl b'_in_xs =>
-              constructor
-              · left; right; assumption
-              · rfl
-            | inr b'_in_ys =>
-              rw [List.mem_cons] at b'_in_ys
-              constructor
-              · right; assumption
-              · rfl
-        -- x.name > y.name
-        · rw [if_neg h_lt]
-          simp only [h, if_false, List.mem_cons]
-          intro h_b
-          cases h_b with
-          | inl h_b_eq_y =>
-            rw [h_b_eq_y]
-            use y
-            constructor
-            · right; left; rfl
-            · rfl
-          | inr h_b_in_merge =>
-            apply yh at h_b_in_merge
-            obtain ⟨b', h_b', h_name⟩ := h_b_in_merge
-            rw [←h_name]
-            use b'
-            cases h_b' with
-            | inl b'_in_xs =>
-              constructor
-              · left; rw [List.mem_cons] at b'_in_xs; assumption
-              · rfl
-            | inr b'_in_ys =>
-              constructor
-              · right; right; assumption
-              · rfl
-
 theorem merge_mem (l₁ l₂ : Bases) (b : Base) :
   b ∈ merge l₁ l₂ →
     (∃ b', (b' ∈ l₁ ∨ b' ∈ l₂) ∧ b'.exponent = b.exponent ∧
-     b'.name = b.name)
+    b'.name = b.name)
     ∨
     (∃ b₁ b₂, b₁ ∈ l₁ ∧ b₂ ∈ l₂ ∧ b₁.exponent + b₂.exponent = b.exponent ∧
-     b₁.name = b.name ∧
-     b₂.name = b.name) := by
+    b₁.name = b.name ∧
+    b₂.name = b.name) := by
   induction l₁ generalizing l₂ with
   | nil => aesop
   | cons x xs xh =>
@@ -447,7 +382,6 @@ theorem merge_mem (l₁ l₂ : Bases) (b : Base) :
                 · constructor
                   · exact Eq.symm (h_z_name h_base_merge)
                   · rw [← h]; exact Eq.symm (h_z_name h_base_merge)
-
           | inr h_b_in_merge =>
             specialize xh ys
             have h_exp := xh h_b_in_merge
@@ -559,6 +493,14 @@ theorem merge_mem (l₁ l₂ : Bases) (b : Base) :
               · constructor
                 · exact List.mem_cons_of_mem y h_b₂_in_ys
                 · exact h_sum
+
+/-- lemma about membership of merged bases, to handle sorted proof -/
+theorem merge_mem_name (l₁ l₂ : Bases) (b : Base) :
+  b ∈ merge l₁ l₂ → ∃ b', (b' ∈ l₁ ∨ b' ∈ l₂) ∧ b'.name = b.name := by
+  have h := merge_mem l₁ l₂ b
+  intro h_b
+  specialize h h_b
+  aesop
 
 /-- Two merges of sorted exponent list are sorted -/
 theorem merge_sorted (l₁ l₂ : Bases) (h₁ : Sorted l₁) (h₂ : Sorted l₂) : Sorted (merge l₁ l₂) := by
@@ -680,7 +622,7 @@ then all their members are preserved when merging them.
 This is not true in general, as merging two lists with the same base name
 will result in a single base with the sum of their exponents.
 -/
-theorem merge_mem (l₁ l₂ : Bases) (b : Base)
+theorem merge_mem_no_dup (l₁ l₂ : Bases) (b : Base)
  (no_dup : ∀ b₁ b₂ : Base, b₁∈l₁ → b₂∈l₂ → b₁.name ≠ b₂.name) :
   b ∈ l₁ ∨ b ∈ l₂ ↔ b ∈ merge l₁ l₂ := by
   induction l₁ generalizing l₂ with
@@ -733,10 +675,13 @@ theorem exponentOf_merge (l₁ l₂ : Bases) (h₁ : Sorted l₁) (h₂ : Sorted
     by_cases h_exp : b.exponent + b'.exponent = 0
     · rw [h_exp, exponentOf_eq_zero_iff (l:=merge l₁ l₂) name]
       intro c hc hc_name
-      have h_merge := Bases.merge_mem_exp l₁ l₂ c hc
+      have h_merge := Bases.merge_mem l₁ l₂ c hc
       cases h_merge with
       | inl h_either =>
         obtain ⟨d, h_d_l₁|h_d_l₂, h_d_exp ⟩ := h_either
+        have h_d_eq_c : d = c := by exact (Base.eq_iff d c).mpr ⟨h_d_exp.2, h_d_exp.1⟩
+        have h_c_in_l₁ : c ∈ l₁ := by rw [←h_d_eq_c]; exact h_d_l₁
+        have h_d_eq_b : c = b := by exact (base_eq_iff_sorted_name_eq h₁ )
       |inr h_sum => sorry
     · sorry
   · push_neg at h_b_l₂
