@@ -49,7 +49,7 @@ theorem name_neq_imp_nodup (l : Bases) :
   | nil => trivial
   | cons x xs xh => simp_all
 
-theorem base_eq_iff_sorted_name_eq {l : Bases} (h_sorted : Sorted l) (b₁ b₂ : Base) :
+theorem eq_iff_sorted_name_eq {l : Bases} (h_sorted : Sorted l) (b₁ b₂ : Base) :
   b₁ ∈ l → b₂ ∈ l → (b₁ = b₂ ↔ b₁.name = b₂.name) := by
   intro h_b1 h_b2
   constructor
@@ -643,7 +643,7 @@ theorem comm (l₁ l₂ : Bases) : merge l₁ l₂ = merge l₂ l₁ := by
 /--
 Used to simplify proofs about merge associativity.
 -/
-theorem exp_eq (l₁ l₂ : Bases) (h₁ : Sorted l₁) (h₂ : Sorted l₂) (name : String) :
+theorem exp_eq_add (l₁ l₂ : Bases) (h₁ : Sorted l₁) (h₂ : Sorted l₂) (name : String) :
     exponentOf name (merge l₁ l₂) = exponentOf name l₁ + exponentOf name l₂ := by
   induction l₁ generalizing l₂ with
   | nil => simp [exponentOf]
@@ -751,10 +751,10 @@ theorem assoc (l₁ l₂ l₃ : Bases)
   apply (exponentOf.eq_iff (merge (merge l₁ l₂) l₃) (merge l₁ (merge l₂ l₃))
         left_sorted right_sorted).mp
   intro name
-  have h_left := exp_eq (merge l₁ l₂) l₃ sorted12 h₃ name
-  have h_right := exp_eq l₁ (merge l₂ l₃) h₁ sorted23 name
-  rw [exp_eq l₁ l₂ h₁ h₂ name] at h_left
-  rw [exp_eq l₂ l₃ h₂ h₃ name] at h_right
+  have h_left := exp_eq_add (merge l₁ l₂) l₃ sorted12 h₃ name
+  have h_right := exp_eq_add l₁ (merge l₂ l₃) h₁ sorted23 name
+  rw [exp_eq_add l₁ l₂ h₁ h₂ name] at h_left
+  rw [exp_eq_add l₂ l₃ h₂ h₃ name] at h_right
   rw [h_left, h_right]
   rw [add_assoc]
 
