@@ -123,7 +123,7 @@ theorem mul_assoc (d₁ d₂ d₃ : Dimension) : (d₁ * d₂) * d₃ = d₁ * (
 theorem mul_inv_cancel' (d : Dimension) : mul d (pow d (-1)) = 1 := by
   unfold mul pow
   rw [eq_iff_elements_eq]
-  apply Bases.merge_qmul_inv d.elements d.is_sorted
+  apply Bases.merge_qmul_inv d.is_sorted
 
 theorem mul_inv_cancel (d : Dimension) : d * d ^ (-1:ℚ) = 1 := by
   exact mul_inv_cancel' d
