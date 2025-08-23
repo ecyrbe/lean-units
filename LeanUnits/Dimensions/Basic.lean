@@ -38,7 +38,7 @@ def dimensionless : Dimension :=
 def ofBase (b : Base) : Dimension :=
   {
     elements := [b],
-    is_sorted := Bases.Sorted.singleton b
+    is_sorted := Bases.Sorted.singleton
   }
 
 def ofString (b : String) : Dimension :=
@@ -47,10 +47,7 @@ def ofString (b : String) : Dimension :=
 def mul (d₁ d₂ : Dimension) : Dimension :=
   {
     elements := Bases.merge d₁.elements d₂.elements,
-    is_sorted := by
-      apply Bases.merge.sorted
-      · exact d₁.is_sorted
-      · exact d₂.is_sorted
+    is_sorted := by apply Bases.merge.sorted d₁.is_sorted d₂.is_sorted
   }
 
 def pow (d : Dimension) (n : ℚ) : Dimension :=
@@ -133,6 +130,22 @@ theorem inv_mul_cancel' (d : Dimension) : mul (pow d (-1)) d = 1 := by
 
 theorem inv_mul_cancel (d : Dimension) : d ^ (-1:ℚ) * d = 1 := by
   exact inv_mul_cancel' d
+
+theorem pow_zero' (d : Dimension) : pow d 0 = dimensionless := by
+  unfold pow dimensionless Bases.qmul
+  rw [eq_iff_elements_eq]
+  simp only [↓reduceDIte]
+
+theorem pow_zero (d : Dimension) : d ^ (0:ℚ) = 1 := by
+  exact pow_zero' d
+
+theorem pow_one' (d : Dimension) : pow d 1 = d := by
+  unfold pow Bases.qmul
+  rw [eq_iff_elements_eq]
+  simp only [one_ne_zero, ↓reduceDIte, ↓reduceIte]
+
+theorem pow_one (d : Dimension) : d ^ (1:ℚ) = d := by
+  exact pow_one' d
 
 instance instCommGroup : CommGroup Dimension where
   mul_assoc := mul_assoc
