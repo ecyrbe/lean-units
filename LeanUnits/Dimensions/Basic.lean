@@ -147,7 +147,7 @@ instance : Repr Dimension where
     if d.elements.isEmpty then
       "∅"
     else
-      String.intercalate "·" (
+      String.intercalate "•" (
         d.elements.map (
           fun (e : Base) => match e.exponent with
           | 1 => e.name
@@ -155,11 +155,19 @@ instance : Repr Dimension where
           | 3 => s!"{e.name}³"
           | 4 => s!"{e.name}⁴"
           | 5 => s!"{e.name}⁵"
+          | 6 => s!"{e.name}⁶"
+          | 7 => s!"{e.name}⁷"
+          | 8 => s!"{e.name}⁸"
+          | 9 => s!"{e.name}⁹"
           | -1 => s!"{e.name}⁻¹"
           | -2 => s!"{e.name}⁻²"
           | -3 => s!"{e.name}⁻³"
           | -4 => s!"{e.name}⁻⁴"
           | -5 => s!"{e.name}⁻⁵"
+          | -6 => s!"{e.name}⁻⁶"
+          | -7 => s!"{e.name}⁻⁷"
+          | -8 => s!"{e.name}⁻⁸"
+          | -9 => s!"{e.name}⁻⁹"
           | _ => s!"{e.name}^{e.exponent}"
         )
       )
@@ -204,11 +212,11 @@ def Empty := Speed / Length * Time
 def Frequency := 1 / Time
 #eval Frequency
 
-def accel1 := Length * Time^(-1: ℚ) / Time * Length / Length
-def accel2 := Length / Time ^ (2:ℚ)
+def accel1 := Length * Time^(-1 :ℚ) / Time * Length / Length
+def accel2 := Length / Time ^ (2 :ℚ)
 
 #eval accel1 == accel2
 #eval accel1 = accel2
-#eval Length * Time^(-1: ℚ) / Time * Length / Length = Length / Time ^ (2:ℚ)
+#eval Length * Time^(-1: ℚ) / Time * Length / Length = Length / Time ^ 2
 
 end Units.Dimension
