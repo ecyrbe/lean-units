@@ -44,13 +44,13 @@ def ofBase (b : Base) : Dimension :=
 def ofString (b : String) : Dimension :=
   ofBase (Base.ofString b)
 
-def mul (d₁ d₂ : Dimension) : Dimension :=
+def add (d₁ d₂ : Dimension) : Dimension :=
   {
     elements := Bases.merge d₁.elements d₂.elements,
     is_sorted := by apply Bases.merge.sorted d₁.is_sorted d₂.is_sorted
   }
 
-def pow (d : Dimension) (n : ℚ) : Dimension :=
+def smul (n : ℚ) (d : Dimension) : Dimension :=
   {
     elements := Bases.qmul d.elements n,
     is_sorted := by
@@ -58,102 +58,152 @@ def pow (d : Dimension) (n : ℚ) : Dimension :=
       exact d.is_sorted
   }
 
-def inv (d : Dimension) : Dimension :=
-  pow d (-1)
+def neg (d : Dimension) : Dimension :=
+  smul (-1) d
 
-def div (d₁ d₂ : Dimension) : Dimension :=
-  mul d₁ (inv d₂)
+def sub (d₁ d₂ : Dimension) : Dimension :=
+  add d₁ (neg d₂)
 
 instance : Inhabited Dimension where
   default := dimensionless
 
-instance : One Dimension where
-  one := dimensionless
+instance : Zero Dimension where
+  zero := dimensionless
 
 instance : EmptyCollection Dimension where
   emptyCollection := dimensionless
 
-instance : Mul Dimension where
-  mul := mul
+instance : Add Dimension where
+  add := add
 
-instance : Div Dimension where
-  div := div
+instance : Sub Dimension where
+  sub := sub
 
-instance : Pow Dimension ℚ where
-  pow := Dimension.pow
+instance : SMul ℕ Dimension where
+  smul n := smul ↑n
 
-instance : Inv Dimension where
-  inv d := pow d (-1)
+instance : SMul ℤ Dimension where
+  smul n := smul ↑n
 
-theorem one_mul' (d : Dimension) : mul dimensionless d = d := by
-  unfold mul dimensionless
+instance : SMul ℚ Dimension where
+  smul := smul
+
+
+instance : Neg Dimension where
+  neg := smul (-1)
+
+theorem zero_add' (d : Dimension) : add dimensionless d = d := by
+  unfold add dimensionless
   rw [eq_iff_elements_eq]
   apply Bases.merge.nil_self_eq_self
 
-theorem one_mul (d : Dimension) : 1 * d = d := by
-  exact one_mul' d
+theorem zero_add (d : Dimension) : 0 + d = d := by
+  exact zero_add' d
 
-theorem mul_one' (d : Dimension) : mul d dimensionless = d := by
-  unfold mul dimensionless
+theorem add_zero' (d : Dimension) : add d dimensionless = d := by
+  unfold add dimensionless
   rw [eq_iff_elements_eq]
   apply Bases.merge.self_nil_eq_self
 
-theorem mul_one (d : Dimension) : d * 1 = d := by
-  exact mul_one' d
+theorem add_zero (d : Dimension) : d + 0 = d := by
+  exact add_zero' d
 
-theorem mul_comm' (d₁ d₂ : Dimension) : mul d₁ d₂ = mul d₂ d₁ := by
-  unfold mul
+theorem add_comm' (d₁ d₂ : Dimension) : add d₁ d₂ = add d₂ d₁ := by
+  unfold add
   rw [eq_iff_elements_eq]
   apply Bases.merge.comm d₁.elements d₂.elements
 
-theorem mul_comm (d₁ d₂ : Dimension) : d₁ * d₂ = d₂ * d₁ := by
-  exact mul_comm' d₁ d₂
+theorem add_comm (d₁ d₂ : Dimension) : d₁ + d₂ = d₂ + d₁ := by
+  exact add_comm' d₁ d₂
 
-theorem mul_assoc' (d₁ d₂ d₃ : Dimension) : mul (mul d₁ d₂) d₃ = mul d₁ (mul d₂ d₃) := by
-  unfold mul
+theorem add_assoc' (d₁ d₂ d₃ : Dimension) : add (add d₁ d₂) d₃ = add d₁ (add d₂ d₃) := by
+  unfold add
   rw [eq_iff_elements_eq]
   apply Bases.merge.assoc d₁.elements d₂.elements d₃.elements d₁.is_sorted d₂.is_sorted d₃.is_sorted
 
-theorem mul_assoc (d₁ d₂ d₃ : Dimension) : (d₁ * d₂) * d₃ = d₁ * (d₂ * d₃) := by
-  exact mul_assoc' d₁ d₂ d₃
+theorem add_assoc (d₁ d₂ d₃ : Dimension) : (d₁ + d₂) + d₃ = d₁ + (d₂ + d₃) := by
+  exact add_assoc' d₁ d₂ d₃
 
-theorem mul_inv_cancel' (d : Dimension) : mul d (pow d (-1)) = 1 := by
-  unfold mul pow
+theorem add_neg_cancel' (d : Dimension) : add d (neg d ) = 0 := by
+  unfold add neg
   rw [eq_iff_elements_eq]
   apply Bases.merge_qmul_inv d.is_sorted
 
-theorem mul_inv_cancel (d : Dimension) : d * d ^ (-1:ℚ) = 1 := by
-  exact mul_inv_cancel' d
+theorem add_neg_cancel (d : Dimension) : d + -d  = 0 := by
+  exact add_neg_cancel' d
 
-theorem inv_mul_cancel' (d : Dimension) : mul (pow d (-1)) d = 1 := by
-  rw [mul_comm', mul_inv_cancel']
+theorem neg_add_cancel' (d : Dimension) : add (neg d ) d = 0 := by
+  rw [add_comm', add_neg_cancel']
 
-theorem inv_mul_cancel (d : Dimension) : d ^ (-1:ℚ) * d = 1 := by
-  exact inv_mul_cancel' d
+theorem neg_add_cancel (d : Dimension) : -d + d = 0 := by
+  exact neg_add_cancel' d
 
-theorem pow_zero' (d : Dimension) : pow d 0 = dimensionless := by
-  unfold pow dimensionless Bases.qmul
+theorem smul_zero' (d : Dimension) : smul 0 d = dimensionless := by
+  unfold smul dimensionless Bases.qmul
   rw [eq_iff_elements_eq]
   simp only [↓reduceDIte]
 
-theorem pow_zero (d : Dimension) : d ^ (0:ℚ) = 1 := by
-  exact pow_zero' d
+theorem smul_zero (d : Dimension) : 0 • d = 0 := by
+  exact smul_zero' d
 
-theorem pow_one' (d : Dimension) : pow d 1 = d := by
-  unfold pow Bases.qmul
+theorem smul_one' (d : Dimension) : smul 1 d = d := by
+  unfold smul Bases.qmul
   rw [eq_iff_elements_eq]
   simp only [one_ne_zero, ↓reduceDIte, ↓reduceIte]
 
-theorem pow_one (d : Dimension) : d ^ (1:ℚ) = d := by
-  exact pow_one' d
+theorem smul_one (d : Dimension) : 1 • d = d := by
+  exact smul_one' d
 
-instance instCommGroup : CommGroup Dimension where
-  mul_assoc := mul_assoc
-  one_mul := one_mul
-  mul_one := mul_one
-  mul_comm := mul_comm
-  inv := inv
-  inv_mul_cancel := inv_mul_cancel
+theorem smul_succ' (n : ℚ) (d : Dimension) :
+  smul (n + 1) d = add (smul n d) d := by
+  unfold smul add
+  rw [eq_iff_elements_eq]
+  simp
+  apply Bases.qmul_succ_eq_merge d.is_sorted n
+
+theorem smul_succ (n : ℚ) (d : Dimension) :
+  (n + 1) • d = n • d + d := by
+  exact smul_succ' n d
+
+theorem smul_neg' (n : ℚ) (d : Dimension) :
+  smul (-n) d = neg (smul n d) := by
+  unfold smul neg
+  rw [eq_iff_elements_eq]
+  apply Bases.qmul.neg_eq_neg n d.is_sorted
+
+theorem smul_neg (n : ℚ) (d : Dimension) :
+  (-n) • d = -(n • d) := by
+  exact smul_neg' n d
+
+theorem nsmul_succ' (n : ℕ) (d : Dimension) :
+  instSMulNat.smul (n + 1) d = add (instSMulNat.smul n d) d := by
+  change smul ↑(n + 1) d = add (smul ↑n d) d
+  simp only [Nat.cast_add, Nat.cast_one, smul_succ']
+
+theorem nsmul_succ (n : ℕ) (d : Dimension) :
+  (n + 1) • d = n • d + d := by
+  exact nsmul_succ' n d
+
+theorem zsmul_neg' (n : ℕ) (d : Dimension) :
+  instSMulInt.smul (-(n + 1)) d = neg (instSMulInt.smul (n + 1) d) := by
+  change smul (-↑(n + 1)) d = neg (smul ↑(n + 1) d)
+  rw [smul_neg']
+
+theorem zsmul_neg (n : ℕ) (d : Dimension) :
+  (-((n:ℤ) + 1)) • d = -( (n + 1) • d) := by
+  exact zsmul_neg' n d
+
+instance instAddCommGroup : AddCommGroup Dimension where
+  add_assoc := add_assoc
+  zero_add := zero_add
+  add_zero := add_zero
+  nsmul n := smul ↑n
+  zsmul n := smul ↑n
+  neg_add_cancel := neg_add_cancel
+  add_comm := add_comm
+  nsmul_succ := nsmul_succ
+  zsmul_succ' := nsmul_succ
+  zsmul_neg' := zsmul_neg
 
 instance : Repr Dimension where
   reprPrec d _ :=
@@ -202,34 +252,49 @@ def LuminousIntensity := ofString "J"
 def Currency := ofString "C"
 
 -- we can derive some new dimensions from the base ones
-def Area := Length ^ (2:ℚ)
+abbrev Area := 2 • Length
 #eval Area
-def Volume := Length ^ (3:ℚ)
+abbrev Volume := 3 • Length
 #eval Volume
-def Speed := Length / Time
+abbrev Speed := Length - Time
 #eval Speed
-def Acceleration := Length / Time ^ (2:ℚ)
+abbrev Acceleration := Length - 2•Time
 #eval Acceleration
-def Force := Mass * Acceleration
+abbrev Jerk := Length - 3•Time
+#eval Jerk
+abbrev Snap := Length - 4•Time
+#eval Snap
+abbrev Momentum := Mass + Speed
+#eval Momentum
+abbrev AngularMomentum := Momentum + Length
+#eval AngularMomentum
+abbrev Force := Mass + Acceleration
 #eval Force
-def Pressure := Force / Area
+abbrev Pressure := Force - Area
 #eval Pressure
-def Energy := Force * Length
+abbrev Energy := Force + Length
 #eval Energy
-def Power := Energy / Time
+abbrev Action := Energy + Time
+#eval Action
+abbrev Power := Energy - Time
 #eval Power
-def Charge := Current * Time
+abbrev Charge := Current + Time
 #eval Charge
-def Empty := Speed / Length * Time
-#eval Empty
-def Frequency := 1 / Time
+abbrev Frequency := -Time
 #eval Frequency
-
-def accel1 := Length * Time^(-1 :ℚ) / Time * Length / Length
-def accel2 := Length / Time ^ (2 :ℚ)
-
-#eval accel1 == accel2
-#eval accel1 = accel2
-#eval Length * Time^(-1: ℚ) / Time * Length / Length = Length / Time ^ 2
+abbrev Voltage := Power - Current
+#eval Voltage
+abbrev Capacitance := Charge - Voltage
+#eval Capacitance
+abbrev Resistance := Voltage - Current
+#eval Resistance
+abbrev Conductance := Current - Voltage
+#eval Conductance
+abbrev Inductance := Resistance + Time
+#eval Inductance
+abbrev MagneticFlux := Voltage + Time
+#eval MagneticFlux
+abbrev MagneticInduction := MagneticFlux - Area
+#eval MagneticInduction
 
 end Units.Dimension

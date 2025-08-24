@@ -800,6 +800,19 @@ theorem exp_eq_mul (l : Bases) (n : ℚ) (name : String) :
           · simpa only [qmul, h0, ↓reduceDIte, h1, ↓reduceIte, List.map_cons,
             ne_eq, hx, not_false_eq_true, exponentOf.cons_neq] using ih
 
+theorem neg_eq_neg {l : Bases} (n : ℚ) (h_sorted : Bases.Sorted l) :
+  qmul l (-n) = qmul (qmul l n) (-1) := by
+  have hn_sorted := sorted l n h_sorted
+  have hnn_sorted := sorted l (-n) h_sorted
+  have h_neg_sorted := sorted (qmul l n) (-1) hn_sorted
+  apply (exponentOf.eq_iff hnn_sorted h_neg_sorted).mp
+  intro name
+  calc
+    exponentOf name (qmul l (-n)) = (-n) * exponentOf name l := by
+      rw [exp_eq_mul l (-n) name]
+    _ = -1 * (n * exponentOf name l) := by simp only [neg_mul, one_mul]
+    _ = exponentOf name (qmul (qmul l n) (-1)) := by
+      rw [exp_eq_mul (qmul l n) (-1) name, exp_eq_mul l n name]
 
 end qmul
 
@@ -816,5 +829,19 @@ theorem merge_qmul_inv {l : Bases} (h_sorted : Sorted l) :
     _ = exponentOf name l + (-1) * exponentOf name l := by rw [qmul.exp_eq_mul l (-1) name]
     _ = exponentOf name [] := by simp only [exponentOf, neg_mul, one_mul, add_neg_cancel,
       List.find?_nil]
+
+theorem qmul_succ_eq_merge {l : Bases} (h_sorted : Sorted l) (n : ℚ) :
+  l.qmul (n + 1) = merge (l.qmul n) l  := by
+  have hn_sorted := qmul.sorted l n h_sorted
+  have hn_succ_sorted := qmul.sorted l (n+1) h_sorted
+  have hn_merge := merge.sorted hn_sorted h_sorted
+  apply (exponentOf.eq_iff hn_succ_sorted hn_merge).mp
+  intro name
+  calc
+    exponentOf name (l.qmul (n + 1)) =
+      (n + 1) * exponentOf name l := by rw [qmul.exp_eq_mul l (n + 1) name]
+    _ = n * exponentOf name l + exponentOf name l := by rw [add_mul, one_mul]
+    _ = exponentOf name (l.qmul n) + exponentOf name l := by rw [qmul.exp_eq_mul l n name]
+    _ = exponentOf name (merge (l.qmul n) l) := by rw [merge.exp_eq_add hn_sorted h_sorted name]
 
 end Units.Dimension.Bases
