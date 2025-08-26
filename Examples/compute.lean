@@ -11,7 +11,7 @@ def G := 6.67430e-11 • (m³ / (kg * s²))
 def pi := 3.14159265358979323846
 
 def solar_mass_kepler_formula
-(period : SI Unit.second) (semi_major_axis : SI Unit.meter): SI Unit.kilogram :=
+(period : SI Unit.second) (semi_major_axis : SI Unit.meter) : SI Unit.kilogram :=
   ↑(4.0 * pi^2  * semi_major_axis³ / (G * period²))
 
 def earth_semi_major_axis := 1.496e11 • m
