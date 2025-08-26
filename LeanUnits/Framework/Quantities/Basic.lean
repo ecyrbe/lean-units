@@ -1,27 +1,30 @@
-import LeanUnits.Dimensions.Dfinsupp
+import LeanUnits.Framework.Dimensions.Basic
+import LeanUnits.Framework.Units.Basic
+import LeanUnits.Framework.Units.Tactic
+import LeanUnits.Framework.Conversion
 import LeanUnits.Math
 -- import ring tactic
 import Mathlib
 
 namespace Units
 
-structure Quantity (dim : Dimension) (α : Type) where
-  val : α
-  deriving Inhabited, BEq, DecidableEq
+variable {α δ : Type} [AddCommGroup δ] [SMul ℚ δ] [Repr δ] [UnitSystem δ]
+
+structure Quantity (dim : δ) (α : Type) where
+    val : α
+    deriving Inhabited, BEq, DecidableEq
 
 namespace Quantity
 open Units.Math
 
-unsafe instance {α : Type} [Repr α] (dim : Dimension) :
-  Repr (Quantity dim α) where
-  reprPrec q _ := s!"{repr q.val} ({repr dim})"
-
-unsafe instance {α : Type} [Repr α] (dim : Dimension) :
-  ToString (Quantity dim α) where
-  toString q := reprStr q
-
 -- ### Operations on Quantities
-variable {α : Type} {d d₁ d₂ : Dimension}
+variable {d d₁ d₂ : δ}
+
+unsafe instance [Repr α] : Repr (Quantity d α) where
+  reprPrec q _ := s!"{repr q.val} ({repr d})"
+
+unsafe instance [Repr α] : ToString (Quantity d α) where
+  toString q := reprStr q
 
 def add [Add α] (q1 q2 : Quantity d α) : Quantity d α :=
     { val := q1.val + q2.val }
@@ -137,68 +140,27 @@ def le [LE α] (q1 q2 : Quantity d α) : Prop :=
 instance [LE α] : LE (Quantity d α) where
     le := le
 
-def cast {d d' : Dimension} (q : Quantity d α) (_ : d' = d := by module) : Quantity d' α :=
+def dimension (_ : Quantity d α) : Dimension := UnitSystem.dimension d
+
+def units (_ : Quantity d α) : δ := d
+
+def cast (q : Quantity d₁ α) (_ : d₁ = d₂ := by module) : Quantity d₂ α :=
   ⟨q.val⟩
+
+def convert [Coe ℚ α] [Mul α] [Add α] (q : Quantity d₁ α)
+ (_ : UnitSystem.dimension d₁ = UnitSystem.dimension d₂ := by dimension_check) :
+ Quantity d₂ α := ⟨((UnitSystem.conversion d₁).div (UnitSystem.conversion d₂) ).apply q.val⟩
+
+def into [Coe ℚ α] [Mul α] [Add α] (q : Quantity d α) (target : δ)
+ (_ : UnitSystem.dimension d = UnitSystem.dimension target := by dimension_check) :
+ Quantity target α := ⟨((UnitSystem.conversion d).div (UnitSystem.conversion target)).apply q.val⟩
 
 -- cast operator prefix
 prefix:100 (priority := high) "↑" => cast
 
+-- convert operator postfix
+postfix:100 (priority := high) "→" => convert
+
 end Quantity
-
-abbrev SI (dim : Dimension) := Quantity dim Float
-
-instance : Inv Float where
-  inv v := 1.0 / v
-
-
-section si_base_units
-set_option linter.style.commandStart false
-set_option allowUnsafeReducibility true
-unseal Rat
-
-@[inline] def one       : SI Dimension.dimensionless := ⟨1.0⟩ -- 1 scalar
-@[inline] def meter     : SI Dimension.Length := ⟨1.0⟩ -- 1 meter
-@[inline] def kilogram  : SI Dimension.Mass := ⟨1.0⟩ -- 1 kilogram
-@[inline] def second    : SI Dimension.Time := ⟨1.0⟩ -- 1 second
-@[inline] def ampere    : SI Dimension.Current := ⟨1.0⟩ -- 1 ampere
-@[inline] def kelvin    : SI Dimension.Temperature := ⟨1.0⟩ -- 1 kelvin
-@[inline] def mole      : SI Dimension.AmountOfSubstance := ⟨1.0⟩ -- 1 mole
-@[inline] def candela   : SI Dimension.LuminousIntensity := ⟨1.0⟩ -- 1 candela
-
-unseal Rat.add Rat.mul Rat.sub Rat.neg Rat.inv Rat.div
-
-def speed_of_light: SI Dimension.Speed := ↑(299792458.0 • meter * second⁻¹)
-#eval! speed_of_light
-
-def gravitational_constant: SI (3•Dimension.Length - (Dimension.Mass + 2•Dimension.Time)) :=
-  6.67430e-11 • (meter³ / (kilogram * second²))
-#eval gravitational_constant
-
-def pi := 3.14159265358979323846
-
-def solar_mass_kepler_formula
-(period : SI Dimension.Time) (semi_major_axis : SI Dimension.Length): SI Dimension.Mass :=
-  ↑(4.0 * pi^2  * semi_major_axis³ / (gravitational_constant*period²))
-
-def earth_semi_major_axis := 1.496e11 • meter
-def minute := 60.0 • second
-def hour := 60.0 • minute
-def day := 24.0 • hour
-def year := 365.25 • day
-
-def Currency := Dimension.ofString "C"
-def dollar : SI Currency := ⟨1.0⟩
-
-def earning_rate : SI (Currency - Dimension.Time) := (50.0 • dollar / second)
-#eval earning_rate
-
-def non_computable := kilogram/second + ↑(second/kilogram)
-def computable := kilogram/second + ↑(second/kilogram)⁻¹
-
-
-#eval solar_mass_kepler_formula year earth_semi_major_axis
-
-
-end si_base_units
 
 end Units
