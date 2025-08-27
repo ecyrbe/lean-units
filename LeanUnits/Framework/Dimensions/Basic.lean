@@ -34,6 +34,28 @@ instance instSMul : SMul ℚ Dimension :=
 instance instDecidableNeqZero : DecidableNEqZero Dimension :=
   fun x => (inferInstance : Decidable (x ≠ 0))
 
+-- implement convenient syntax for dimensions, because addition is confusing
+instance : One Dimension where
+  one := 0
+
+instance : Mul Dimension where
+  mul u1 u2 := u1 + u2
+
+instance : Inv Dimension where
+  inv u := -u
+
+instance : Div Dimension where
+  div u1 u2 := u1 - u2
+
+instance : Pow Dimension ℕ where
+  pow u q := q • u
+
+instance : Pow Dimension ℤ where
+  pow u n := n • u
+
+instance : Pow Dimension ℚ where
+  pow u n := n • u
+
 section Repr
 open Lean Parser Term
 
