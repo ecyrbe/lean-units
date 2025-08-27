@@ -50,6 +50,37 @@ def electron_mass_kg := electron_mass_ev.into Unit.kilogram
 #eval electron_mass_kg.dimension -- M
 ```
 
+- defining new dimensions :
+
+```lean
+-- base dimensions
+def Length : Dimension := ofString "L"
+def Time : Dimension := ofString "T"
+def Mass : Dimension := ofString "M"
+
+-- derived dimensions
+@[simp] def Acceleration := Length / Time^2
+@[simp] def Force := Mass * Acceleration
+```
+
+- defining new units:
+
+```lean
+def light_year := defineDerivedUnit "ly" meter (Conversion.scale (9460728 * 10^9) (by simp))
+```
+- defining new quantities:
+
+```lean
+abbrev SI {μ} (units : μ) := Quantity units Float
+
+def ly : SI light_year := ⟨1.0⟩
+
+def distance_to_alpha_centauri : SI light_year := 4.367 • ly
+#eval distance_to_alpha_centauri -- 4.367 (ly)
+#eval distance_to_alpha_centauri.units -- ly
+#eval distance_to_alpha_centauri.dimension -- L
+```
+
 Examples
 - See the example files for working code and common tasks:
   - Basic computations: [Examples/compute.lean](Examples/compute.lean)
