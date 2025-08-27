@@ -78,6 +78,7 @@ def ly : SI light_year := ⟨1.0⟩
 def distance_to_alpha_centauri : SI light_year := 4.367 • ly
 #eval distance_to_alpha_centauri -- 4.367 (ly)
 #eval distance_to_alpha_centauri.units -- ly
+#eval distance_to_alpha_centauri.into Unit.meter -- 4.132e16 (m)
 #eval distance_to_alpha_centauri.dimension -- L
 ```
 
