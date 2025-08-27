@@ -65,6 +65,17 @@ def electron_mass_kg2 : SI Unit.kilogram := electron_mass_ev.convert
 #check_failure kg/s + ↑(s/kg)
 def computable := kg/s + ↑(s/kg)⁻¹
 
+def light_year := Unit.defineDerivedUnit "ly" Unit.meter (Conversion.scale (9460728 * 10^9) (by simp))
+
+def ly : SI light_year := ⟨1.0⟩
+
+def distance_to_alpha_centauri : SI light_year := 4.367 • ly
+#eval distance_to_alpha_centauri -- 4.367 (ly)
+#eval distance_to_alpha_centauri.units -- ly
+#eval distance_to_alpha_centauri.into Unit.meter -- 4.132e16 (m)
+#eval distance_to_alpha_centauri.dimension -- L
+
+
 -- temperature conversion
 
 def human_body_temp := 37.8 • C₀
