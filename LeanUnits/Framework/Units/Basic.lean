@@ -12,6 +12,8 @@ class UnitSystem (μ : Type) [AddCommGroup μ] where
   dimension (u : μ) : Dimension
   conversion (u : μ) : Conversion
 
+alias 𝒞 := UnitSystem.conversion
+alias 𝒟 := UnitSystem.dimension
 
 structure Unit where
   _impl : DFinsupp (fun _ : String =>  (ℚ×Conversion) × Dimension)

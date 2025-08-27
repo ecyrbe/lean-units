@@ -50,7 +50,7 @@ def electron_mass_kg := electron_mass_ev.into Unit.kilogram
 #eval electron_mass_kg.dimension
 
 -- implicit conversion to kg using convert
-def electron_mass_kg2: SI Unit.kilogram := electron_mass_ev→
+def electron_mass_kg2 : SI Unit.kilogram := electron_mass_ev.convert
 #eval electron_mass_kg2
 #eval electron_mass_kg2.units
 #eval electron_mass_kg2.dimension

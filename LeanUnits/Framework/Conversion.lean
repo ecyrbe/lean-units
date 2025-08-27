@@ -45,7 +45,19 @@ def inv (c : Conversion) : Conversion :=
 
 def div (c1 c2 : Conversion) : Conversion := mul c1 (inv c2)
 
+instance : Mul Conversion where
+  mul := mul
+
+instance : Div Conversion where
+  div := div
+
+instance : Inv Conversion where
+  inv := inv
+
 def apply {α} [Coe ℚ α] [Mul α] [Add α] (c : Conversion) (x : α) : α := x * c.factor  + c.offset
+
+-- infix for apply with a good unicode symbol
+infix:100 "⊙" => apply
 
 -- AddCommGroup operations, not proper affine transformations when offset is not zero `AND` factor is not 1
 def add (c1 c2 : Conversion) : Conversion :=
