@@ -28,7 +28,7 @@ instance instEquiv : Dimension ≃ DFinsupp (fun _ : String => ℚ) :=
 instance instAddCommGroup : AddCommGroup Dimension :=
   Dimension.instEquiv.addCommGroup
 
-instance instModule : SMul ℚ Dimension :=
+instance instSMul : SMul ℚ Dimension :=
   Dimension.instEquiv.smul ℚ
 
 instance instDecidableNeqZero : DecidableNEqZero Dimension :=

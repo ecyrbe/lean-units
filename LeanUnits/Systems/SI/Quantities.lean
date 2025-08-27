@@ -1,7 +1,7 @@
-import LeanUnits.Framework.Quantities.Basic
 import LeanUnits.Framework.Units.Basic
 import LeanUnits.Framework.Dimensions.Basic
 import LeanUnits.Systems.Dimensions
+import LeanUnits.Systems.SI.SI
 import LeanUnits.Systems.SI.Units
 import LeanUnits.Systems.SI.Prefix
 import LeanUnits.Systems.Utils
@@ -9,8 +9,6 @@ import LeanUnits.Systems.Utils
 namespace Units
 set_option allowUnsafeReducibility true
 set_option linter.style.commandStart false
-
-abbrev SI {μ} (units : μ) := Quantity units Float
 
 -- base SI units quantities
 @[inline] abbrev m   : SI Unit.meter := ⟨1.0⟩ -- 1 meter

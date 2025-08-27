@@ -1,5 +1,4 @@
-import LeanUnits.Framework.Dimensions.Basic
-import LeanUnits.Framework.Conversion
+import LeanUnits.Framework.UnitSystem
 import LeanUnits.Framework.Utils
 import Mathlib.Data.DFinsupp.Defs
 import Mathlib.Data.DFinsupp.BigOperators
@@ -8,22 +7,14 @@ import Mathlib.Data.Rat.Defs
 
 namespace Units
 
-class UnitSystem (μ : Type) [AddCommGroup μ] where
-  dimension (u : μ) : Dimension
-  conversion (u : μ) : Conversion
-
-alias 𝒞 := UnitSystem.conversion
-alias 𝒟 := UnitSystem.dimension
-
 structure Unit where
   _impl : DFinsupp (fun _ : String =>  (ℚ×Conversion) × Dimension)
 
 namespace Unit
 
 
-def defineUnit (s : String) (d : Dimension) : Unit := ⟨DFinsupp.single s ((1,0),d)⟩
-def defineDerivedUnit (s : String) (d : Dimension) (conv : Conversion) : Unit :=
-  ⟨DFinsupp.single s ((1,conv),d)⟩
+-- def defineDerivedUnit (s : String) (d : Dimension) (conv : Conversion) : Unit :=
+--   ⟨DFinsupp.single s ((1,conv),d)⟩
 
 instance instEquiv : Unit ≃ (DFinsupp (fun _ : String => (ℚ×Conversion)× Dimension)) where
   toFun := Unit._impl
@@ -31,6 +22,26 @@ instance instEquiv : Unit ≃ (DFinsupp (fun _ : String => (ℚ×Conversion)× D
 
 instance instAddCommGroup : AddCommGroup Unit :=
   Unit.instEquiv.addCommGroup
+
+-- implement convenient syntax for units, because addition is confusing
+-- e.g. m/s = m + (-s) = m + (1/s)
+instance : One Unit where
+  one := 0
+
+instance : Mul Unit where
+  mul u1 u2 := u1 + u2
+
+instance : Inv Unit where
+  inv u := -u
+
+instance : Div Unit where
+  div u1 u2 := u1 - u2
+
+instance : Pow Unit ℕ where
+  pow u q := q • u
+
+instance : Pow Unit ℤ where
+  pow u n := n • u
 
 def dimension (u : Unit) : Dimension :=
   u._impl.sum (fun _ qd => qd.2)
@@ -41,6 +52,10 @@ def conversion (u : Unit) : Conversion :=
 instance : UnitSystem Unit where
   dimension := Unit.dimension
   conversion := Unit.conversion
+
+def defineUnit (s : String) (d : Dimension) : Unit := ⟨DFinsupp.single s ((1,0),d)⟩
+def defineDerivedUnit (s : String) (u : Unit)
+  (conv : Conversion := 0) : Unit := ⟨DFinsupp.single s ((1,conv.div u.conversion),u.dimension)⟩
 
 section Repr
 open Lean Parser Term

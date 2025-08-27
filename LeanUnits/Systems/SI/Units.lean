@@ -10,26 +10,27 @@ abbrev ampere := defineUnit "A" Dimension.Current
 abbrev kelvin := defineUnit "K" Dimension.Temperature
 abbrev mole := defineUnit "mol" Dimension.AmountOfSubstance
 abbrev candela := defineUnit "cd" Dimension.LuminousIntensity
+abbrev steradian := defineUnit "sr" Dimension.dimensionless
 
 -- derived SI units
-abbrev hertz := defineUnit "Hz" (-Dimension.Time)
-abbrev newton := defineUnit "N" (Dimension.Force)
-abbrev pascal := defineUnit "Pa" (Dimension.Pressure)
-abbrev watt := defineUnit "W" (Dimension.Power)
-abbrev coulomb := defineUnit "C" (Dimension.Charge)
-abbrev volt := defineUnit "V" (Dimension.Voltage)
-abbrev ohm := defineUnit "Ω" (Dimension.Resistance)
-abbrev farad := defineUnit "F" (-Dimension.Capacitance)
-abbrev weber := defineUnit "Wb" (Dimension.MagneticFlux)
-abbrev joule := defineUnit "J" (Dimension.Energy)
-abbrev tesla := defineUnit "T" (Dimension.MagneticInduction)
-abbrev henry := defineUnit "H" (Dimension.Inductance)
-abbrev lumen := defineUnit "lm" Dimension.LuminousIntensity
-abbrev lux := defineUnit "lx" (Dimension.LuminousIntensity - 2•Dimension.Length)
-abbrev becquerel := defineUnit "Bq" (-Dimension.Time)
-abbrev gray := defineUnit "Gy" (Dimension.Energy - Dimension.Mass)
-abbrev sievert := defineUnit "Sv" (Dimension.Energy - Dimension.Mass)
-abbrev katal := defineUnit "kat" (Dimension.AmountOfSubstance-Dimension.Time)
-abbrev celsius := defineDerivedUnit "°C" Dimension.Temperature (Conversion.translate (273.15))
+abbrev hertz := defineDerivedUnit "Hz" (second⁻¹)
+abbrev newton := defineDerivedUnit "N" (kilogram * meter / second^2)
+abbrev pascal := defineDerivedUnit "Pa" (newton / meter^2)
+abbrev joule := defineDerivedUnit "J" (newton * meter)
+abbrev watt := defineDerivedUnit "W" (joule / second)
+abbrev coulomb := defineDerivedUnit "C" (ampere * second)
+abbrev volt := defineDerivedUnit "V" (watt / ampere)
+abbrev ohm := defineDerivedUnit "Ω" (volt / ampere)
+abbrev farad := defineDerivedUnit "F" (coulomb / volt)
+abbrev weber := defineDerivedUnit "Wb" (volt * second)
+abbrev tesla := defineDerivedUnit "T" (weber / meter^2)
+abbrev henry := defineDerivedUnit "H" (ohm * second)
+abbrev lumen := defineDerivedUnit "lm" (candela * steradian)
+abbrev lux := defineDerivedUnit "lx" (lumen / meter^2)
+abbrev becquerel := defineDerivedUnit "Bq" (second⁻¹)
+abbrev gray := defineDerivedUnit "Gy" (joule / kilogram)
+abbrev sievert := defineDerivedUnit "Sv" (joule / kilogram)
+abbrev katal := defineDerivedUnit "kat" (mole * second)
+abbrev celsius := defineDerivedUnit "°C" kelvin (Conversion.translate (273.15))
 
 end Units.Unit

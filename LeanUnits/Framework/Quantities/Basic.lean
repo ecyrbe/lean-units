@@ -1,7 +1,5 @@
-import LeanUnits.Framework.Dimensions.Basic
-import LeanUnits.Framework.Units.Basic
-import LeanUnits.Framework.Units.Tactic
-import LeanUnits.Framework.Conversion
+import LeanUnits.Framework.UnitSystem
+import LeanUnits.Framework.Dimensions.Tactic
 import LeanUnits.Math
 -- import ring tactic
 import Mathlib
@@ -144,24 +142,64 @@ def dimension (_ : Quantity d α) : Dimension := 𝒟 d
 def conversion (_ : Quantity d α) : Conversion := 𝒞 d
 def units (_ : Quantity d α) : δ := d
 
+-- cast operator prefix
+/--
+Preferred notation for casting: write `↑x` instead of `cast x`.
+
+- Purpose: `↑x` is equivalent to `cast x` and is the idiomatic, preferred syntax
+    throughout this library. Please use this notation in new code and docs.
+- Precedence: the operator has high priority and binds tightly; use parentheses
+    when needed, e.g. `↑(f x)` or `(↑x).field`.
+- Typing the symbol: in Lean/VSCode, type `\uparrow` then space to get `↑`.
+
+Examples:
+- `let q' : Quantity β := ↑q`    -- preferred
+- -- instead of: `cast q`
+-/
 def cast (q : Quantity d₁ α) (_ : d₁ = d₂ := by module) : Quantity d₂ α :=
   ⟨q.val⟩
 
+/--
+convert from one quantity to another of the same dimension
+
+Preferred notation for convert: write `q →` instead of `convert q`.
+- Purpose: `q →` is equivalent to `convert q` and is the idiomatic, preferred syntax
+    throughout this library. Please use this notation in new code and docs.
+
+Examples:
+- `let q' : Quantity d₂ α := q →`    -- preferred
+- -- instead of: `convert q`
+-/
 def convert [Coe ℚ α] [Mul α] [Add α] (q : Quantity d₁ α) (_ : 𝒟 d₁ = 𝒟 d₂ := by dimension_check) :
  Quantity d₂ α := ⟨((𝒞 d₁)/(𝒞 d₂) ) ⊙ q.val⟩
 
+/--
+convert and cast in one step from one quantity to another of the same dimension
+the target is a unit
+
+Examples:
+ convert constant c from natural unit to meter per second: c.into (Unit.meter-Unit.second)
+-/
 def into [Coe ℚ α] [Mul α] [Add α] (q : Quantity d α) (target : δ)
  (_ : 𝒟 d = 𝒟 target := by dimension_check) :
  Quantity target α := ⟨((𝒞 d)/(𝒞 target)) ⊙ q.val⟩
 
-def into' [Coe ℚ α] [Mul α] [Add α] (q : Quantity d₁ α) (_ : Quantity d₂ α)
+/--
+convert and cast in one step from one quantity to another of the same dimension
+the target is another quantity
+
+Examples:
+- `let q' : Quantity (Unit.meter-Unit.second) Float := q.as (m/s)`
+-/
+def as [Coe ℚ α] [Mul α] [Add α] (q : Quantity d₁ α) (_ : Quantity d₂ α)
  (_ : 𝒟 d₁ = 𝒟 d₂ := by dimension_check) :
  Quantity d₂ α := ⟨((𝒞 d₁)/(𝒞 d₂)) ⊙ q.val⟩
 
--- cast operator prefix
+
+@[inherit_doc cast]
 prefix:100 (priority := high) "↑" => cast
 
--- convert operator postfix
+@[inherit_doc convert]
 postfix:100 (priority := high) "→" => convert
 
 end Quantity

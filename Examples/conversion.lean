@@ -55,6 +55,8 @@ def electron_mass_kg2 : SI Unit.kilogram := electron_mass_ev.convert
 #eval electron_mass_kg2.units
 #eval electron_mass_kg2.dimension
 
+#eval c.as (m/s) -- we can also convert to another quantity
+
 -- can't convert to joules
 #check_failure electron_mass_ev.into Unit.joule-- doesn't compile
 
