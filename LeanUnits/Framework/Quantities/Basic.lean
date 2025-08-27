@@ -141,7 +141,7 @@ instance [LE α] : LE (Quantity d α) where
     le := le
 
 def dimension (_ : Quantity d α) : Dimension := UnitSystem.dimension d
-
+def conversion (_ : Quantity d α) : Conversion := UnitSystem.conversion d
 def units (_ : Quantity d α) : δ := d
 
 def cast (q : Quantity d₁ α) (_ : d₁ = d₂ := by module) : Quantity d₂ α :=
@@ -154,6 +154,10 @@ def convert [Coe ℚ α] [Mul α] [Add α] (q : Quantity d₁ α)
 def into [Coe ℚ α] [Mul α] [Add α] (q : Quantity d α) (target : δ)
  (_ : UnitSystem.dimension d = UnitSystem.dimension target := by dimension_check) :
  Quantity target α := ⟨((UnitSystem.conversion d).div (UnitSystem.conversion target)).apply q.val⟩
+
+def into' [Coe ℚ α] [Mul α] [Add α] (q : Quantity d₁ α) (_ : Quantity d₂ α)
+ (_ : UnitSystem.dimension d₁ = UnitSystem.dimension d₂ := by dimension_check) :
+ Quantity d₂ α := ⟨((UnitSystem.conversion d₁).div (UnitSystem.conversion d₂)).apply q.val⟩
 
 -- cast operator prefix
 prefix:100 (priority := high) "↑" => cast
