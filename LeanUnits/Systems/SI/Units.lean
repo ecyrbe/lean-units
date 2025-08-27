@@ -10,6 +10,7 @@ def ampere := defineUnit "A" Dimension.Current
 def kelvin := defineUnit "K" Dimension.Temperature
 def mole := defineUnit "mol" Dimension.AmountOfSubstance
 def candela := defineUnit "cd" Dimension.LuminousIntensity
+def radian := defineUnit "rad" Dimension.dimensionless
 def steradian := defineUnit "sr" Dimension.dimensionless
 
 -- derived SI units
