@@ -11,34 +11,34 @@ set_option allowUnsafeReducibility true
 set_option linter.style.commandStart false
 
 -- base SI units quantities
-@[inline] abbrev m   : SI Unit.meter := ⟨1.0⟩ -- 1 meter
-@[inline] abbrev kg  : SI Unit.kilogram := ⟨1.0⟩ -- 1 kilogram
-@[inline] abbrev s   : SI Unit.second := ⟨1.0⟩ -- 1 second
-@[inline] abbrev A   : SI Unit.ampere := ⟨1.0⟩ -- 1 ampere
-@[inline] abbrev K   : SI Unit.kelvin := ⟨1.0⟩ -- 1 kelvin
-@[inline] abbrev mol : SI Unit.mole := ⟨1.0⟩ -- 1 mole
-@[inline] abbrev cd  : SI Unit.candela := ⟨1.0⟩ -- 1 candela
+@[inline] def m   : SI Unit.meter := ⟨1.0⟩ -- 1 meter
+@[inline] def kg  : SI Unit.kilogram := ⟨1.0⟩ -- 1 kilogram
+@[inline] def s   : SI Unit.second := ⟨1.0⟩ -- 1 second
+@[inline] def A   : SI Unit.ampere := ⟨1.0⟩ -- 1 ampere
+@[inline] def K   : SI Unit.kelvin := ⟨1.0⟩ -- 1 kelvin
+@[inline] def mol : SI Unit.mole := ⟨1.0⟩ -- 1 mole
+@[inline] def cd  : SI Unit.candela := ⟨1.0⟩ -- 1 candela
 
 -- derived SI units quantities
-@[inline] abbrev Hz : SI Unit.hertz := ⟨1.0⟩ -- 1 hertz
-@[inline] abbrev N : SI Unit.newton := ⟨1.0⟩ -- 1 newton
-@[inline] abbrev Pa : SI Unit.pascal := ⟨1.0⟩ -- 1 pascal
-@[inline] abbrev J : SI Unit.joule := ⟨1.0⟩ -- 1 joule
-@[inline] abbrev W : SI Unit.watt := ⟨1.0⟩ -- 1 watt
-@[inline] abbrev C : SI Unit.coulomb := ⟨1.0⟩ -- 1 coulomb
-@[inline] abbrev V : SI Unit.volt := ⟨1.0⟩ -- 1 volt
-@[inline] abbrev Ω : SI Unit.ohm := ⟨1.0⟩ -- 1 ohm
-@[inline] abbrev F : SI Unit.farad := ⟨1.0⟩ -- 1 farad
-@[inline] abbrev Wb : SI Unit.weber := ⟨1.0⟩ -- 1 weber
-@[inline] abbrev T : SI Unit.tesla := ⟨1.0⟩ -- 1 tesla
-@[inline] abbrev H : SI Unit.henry := ⟨1.0⟩ -- 1 henry
-@[inline] abbrev C₀ : SI Unit.celsius := ⟨1.0⟩ -- 1 degree Celsius
-@[inline] abbrev lm : SI Unit.lumen := ⟨1.0⟩ -- 1 lumen
-@[inline] abbrev lx : SI Unit.lux := ⟨1.0⟩ -- 1 lux
-@[inline] abbrev Bq : SI Unit.becquerel := ⟨1.0⟩ -- 1 becquerel
-@[inline] abbrev Gy : SI Unit.gray := ⟨1.0⟩ -- 1 gray
-@[inline] abbrev Sv : SI Unit.sievert := ⟨1.0⟩ -- 1 sievert
-@[inline] abbrev kat : SI Unit.katal := ⟨1.0⟩ -- 1 katal
+@[inline] def Hz : SI Unit.hertz := ⟨1.0⟩ -- 1 hertz
+@[inline] def N : SI Unit.newton := ⟨1.0⟩ -- 1 newton
+@[inline] def Pa : SI Unit.pascal := ⟨1.0⟩ -- 1 pascal
+@[inline] def J : SI Unit.joule := ⟨1.0⟩ -- 1 joule
+@[inline] def W : SI Unit.watt := ⟨1.0⟩ -- 1 watt
+@[inline] def C : SI Unit.coulomb := ⟨1.0⟩ -- 1 coulomb
+@[inline] def V : SI Unit.volt := ⟨1.0⟩ -- 1 volt
+@[inline] def Ω : SI Unit.ohm := ⟨1.0⟩ -- 1 ohm
+@[inline] def F : SI Unit.farad := ⟨1.0⟩ -- 1 farad
+@[inline] def Wb : SI Unit.weber := ⟨1.0⟩ -- 1 weber
+@[inline] def T : SI Unit.tesla := ⟨1.0⟩ -- 1 tesla
+@[inline] def H : SI Unit.henry := ⟨1.0⟩ -- 1 henry
+@[inline] def C₀ : SI Unit.celsius := ⟨1.0⟩ -- 1 degree Celsius
+@[inline] def lm : SI Unit.lumen := ⟨1.0⟩ -- 1 lumen
+@[inline] def lx : SI Unit.lux := ⟨1.0⟩ -- 1 lux
+@[inline] def Bq : SI Unit.becquerel := ⟨1.0⟩ -- 1 becquerel
+@[inline] def Gy : SI Unit.gray := ⟨1.0⟩ -- 1 gray
+@[inline] def Sv : SI Unit.sievert := ⟨1.0⟩ -- 1 sievert
+@[inline] def kat : SI Unit.katal := ⟨1.0⟩ -- 1 katal
 
 -- SI prefixes for base units
 define_si_prefixes m -- cmm, km, etc.

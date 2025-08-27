@@ -12,28 +12,31 @@ def AmountOfSubstance : Dimension := ofString "N"
 def LuminousIntensity : Dimension := ofString "J"
 
 
--- we can derive some new dimensions from the base ones
-abbrev Area := Length^2
-abbrev Volume := Length^3
-abbrev Speed := Length / Time
-abbrev Acceleration := Length / Time^2
-abbrev Jerk := Length / Time^3
-abbrev Snap := Length / Time^4
-abbrev Momentum := Mass * Speed
-abbrev AngularMomentum := Momentum * Length
-abbrev Force := Mass * Acceleration
-abbrev Pressure := Force / Area
-abbrev Energy := Force * Length
-abbrev Action := Energy * Time
-abbrev Power := Energy / Time
-abbrev Charge := Current * Time
-abbrev Frequency := Time^(-1)
-abbrev Voltage := Power / Current
-abbrev Capacitance := Charge / Voltage
-abbrev Resistance := Voltage / Current
-abbrev Conductance := Current / Voltage
-abbrev Inductance := Resistance * Time
-abbrev MagneticFlux := Voltage * Time
-abbrev MagneticInduction := MagneticFlux / Area
+/-!
+we can derive some new dimensions from the base ones
+simp is mandatory to allow dsimp to unfold these definitions
+-/
+@[simp] def Area := Length^2
+@[simp] def Volume := Length^3
+@[simp] def Speed := Length / Time
+@[simp] def Acceleration := Length / Time^2
+@[simp] def Jerk := Length / Time^3
+@[simp] def Snap := Length / Time^4
+@[simp] def Momentum := Mass * Speed
+@[simp] def AngularMomentum := Momentum * Length
+@[simp] def Force := Mass * Acceleration
+@[simp] def Pressure := Force / Area
+@[simp] def Energy := Force * Length
+@[simp] def Action := Energy * Time
+@[simp] def Power := Energy / Time
+@[simp] def Charge := Current * Time
+@[simp] def Frequency := Time^(-1)
+@[simp] def Voltage := Power / Current
+@[simp] def Capacitance := Charge / Voltage
+@[simp] def Resistance := Voltage / Current
+@[simp] def Conductance := Current / Voltage
+@[simp] def Inductance := Resistance * Time
+@[simp] def MagneticFlux := Voltage * Time
+@[simp] def MagneticInduction := MagneticFlux / Area
 
 end Units.Dimension

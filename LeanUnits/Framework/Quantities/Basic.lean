@@ -2,7 +2,7 @@ import LeanUnits.Framework.UnitSystem
 import LeanUnits.Framework.Dimensions.Tactic
 import LeanUnits.Math
 -- import ring tactic
-import Mathlib
+import Mathlib.Tactic
 
 namespace Units
 
@@ -156,8 +156,8 @@ Examples:
 - `let q' : Quantity β := ↑q`    -- preferred
 - -- instead of: `cast q`
 -/
-def cast (q : Quantity d₁ α) (_ : d₁ = d₂ := by module) : Quantity d₂ α :=
-  ⟨q.val⟩
+def cast (q : Quantity d₁ α) (_ : d₁ = d₂ := by try dsimp [instHMul, instHDiv, instHPow]; module)
+ : Quantity d₂ α := ⟨q.val⟩
 
 /--
 convert from one quantity to another of the same dimension

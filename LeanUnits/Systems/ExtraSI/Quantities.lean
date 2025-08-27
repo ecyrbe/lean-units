@@ -3,13 +3,13 @@ import LeanUnits.Systems.SI.Quantities
 
 namespace Units
 
-@[inline] abbrev L : SI Unit.liter := ⟨1.0⟩ -- 1 liter
-@[inline] abbrev t : SI Unit.tonne := ⟨1.0⟩ -- 1 tonne
-@[inline] abbrev Da : SI Unit.dalton := ⟨1.0⟩ -- 1 dalton
-@[inline] abbrev bar : SI Unit.bar := ⟨1.0⟩ -- 1 bar
-@[inline] abbrev atm : SI Unit.atmosphere := ⟨1.0⟩ -- 1 atmosphere
-@[inline] abbrev ha : SI Unit.hectare := ⟨1.0⟩ -- 1 hectare
-@[inline] abbrev eV : SI Unit.electronvolt := ⟨1.0⟩ -- 1 electronvolt
+@[inline] def L : SI Unit.liter := ⟨1.0⟩ -- 1 liter
+@[inline] def t : SI Unit.tonne := ⟨1.0⟩ -- 1 tonne
+@[inline] def Da : SI Unit.dalton := ⟨1.0⟩ -- 1 dalton
+@[inline] def bar : SI Unit.bar := ⟨1.0⟩ -- 1 bar
+@[inline] def atm : SI Unit.atmosphere := ⟨1.0⟩ -- 1 atmosphere
+@[inline] def ha : SI Unit.hectare := ⟨1.0⟩ -- 1 hectare
+@[inline] def eV : SI Unit.electronvolt := ⟨1.0⟩ -- 1 electronvolt
 
 define_si_prefixes L
 define_si_prefixes bar

@@ -6,6 +6,6 @@ namespace Units
 
 abbrev Imperial {μ} (units : μ) := Quantity units Float
 
-@[inline] abbrev F₀ : Imperial Unit.fahrenheit := ⟨1.0⟩ -- 1 degree Fahrenheit
+@[inline] def F₀ : Imperial Unit.fahrenheit := ⟨1.0⟩ -- 1 degree Fahrenheit
 
 end Units

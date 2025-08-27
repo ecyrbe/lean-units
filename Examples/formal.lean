@@ -5,7 +5,7 @@ open Units
 
 abbrev SI {μ} (units : μ) := Quantity units ℝ
 
-variable (G : SI (3 • Dimension.Length - Dimension.Mass - 2 • Dimension.Time))
+variable (G : SI (Dimension.Length ^ 3 / (Dimension.Mass * Dimension.Time ^ 2)))
 variable (π : ℝ)
 variable (c : SI Dimension.Speed)
 

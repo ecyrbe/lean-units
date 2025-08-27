@@ -19,7 +19,7 @@ def ofString (s : String) : Dimension := ⟨DFinsupp.single s 1⟩
 
 def dimensionless : Dimension := ⟨0⟩
 
-abbrev DecidableNEqZero.{u} (α : Type u) [Zero α] :=
+def DecidableNEqZero.{u} (α : Type u) [Zero α] :=
   (x : α) → Decidable (x ≠ 0)
 
 instance instEquiv : Dimension ≃ DFinsupp (fun _ : String => ℚ) :=
@@ -38,21 +38,27 @@ instance instDecidableNeqZero : DecidableNEqZero Dimension :=
 instance : One Dimension where
   one := 0
 
+@[simp]
 instance : Mul Dimension where
   mul u1 u2 := u1 + u2
 
+@[simp]
 instance : Inv Dimension where
   inv u := -u
 
+@[simp]
 instance : Div Dimension where
   div u1 u2 := u1 - u2
 
+@[simp]
 instance : Pow Dimension ℕ where
   pow u q := q • u
 
+@[simp]
 instance : Pow Dimension ℤ where
   pow u n := n • u
 
+@[simp]
 instance : Pow Dimension ℚ where
   pow u n := n • u
 
