@@ -11,7 +11,7 @@ namespace Units
 @[ext]
 structure Dimension where
   _impl : DFinsupp (fun _ : String => ℚ)
-  deriving DecidableEq
+  deriving DecidableEq, BEq
 
 namespace Dimension
 

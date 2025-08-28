@@ -9,6 +9,7 @@ namespace Units
 
 structure Unit where
   _impl : DFinsupp (fun _ : String =>  (ℚ×Conversion) × Dimension)
+  deriving DecidableEq, BEq
 
 namespace Unit
 

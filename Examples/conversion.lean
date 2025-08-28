@@ -36,6 +36,12 @@ instance : Repr Float where
   else
     f.toString
 
+def ev := e * V
+#eval ev -- 1 (e·V)
+#eval ev.units -- e·V
+#eval ev.dimension -- M·L²·T⁻²
+#eval (ev.as J) == eV.as J -- true
+
 def electron_mass_ev := (0.51099895069 • MeV / c²)
 #eval electron_mass_ev
 #eval electron_mass_ev.units
