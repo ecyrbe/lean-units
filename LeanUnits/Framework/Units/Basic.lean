@@ -7,17 +7,36 @@ import Mathlib.Data.Rat.Defs
 
 namespace Units
 
+/--
+Choosing a unit involves choosing
+- a power factor (it's one for base units)
+- an affine conversion (to convert between units of the same dimension)
+- a dimension (to ensure dimensional correctness)
+
+Note that all these 3 choices form a AddCommGroup, so we can combine them easily.
+-/
+abbrev UnitChoice := ℚ × Conversion × Dimension
+
+/--
+A unit is a product of base units raised to rational powers.
+For example, the unit of force in the SI system is `kg•m/s²`
+can be represented as :
+- `force₁ = {"kg" ↦ (1,0,Mass), "m" ↦ (1,0,Length), "s" ↦ (-2,0,Time⁻²)}`
+
+or when using derived units:
+- `force₂={"N" ↦ (1,0,Mass•Length•Time⁻²)}`
+
+Converting between these two representations is possible because
+their dimensions are the same under summation:
+- `Σ force₁ = Mass•Length•Time⁻² = Σ force₂`
+-/
 structure Unit where
-  _impl : DFinsupp (fun _ : String =>  (ℚ×Conversion) × Dimension)
+  _impl : DFinsupp (fun _ : String =>  UnitChoice)
   deriving DecidableEq, BEq
 
 namespace Unit
 
-
--- def defineDerivedUnit (s : String) (d : Dimension) (conv : Conversion) : Unit :=
---   ⟨DFinsupp.single s ((1,conv),d)⟩
-
-instance instEquiv : Unit ≃ (DFinsupp (fun _ : String => (ℚ×Conversion)× Dimension)) where
+instance instEquiv : Unit ≃ (DFinsupp (fun _ : String => UnitChoice)) where
   toFun := Unit._impl
   invFun := Unit.mk
 
@@ -25,7 +44,6 @@ instance instAddCommGroup : AddCommGroup Unit :=
   Unit.instEquiv.addCommGroup
 
 -- implement convenient syntax for units, because addition is confusing
--- e.g. m/s = m + (-s) = m + (1/s)
 @[simp]
 instance : One Unit where
   one := 0
@@ -51,18 +69,18 @@ instance : Pow Unit ℤ where
   pow u n := n • u
 
 def dimension (u : Unit) : Dimension :=
-  u._impl.sum (fun _ qd => qd.2)
+  u._impl.sum (fun _ qd => qd.2.2)
 
 def conversion (u : Unit) : Conversion :=
-  u._impl.sum (fun _ qd => qd.1.2)
+  u._impl.sum (fun _ qd => qd.2.1)
 
 instance : UnitSystem Unit where
   dimension := Unit.dimension
   conversion := Unit.conversion
 
-def defineUnit (s : String) (d : Dimension) : Unit := ⟨DFinsupp.single s ((1,0),d)⟩
+def defineUnit (s : String) (d : Dimension) : Unit := ⟨DFinsupp.single s (1,0,d)⟩
 def defineDerivedUnit (s : String) (u : Unit)
-  (conv : Conversion := 0) : Unit := ⟨DFinsupp.single s ((1,conv.div u.conversion),u.dimension)⟩
+  (conv : Conversion := 0) : Unit := ⟨DFinsupp.single s (1,conv.div u.conversion,u.dimension)⟩
 
 section Repr
 open Lean Parser Term
