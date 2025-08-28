@@ -4,11 +4,11 @@ import LeanUnits.Systems.SI.Units
 
 namespace Units.Unit
 
-def fahrenheit := defineDerivedUnit "°F" Unit.kelvin
+def fahrenheit := defineDerivedUnit "°F" kelvin
   ((Conversion.scale (5/9) (by simp)) + Conversion.translate (45967 / 100 * 5/9 ))
 
 -- Length
-def inch := defineDerivedUnit "in" Unit.meter (Conversion.scale (254/10000) (by simp))
+def inch := defineDerivedUnit "in" meter (Conversion.scale (254/10000) (by simp))
 def foot := defineDerivedUnit "ft" inch (Conversion.scale (12) (by simp))
 def yard := defineDerivedUnit "yd" foot (Conversion.scale (3) (by simp))
 def mile := defineDerivedUnit "mi" yard (Conversion.scale (1760) (by simp))
