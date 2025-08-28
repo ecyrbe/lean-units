@@ -9,7 +9,7 @@ namespace Units
 
 /--
 Choosing a unit involves choosing
-- a power factor (it's one for base units)
+- a power factor (it's one for base and derived units)
 - an affine conversion (to convert between units of the same dimension)
 - a dimension (to ensure dimensional correctness)
 

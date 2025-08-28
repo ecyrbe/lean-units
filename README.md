@@ -5,7 +5,7 @@ lean-units is a small Lean library that provides:
 - unit definitions for SI, ExtraSI and Imperial systems,
 - quantities built on top of units so you can represent typed physical values.
 
-Build / install
+## Build / install
 - Build the project with Lake:
 ```sh
 lake build
@@ -18,7 +18,9 @@ Quick overview
 - Support for safe compile-time checked conversions
 - Allow Formal verification of physics statements relying on Dimensional Analysis (more work on this part to be done)
 
-Basic usage (Lean)
+## Basic usage
+
+- Compute with physical quantities:
 
 ```lean
 import LeanUnits.Systems.SI
@@ -32,7 +34,7 @@ def solar_mass_kepler_formula
 #eval solar_mass_kepler_formula year earth_semi_major_axis
 -- 1.9884098707065004e30 (kg)
 ```
-- Allow for easy conversion between units:
+- Converting between units:
 
 ```lean
 
@@ -82,7 +84,61 @@ def distance_to_alpha_centauri : SI light_year := 4.367 • ly
 #eval distance_to_alpha_centauri.dimension -- L
 ```
 
-Examples
+## Internal representation
+
+Internal representation of units and dimensions use Mathlib's `DFinsupp` (dependent finitely supported functions).
+This allows to represent dimension or units as products of base dimensions or units raised to rational powers.
+
+### Dimensions
+
+A dimension is a product of base dimensions raised to rational powers.
+For example, the dimension of force is `Mass•Length•Time⁻²` and is represented as:
+- `force = {"M" ↦ 1, "L" ↦ 1, "T" ↦ -2}`
+
+DFinsupp then gives us a natural way to combine dimensions by addition of the exponents since we get a `AddCommGroup` structure on dimensions.
+
+And we can define as many base dimensions as we want, since they are just string identifiers mapped to rational exponents.
+
+### Units
+
+Units represent a choice of metric in a given dimension.
+
+Choosing a metric involves choosing
+- a power factor (it's one for base and derived units)
+- an affine conversion (to convert between units of the same dimension)
+- a dimension (to ensure dimensional correctness)
+
+A unit is a product of base units raised to rational powers.
+For example, the unit of force in the SI system is `kg•m/s²`
+can be represented as :
+- `force₁ = {"kg" ↦ (1,0,Mass), "m" ↦ (1,0,Length), "s" ↦ (-2,0,Time⁻²)}`
+
+or when using derived units:
+- `force₂={"N" ↦ (1,0,Mass•Length•Time⁻²)}`
+
+Converting between these two representations is possible because
+their dimensions are the same under product:
+- `Π 𝒟(force₁) = Mass•Length•Time⁻² = Π 𝒟(force₂)`
+
+### Quantities
+
+A quantity is a value associated with a Unit or a Dimension.
+Lean units allows you to work with quantities associated with either a unit or a dimension. Both ways are represented by the same structure `Quantity` allowing to transition your proofs on dimensional analysis to computations with physical quantities with a real unit system (like SI standard).
+
+#### For engineering computations
+
+When computing a quantity, you usually want to work with a value associated with a unit.
+For example, `9.81 (m/s²)` is a quantity representing the acceleration due to gravity at the surface of the Earth.
+
+Usually, in engineering you mostly only work with quantities associated with units.
+And units are just a way to ensure dimensional correctness and perform conversions.
+
+#### For formal proofs
+
+When doing formal proofs, you usually want to work with quantities associated with a dimension. And don't care about the units.
+Formal proof side of the library is still a work in progress, but you can already define dimensions and prove statements about them.
+
+## Examples
 - See the example files for working code and common tasks:
   - Basic computations: [Examples/compute.lean](Examples/compute.lean)
   - Unit conversions and derived units: [Examples/conversion.lean](Examples/conversion.lean)
