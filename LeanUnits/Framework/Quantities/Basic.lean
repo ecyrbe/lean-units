@@ -1,14 +1,15 @@
-import LeanUnits.Framework.UnitSystem
+import LeanUnits.Framework.Dimensions.Basic
 import LeanUnits.Framework.Dimensions.Tactic
+import LeanUnits.Framework.Conversion
 import LeanUnits.Math
 -- import ring tactic
 import Mathlib.Tactic
 
 namespace Units
 
-variable {α δ : Type} [AddCommGroup δ] [SMul ℚ δ] [Repr δ] [UnitSystem δ]
+variable {α δ : Type} [AddCommGroup δ] [Repr δ]
 
-structure Quantity (dim : δ) (α : Type) where
+structure Quantity (dim : δ) (α : Type) [AddCommGroup δ] where
     val : α
     deriving Inhabited, BEq, DecidableEq
 
@@ -120,10 +121,10 @@ instance [Mul α] : HIntPow (Quantity d α) 5 (Quantity (5•d) α) where
     hIntPow := hQuintic
 
 -- square root
-def hSqrt [HSqrt α α] (q : Quantity d α) : Quantity ((1/2:ℚ)•d) α :=
+def hSqrt [HSqrt α α] [SMul ℚ δ] (q : Quantity d α) : Quantity ((1/2:ℚ)•d) α :=
     { val := √q.val }
 
-instance [HSqrt α α] : HSqrt (Quantity d α) (Quantity ((1/2:ℚ)•d) α) where
+instance [HSqrt α α] [SMul ℚ δ] : HSqrt (Quantity d α) (Quantity ((1/2:ℚ)•d) α) where
     hSqrt := hSqrt
 
 def lt [LT α] (q1 q2 : Quantity d α) : Prop :=
@@ -138,8 +139,8 @@ def le [LE α] (q1 q2 : Quantity d α) : Prop :=
 instance [LE α] : LE (Quantity d α) where
     le := le
 
-def dimension (_ : Quantity d α) : Dimension := 𝒟 d
-def conversion (_ : Quantity d α) : Conversion := 𝒞 d
+def dimension [HasDimension δ] (_ : Quantity d α) : Dimension := 𝒟 d
+def conversion [HasConversion δ] (_ : Quantity d α) : Conversion := 𝒞 d
 def units (_ : Quantity d α) : δ := d
 
 -- cast operator prefix
@@ -170,7 +171,8 @@ Examples:
 - `let q' : Quantity d₂ α := q →`    -- preferred
 - -- instead of: `convert q`
 -/
-def convert [Coe ℚ α] [Mul α] [Add α] (q : Quantity d₁ α) (_ : 𝒟 d₁ = 𝒟 d₂ := by dimension_check) :
+def convert [Coe ℚ α] [Mul α] [Add α] [HasDimension δ] [HasConversion δ]
+ (q : Quantity d₁ α) (_ : 𝒟 d₁ = 𝒟 d₂ := by dimension_check) :
  Quantity d₂ α := ⟨((𝒞 d₁)/(𝒞 d₂) ) ⊙ q.val⟩
 
 /--
@@ -180,8 +182,8 @@ the target is a unit
 Examples:
  convert constant c from natural unit to meter per second: c.into (Unit.meter-Unit.second)
 -/
-def into [Coe ℚ α] [Mul α] [Add α] (q : Quantity d α) (target : δ)
- (_ : 𝒟 d = 𝒟 target := by dimension_check) :
+def into [Coe ℚ α] [Mul α] [Add α] [HasDimension δ] [HasConversion δ]
+ (q : Quantity d α) (target : δ) (_ : 𝒟 d = 𝒟 target := by dimension_check) :
  Quantity target α := ⟨((𝒞 d)/(𝒞 target)) ⊙ q.val⟩
 
 /--
@@ -191,8 +193,8 @@ the target is another quantity
 Examples:
 - `let q' : Quantity (Unit.meter-Unit.second) Float := q.as (m/s)`
 -/
-def as [Coe ℚ α] [Mul α] [Add α] (q : Quantity d₁ α) (_ : Quantity d₂ α)
- (_ : 𝒟 d₁ = 𝒟 d₂ := by dimension_check) :
+def as [Coe ℚ α] [Mul α] [Add α] [HasDimension δ] [HasConversion δ]
+ (q : Quantity d₁ α) (_ : Quantity d₂ α) (_ : 𝒟 d₁ = 𝒟 d₂ := by dimension_check) :
  Quantity d₂ α := ⟨((𝒞 d₁)/(𝒞 d₂)) ⊙ q.val⟩
 
 

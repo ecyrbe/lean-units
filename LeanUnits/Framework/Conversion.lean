@@ -22,6 +22,11 @@ structure Conversion where
   factor_ne_zero : factor ≠ 0
 deriving Repr, DecidableEq
 
+class HasConversion (μ : Type) [AddCommGroup μ] where
+  conversion (u : μ) : Conversion
+
+alias 𝒞 := HasConversion.conversion
+
 namespace Conversion
 
 def identity : Conversion := ⟨1,0, by decide⟩

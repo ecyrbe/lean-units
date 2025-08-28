@@ -144,7 +144,16 @@ Formal proof side of the library is still a work in progress, but you can alread
   - Unit conversions and derived units: [Examples/conversion.lean](Examples/conversion.lean)
   - Using the library in formal proofs / tactics: [Examples/formal.lean](Examples/formal.lean)
 
-Notes and pointers
+## Notes and pointers
 - The library separates systems (SI, ExtraSI, Imperial, Natural). SI units and prefixes are implemented under `LeanUnits.Systems.SI.*`.
 - If you need to define a new unit or derived unit, inspect the framework in [LeanUnits/Framework/Units/Basic.lean](LeanUnits/Framework/Units/Basic.lean).
 
+## LICENSE
+- The project is licensed under the MIT License. See [LICENSE](LICENSE).
+- Copyright 2025 ecyrbe
+
+## Acknowledgements
+- Thanks to the authors of Mathlib for providing a solid foundation for formalizing mathematics in Lean.
+- Thanks to the Lean community for their support and contributions to the ecosystem.
+- Special thanks to [Terrence Tao](https://github.com/teorth) for the formal [source code here](https://github.com/teorth/analysis/blob/18d4fd7253ff17a05133d9b6b120b5f08f5ce6ad/analysis/Analysis/Misc/UnitsSystem.lean). He gave the permission to use his lemmas and definitions as a starting point for the formal side of the library.
+  The adaptation can be seen in [LeanUnits/Framework/Formal/Basic.lean](LeanUnits/Framework/Formal/Basic.lean).

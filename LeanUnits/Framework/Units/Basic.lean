@@ -1,4 +1,5 @@
-import LeanUnits.Framework.UnitSystem
+import LeanUnits.Framework.Dimensions.Basic
+import LeanUnits.Framework.Conversion
 import LeanUnits.Framework.Utils
 import Mathlib.Data.DFinsupp.Defs
 import Mathlib.Data.DFinsupp.BigOperators
@@ -8,7 +9,7 @@ import Mathlib.Data.Rat.Defs
 namespace Units
 
 /--
-Choosing a unit involves choosing
+Choosing a metric involves choosing
 - a power factor (it's one for base and derived units)
 - an affine conversion (to convert between units of the same dimension)
 - a dimension (to ensure dimensional correctness)
@@ -74,8 +75,10 @@ def dimension (u : Unit) : Dimension :=
 def conversion (u : Unit) : Conversion :=
   u._impl.sum (fun _ qd => qd.2.1)
 
-instance : UnitSystem Unit where
+instance : HasDimension Unit where
   dimension := Unit.dimension
+
+instance : HasConversion Unit where
   conversion := Unit.conversion
 
 def defineUnit (s : String) (d : Dimension) : Unit := ⟨DFinsupp.single s (1,0,d)⟩

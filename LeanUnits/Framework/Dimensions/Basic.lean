@@ -8,11 +8,16 @@ import Mathlib.Algebra.Group.TransferInstance
 import LeanUnits.Framework.Utils
 
 namespace Units
+
 @[ext]
 structure Dimension where
   _impl : DFinsupp (fun _ : String => ℚ)
   deriving DecidableEq, BEq
 
+class HasDimension (μ : Type) [AddCommGroup μ] where
+  dimension (u : μ) : Dimension
+
+alias 𝒟 := HasDimension.dimension
 namespace Dimension
 
 def ofString (s : String) : Dimension := ⟨DFinsupp.single s 1⟩
@@ -33,6 +38,9 @@ instance instSMul : SMul ℚ Dimension :=
 
 instance instDecidableNeqZero : DecidableNEqZero Dimension :=
   fun x => (inferInstance : Decidable (x ≠ 0))
+
+instance : HasDimension Dimension where
+  dimension u := u
 
 -- implement convenient syntax for dimensions, because addition is confusing
 instance : One Dimension where

@@ -4,7 +4,7 @@ import LeanUnits.Systems.Imperial.Units
 
 namespace Units
 
-abbrev Imperial {μ} (units : μ) := Quantity units Float
+abbrev Imperial (units : Unit) := Quantity units Float
 
 @[inline] def F₀ : Imperial Unit.fahrenheit := ⟨1.0⟩ -- 1 degree Fahrenheit
 
