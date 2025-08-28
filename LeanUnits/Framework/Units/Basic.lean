@@ -27,8 +27,8 @@ or when using derived units:
 - `force₂={"N" ↦ (1,0,Mass•Length•Time⁻²)}`
 
 Converting between these two representations is possible because
-their dimensions are the same under summation:
-- `Σ force₁ = Mass•Length•Time⁻² = Σ force₂`
+their dimensions are the same under product:
+- `Π 𝒟(force₁) = Mass•Length•Time⁻² = Π 𝒟(force₂)`
 -/
 structure Unit where
   _impl : DFinsupp (fun _ : String =>  UnitChoice)
