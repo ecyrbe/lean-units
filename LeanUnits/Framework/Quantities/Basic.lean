@@ -25,6 +25,12 @@ unsafe instance [Repr α] : Repr (Quantity d α) where
 unsafe instance [Repr α] : ToString (Quantity d α) where
   toString q := reprStr q
 
+instance [Zero α] : Zero (Quantity d α) where
+  zero := ⟨ 0 ⟩
+
+instance [One α] : One (Quantity d α) where
+  one := ⟨ 1 ⟩
+
 def add [Add α] (q1 q2 : Quantity d α) : Quantity d α :=
     { val := q1.val + q2.val }
 

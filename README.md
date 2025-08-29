@@ -156,4 +156,4 @@ Formal proof side of the library is still a work in progress, but you can alread
 - Thanks to the authors of Mathlib for providing a solid foundation for formalizing mathematics in Lean.
 - Thanks to the Lean community for their support and contributions to the ecosystem.
 - Special thanks to [Terrence Tao](https://github.com/teorth) for the formal [source code here](https://github.com/teorth/analysis/blob/18d4fd7253ff17a05133d9b6b120b5f08f5ce6ad/analysis/Analysis/Misc/UnitsSystem.lean). He gave the permission to use his lemmas and definitions as a starting point for the formal side of the library.
-  The adaptation can be seen in [LeanUnits/Framework/Formal/Basic.lean](LeanUnits/Framework/Formal/Basic.lean).
+  The adaptation can be seen in [LeanUnits/Framework/Quantities/Lemmas.lean](LeanUnits/Framework/Quantities/Lemmas.lean).
