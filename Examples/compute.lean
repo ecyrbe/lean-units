@@ -14,6 +14,10 @@ def solar_mass_kepler_formula
 (period : SI Unit.second) (semi_major_axis : SI Unit.meter) : SI Unit.kilogram :=
   ↑(4.0 * pi^2  * semi_major_axis³ / (G * period²))
 
+def cinetic_energy
+(mass : SI Unit.kilogram) (velocity : SI (Unit.meter - Unit.second)) : SI Unit.joule :=
+  (0.5 * mass * velocity²).into (Unit.joule)
+
 def earth_semi_major_axis := 1.496e11 • m
 def minute := 60.0 • s
 def hour := 60.0 • minute
