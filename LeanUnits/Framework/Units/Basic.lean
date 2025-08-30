@@ -81,7 +81,35 @@ instance : HasDimension Unit where
 instance : HasConversion Unit where
   conversion := Unit.conversion
 
+/--
+Two units are considered equal if they have the same dimension and conversion,
+regardless of their representation.
+
+For example, `N` and `kg•m/s²` are considered equal.
+-/
+instance instSetoidUnit : Setoid Unit where
+  r:= fun u₁ u₂ => u₁.dimension = u₂.dimension ∧ u₁.conversion = u₂.conversion
+  iseqv := ⟨
+    fun _u => ⟨rfl, rfl⟩,
+    fun {_u₁ _u₂} ⟨h1, h2⟩ => ⟨h1.symm, h2.symm⟩,
+    fun {_u₁ _u₂ _u₃} ⟨h1, h2⟩ ⟨h3, h4⟩ =>
+      ⟨h1.trans h3, h2.trans h4⟩
+  ⟩
+
+/--
+Define a base unit with a given name and dimension.
+
+Example:
+- `meter = defineUnit "m" Dimension.Length`
+-/
 def defineUnit (s : String) (d : Dimension) : Unit := ⟨DFinsupp.single s (1,0,d)⟩
+
+/--
+Define a derived unit with a given name, unit and optional conversion.
+Example:
+- `newton = defineDerivedUnit "N" (kilogram * meter / second^2)`
+- `celsius = defineDerivedUnit "°C" kelvin (Conversion.translate (27315/100))`
+-/
 def defineDerivedUnit (s : String) (u : Unit)
   (conv : Conversion := 0) : Unit := ⟨DFinsupp.single s (1,conv.div u.conversion,u.dimension)⟩
 
