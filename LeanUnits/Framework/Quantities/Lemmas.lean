@@ -59,7 +59,7 @@ theorem toFormal_inj (q₁ q₂: Quantity d α) :
   · simp [toFormal, ←val_inj]
     intro h
     replace h := congr($h d)
-    rw [Finsupp.single_eq_same, Finsupp.single_eq_same] at h
+    repeat rw [Finsupp.single_eq_same] at h
     exact h
   · intro h
     rw [h]
