@@ -163,9 +163,7 @@ Examples:
 - `let q' : Quantity β := ↑q`    -- preferred
 - -- instead of: `cast q`
 -/
-def cast (q : Quantity d₁ α) (_ : d₁ = d₂ := by
-    try dsimp [instHMul, instHDiv, instHPow]
-    module)
+def cast [HasEquiv δ] (q : Quantity d₁ α) (_ : d₁ ≈ d₂ := by auto_equiv)
  : Quantity d₂ α := ⟨q.val⟩
 
 /--

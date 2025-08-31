@@ -41,6 +41,7 @@ def ev := e * V
 #eval ev.units -- e·V
 #eval ev.dimension -- M·L²·T⁻²
 #eval (ev.as J) == eV.as J -- true
+#eval ev.units ≈ eV.units -- true, they are equivalent units
 
 def electron_mass_ev := (0.51099895069 • MeV / c²)
 #eval electron_mass_ev

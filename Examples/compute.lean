@@ -16,7 +16,7 @@ def solar_mass_kepler_formula
 
 def cinetic_energy
 (mass : SI Unit.kilogram) (velocity : SI (Unit.meter - Unit.second)) : SI Unit.joule :=
-  (0.5 * mass * velocity²).into (Unit.joule)
+  ↑(0.5 * mass * velocity²)
 
 def earth_semi_major_axis := 1.496e11 • m
 def minute := 60.0 • s

@@ -42,6 +42,13 @@ instance instDecidableNeqZero : DecidableNEqZero Dimension :=
 instance : HasDimension Dimension where
   dimension u := u
 
+instance instHasEquivDimension : HasEquiv Dimension where
+  Equiv a b := a = b
+
+instance instDecidableEquivDimension (a b : Dimension) : Decidable (a ≈ b) := by
+  dsimp [HasEquiv.Equiv, instHasEquivDimension]
+  infer_instance
+
 -- implement convenient syntax for dimensions, because addition is confusing
 instance : One Dimension where
   one := 0

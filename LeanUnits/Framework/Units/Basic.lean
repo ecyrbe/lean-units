@@ -85,7 +85,7 @@ instance : HasConversion Unit where
 Two units are considered equal if they have the same dimension and conversion,
 regardless of their representation.
 
-For example, `N` and `kg•m/s²` are considered equal.
+For example, `N` and `kg•m/s²` are considered equivalent
 -/
 instance instSetoidUnit : Setoid Unit where
   r:= fun u₁ u₂ => u₁.dimension = u₂.dimension ∧ u₁.conversion = u₂.conversion
@@ -95,6 +95,17 @@ instance instSetoidUnit : Setoid Unit where
     fun {_u₁ _u₂ _u₃} ⟨h1, h2⟩ ⟨h3, h4⟩ =>
       ⟨h1.trans h3, h2.trans h4⟩
   ⟩
+
+/--
+An instance to use `u1 ≈ u2` to check if two units are equivalent
+-/
+instance instHasEquivUnit : HasEquiv Unit where
+  Equiv := Setoid.r
+
+-- decidable equivalence of units
+instance instDecidableEquivUnit (u1 u2 : Unit) : Decidable (u1 ≈ u2) := by
+  dsimp [HasEquiv.Equiv, instHasEquivUnit, instSetoidUnit]
+  infer_instance
 
 /--
 Define a base unit with a given name and dimension.

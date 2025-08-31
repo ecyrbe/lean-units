@@ -20,7 +20,7 @@ structure Conversion where
   factor : ℚ
   offset : ℚ
   factor_ne_zero : factor ≠ 0
-deriving Repr, DecidableEq
+deriving Repr, DecidableEq, BEq
 
 class HasConversion (μ : Type) [AddCommGroup μ] where
   conversion (u : μ) : Conversion

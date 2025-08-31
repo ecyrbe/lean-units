@@ -4,7 +4,7 @@ import Mathlib.Data.Real.Basic
 namespace formal
 open Units Real
 
-abbrev SI {μ} (units : μ) := Quantity units ℝ
+abbrev SI (units : Dimension) := Quantity units ℝ
 
 
 variable (G : SI (Dimension.Length ^ 3 / (Dimension.Mass * Dimension.Time ^ 2)))
