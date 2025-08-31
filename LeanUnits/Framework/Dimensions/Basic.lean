@@ -42,11 +42,12 @@ instance instDecidableNeqZero : DecidableNEqZero Dimension :=
 instance : HasDimension Dimension where
   dimension u := u
 
-instance instHasEquivDimension : HasEquiv Dimension where
-  Equiv a b := a = b
+instance instSetoidUnit : Setoid Dimension where
+  r := (· = ·)
+  iseqv := ⟨fun _ => rfl, fun {_ _} h => h.symm, fun {_ _ _} h1 h2 => h1.trans h2⟩
 
 instance instDecidableEquivDimension (a b : Dimension) : Decidable (a ≈ b) := by
-  dsimp [HasEquiv.Equiv, instHasEquivDimension]
+  dsimp [HasEquiv.Equiv, instSetoidUnit]
   infer_instance
 
 -- implement convenient syntax for dimensions, because addition is confusing
