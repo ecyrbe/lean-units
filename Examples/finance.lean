@@ -11,7 +11,7 @@ def EUR := Unit.defineDerivedUnit "€" USD (Conversion.scale (116/100) (by simp
 def GBP := Unit.defineDerivedUnit "£" USD (Conversion.scale (134/100) (by simp)) -- 1 £ = 1.34 $
 
 -- quantities
-abbrev Money {μ} (units : μ) := Quantity units Float
+abbrev Money (units : Units.Unit) := Quantity units Float
 
 def dollar : Money USD := ⟨1.0⟩
 def euro : Money EUR := ⟨1.0⟩

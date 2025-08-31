@@ -96,15 +96,9 @@ instance instSetoidUnit : Setoid Unit where
       ⟨h1.trans h3, h2.trans h4⟩
   ⟩
 
-/--
-An instance to use `u1 ≈ u2` to check if two units are equivalent
--/
-instance instHasEquivUnit : HasEquiv Unit where
-  Equiv := Setoid.r
-
 -- decidable equivalence of units
 instance instDecidableEquivUnit (u1 u2 : Unit) : Decidable (u1 ≈ u2) := by
-  dsimp [HasEquiv.Equiv, instHasEquivUnit, instSetoidUnit]
+  dsimp [HasEquiv.Equiv, instSetoidUnit]
   infer_instance
 
 /--

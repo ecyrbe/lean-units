@@ -64,8 +64,8 @@ def hDiv [Div α] (q1 : Quantity d₁ α) (q2 : Quantity d₂ α) : Quantity (d�
 instance [Div α] : HDiv (Quantity d₁ α) (Quantity d₂ α) (Quantity (d₁ - d₂) α) where
   hDiv := hDiv
 
-def sMul [Mul α] (s : α) (q : Quantity d α) : Quantity d α :=
-    { val := s * q.val }
+def sMul [SMul α α] (s : α) (q : Quantity d α) : Quantity d α :=
+    { val := s • q.val }
 
 instance [Mul α] : HMul α (Quantity d α) (Quantity d α) where
     hMul := sMul
@@ -73,7 +73,7 @@ instance [Mul α] : HMul α (Quantity d α) (Quantity d α) where
 instance [Mul α] : HMul (Quantity d α) α (Quantity d α) where
     hMul q s := sMul s q
 
-instance [Mul α] : SMul α (Quantity d α) where
+instance [SMul α α] : SMul α (Quantity d α) where
     smul := sMul
 
 def divS [Div α] (q : Quantity d α) (s : α) : Quantity d α :=

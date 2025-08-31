@@ -60,6 +60,9 @@ def electron_mass_kg2 : SI Unit.kilogram := electron_mass_ev.convert
 #eval electron_mass_kg2.units
 #eval electron_mass_kg2.dimension
 
+#eval (MeV/c²).units ≈ kg.units -- false, they are not equivalent units, need conversion
+#eval (MeV/c²).dimension = kg.dimension -- true, they have the same dimension
+
 #eval c.as (m/s) -- we can also convert to another quantity
 
 -- can't convert to joules
