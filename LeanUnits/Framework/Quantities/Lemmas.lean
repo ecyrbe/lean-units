@@ -22,17 +22,6 @@ variable {δ : Type} [AddCommGroup δ] [Setoid δ]
 -- here d, d₁, d₂, d₃ can be any dimensions or units in δ
 variable {d d₁ d₂ d₃ : δ}
 
-/--
-A Quantity can be formalized into an AddMonoidAlgebra
-`Formal δ α = AddMonoidAlgebra α δ`
-where
-- δ is the type of dimensions or units, which is an AddCommGroup with an equivalence relation
-- α is the type of scalars, which is a Semiring (we use a Field here for convenience)
-
-This allows to use the machinery of AddMonoidAlgebra to prove lemmas about quantities.
-For example, the multiplication of quantities is associative up to equivalence
--/
-abbrev Formal (δ α) [Field α] [AddCommGroup δ] [Setoid δ] := AddMonoidAlgebra α δ
 
 theorem eq_imp_equiv {μ} [Setoid μ] {u1 u2 : μ} (h : u1 = u2) : u1 ≈ u2 := by
   rw [h]
@@ -58,48 +47,14 @@ theorem cast_val (q : Quantity d₁ α) (h : d₁ = d₂ := by module)
   subst h
   rfl
 
-@[coe]
-noncomputable def toFormal (q : Quantity d α) : Formal δ α :=
-  AddMonoidAlgebra.single d q.val
-
-noncomputable instance instCoeFormal : CoeOut (Quantity d α) (Formal δ α) where
-  coe := toFormal
-
-@[simp]
-theorem toFormal_inj (q₁ q₂: Quantity d α) :
-  (q₁ : Formal δ α) = (q₂ : Formal δ α) ↔ q₁ = q₂ := by
-  constructor
-  · simp only [toFormal, ← val_inj]
-    intro h
-    replace h := congr($h d)
-    repeat rw [Finsupp.single_eq_same] at h
-    exact h
-  · intro h
-    rw [h]
-
-@[simp]
-theorem toFormal_cast (q : Quantity d₁ α) (h : d₁ = d₂ := by module) :
-  ((q.cast (eq_imp_equiv h)):Formal δ α) = (q:Formal δ α) := by
-  subst h
-  rw [cast]
-
 @[simp]
 theorem val_zero : (0:Quantity d α).val = 0 := rfl
 
 theorem neZero_iff (q : Quantity d α) : NeZero q ↔ q.val ≠ 0 := by
   simp only [_root_.neZero_iff, ne_eq, ← val_inj, val_zero]
 
-@[simp, norm_cast]
-theorem toFormal_zero : ((0:Quantity d α): Formal δ α) = 0 := by
-  simp only [toFormal, val_zero, Finsupp.single_zero]
-
 @[simp]
 theorem val_add (q₁ q₂ : Quantity d α) : (q₁ + q₂).val = q₁.val + q₂.val := rfl
-
-@[simp, norm_cast]
-theorem toFormal_add (q₁ q₂ : Quantity d α) :
-  ((q₁ + q₂:Quantity d α):Formal δ α) = (q₁:Formal δ α) + (q₂:Formal δ α) := by
-  simp only [toFormal, val_add, Finsupp.single_add]
 
 @[simp]
 theorem val_neg (q : Quantity d α) : (-q).val = -q.val := rfl
@@ -108,18 +63,8 @@ instance instNeZero_neg (q : Quantity d α) [h : NeZero q] : NeZero (-q) := by
   rw [neZero_iff] at h ⊢
   simp only [val_neg, ne_eq, neg_eq_zero, h, not_false_eq_true]
 
-@[simp, norm_cast]
-theorem toFormal_neg (q : Quantity d α) :
-  ((-q:Quantity d α):Formal δ α) = -(q:Formal δ α) := by
-  simp only [toFormal, val_neg, Finsupp.single_neg]
-
 @[simp]
 theorem val_sub (q₁ q₂ : Quantity d α) : (q₁ - q₂).val = q₁.val - q₂.val := rfl
-
-@[simp, norm_cast]
-theorem toFormal_sub (q₁ q₂ : Quantity d α) :
-  ((q₁ - q₂ :Quantity d α):Formal δ α) = (q₁:Formal δ α) - q₂ := by
-  simp only [toFormal, val_sub, Finsupp.single_sub]
 
 @[simp]
 theorem val_smul [SMul α α] (n : α) (q : Quantity d α) : (n • q).val = n • q.val := rfl
@@ -200,6 +145,106 @@ theorem neZero_coe_iff {a : α} : NeZero (a: Quantity (0: δ) α) ↔ a ≠ 0 :=
 theorem coe_inj {a b : α} :
   (a:Quantity (0: δ) α) = (b:Quantity (0: δ) α) ↔ a = b := by
   rw [ofField, ofField, mk.injEq]
+
+@[norm_cast, simp]
+theorem coe_add (a b : α) :
+  ((a+b:α):Quantity (0: δ) α) = (a:Quantity (0: δ) α) + (b:Quantity (0: δ) α) := rfl
+
+@[norm_cast, simp]
+theorem coe_neg (a : α) : ((-a:α):Quantity (0: δ) α) = -(a: Quantity (0:δ) α) := rfl
+
+@[norm_cast, simp]
+theorem coe_sub (a b : α) :
+  ((a-b:α):Quantity (0:δ) α) = (a:Quantity (0:δ) α) - (b:Quantity (0:δ) α) := by
+  simp only [ofField]
+  rfl
+
+/--
+A Quantity can be formalized into an AddMonoidAlgebra
+`Formal δ α = AddMonoidAlgebra α δ`
+where
+- δ is the type of dimensions or units, which is an AddCommGroup with an equivalence relation
+- α is the type of scalars, which is a Semiring (we use a Field here for convenience)
+
+This allows to use the machinery of AddMonoidAlgebra to prove lemmas about quantities.
+For example, the multiplication of quantities is associative up to equivalence
+-/
+abbrev Formal (δ α) [Field α] [AddCommGroup δ] [Setoid δ] := AddMonoidAlgebra α δ
+
+namespace Formal
+
+
+@[coe]
+noncomputable def toFormal (q : Quantity d α) : Formal δ α :=
+  AddMonoidAlgebra.single d q.val
+
+noncomputable instance instCoeFormal : CoeOut (Quantity d α) (Formal δ α) where
+  coe := toFormal
+
+@[simp]
+theorem toFormal_inj (q₁ q₂: Quantity d α) :
+  (q₁ : Formal δ α) = (q₂ : Formal δ α) ↔ q₁ = q₂ := by
+  constructor
+  · simp only [toFormal, ← val_inj]
+    intro h
+    replace h := congr($h d)
+    repeat rw [Finsupp.single_eq_same] at h
+    exact h
+  · intro h
+    rw [h]
+
+@[simp]
+theorem toFormal_cast (q : Quantity d₁ α) (h : d₁ = d₂ := by module) :
+  ((q.cast (eq_imp_equiv h)):Formal δ α) = (q:Formal δ α) := by
+  subst h
+  rw [cast]
+
+@[simp, norm_cast]
+theorem toFormal_zero : ((0:Quantity d α): Formal δ α) = 0 := by
+  simp only [toFormal, val_zero, Finsupp.single_zero]
+
+@[simp, norm_cast]
+theorem toFormal_add (q₁ q₂ : Quantity d α) :
+  ((q₁ + q₂:Quantity d α):Formal δ α) = (q₁:Formal δ α) + (q₂:Formal δ α) := by
+  simp only [toFormal, val_add, Finsupp.single_add]
+
+@[simp, norm_cast]
+theorem toFormal_neg (q : Quantity d α) :
+  ((-q:Quantity d α):Formal δ α) = -(q:Formal δ α) := by
+  simp only [toFormal, val_neg, Finsupp.single_neg]
+
+@[simp, norm_cast]
+theorem toFormal_sub (q₁ q₂ : Quantity d α) :
+  ((q₁ - q₂ :Quantity d α):Formal δ α) = (q₁:Formal δ α) - q₂ := by
+  simp only [toFormal, val_sub, Finsupp.single_sub]
+
+noncomputable instance instCoeReal : Coe α (Formal δ α) where
+  coe a := ((a:Quantity (0:δ) α):Formal δ α)
+
+@[norm_cast, simp]
+theorem coe_zero : ((0:α): Formal δ α) = 0 := by
+  simp only [Quantity.coe_zero, toFormal_zero]
+
+@[norm_cast, simp]
+theorem coe_one : ((1:α):Formal δ α) = 1 := by
+  rfl
+
+@[norm_cast, simp]
+theorem coe_nat (n : ℕ) : ((n:α):Formal δ α) = (n:Formal δ α) := by
+  rfl
+
+@[norm_cast, simp]
+theorem coe_int (n : ℤ) : ((n:α):Formal δ α) = (n:Formal δ α) := by
+  rfl
+
+@[norm_cast, simp]
+theorem toFormal_smul (c : α) (q : Quantity d α)
+  : ((c • q:Quantity d α):Formal δ α) = (c:Formal δ α) * (q:Formal δ α) := by
+  simp only [toFormal, val_smul, _root_.smul_eq_mul, coe_val, AddMonoidAlgebra.single_mul_single,
+    zero_add]
+
+end Formal
+
 
 
 theorem hMul_assoc (a : Quantity d₁ α) (b : Quantity d₂ α) (c : Quantity d₃ α) :
