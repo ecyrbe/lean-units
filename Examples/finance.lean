@@ -7,8 +7,10 @@ def Currency := Dimension.ofString "C"
 
 -- units
 def USD := Unit.defineUnit "$" Currency
-def EUR := Unit.defineDerivedUnit "€" USD (Conversion.scale (116/100) (by simp)) -- 1 € = 1.16 $
-def GBP := Unit.defineDerivedUnit "£" USD (Conversion.scale (134/100) (by simp)) -- 1 £ = 1.34 $
+@[simp] def EUR := Unit.defineDerivedUnit "€" USD
+  (Conversion.scale (116/100) (by simp)) -- 1 € = 1.16 $
+@[simp] def GBP := Unit.defineDerivedUnit "£" USD
+  (Conversion.scale (134/100) (by simp)) -- 1 £ = 1.34 $
 
 -- quantities
 abbrev Money (units : Units.Unit) := Quantity units Float

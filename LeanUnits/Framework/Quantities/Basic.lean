@@ -178,7 +178,7 @@ Examples:
 - -- instead of: `convert q`
 -/
 def convert [Coe ℚ α] [Mul α] [Add α] [HasDimension δ] [HasConversion δ]
- (q : Quantity d₁ α) (_ : 𝒟 d₁ = 𝒟 d₂ := by dimension_check) :
+ (q : Quantity d₁ α) (_ : 𝒟 d₁ = 𝒟 d₂ := by auto_dim) :
  Quantity d₂ α := ⟨((𝒞 d₁)/(𝒞 d₂) ) ⊙ q.val⟩
 
 /--
@@ -189,7 +189,7 @@ Examples:
  convert constant c from natural unit to meter per second: c.into (Unit.meter-Unit.second)
 -/
 def into [Coe ℚ α] [Mul α] [Add α] [HasDimension δ] [HasConversion δ]
- (q : Quantity d α) (target : δ) (_ : 𝒟 d = 𝒟 target := by dimension_check) :
+ (q : Quantity d α) (target : δ) (_ : 𝒟 d = 𝒟 target := by auto_dim) :
  Quantity target α := ⟨((𝒞 d)/(𝒞 target)) ⊙ q.val⟩
 
 /--
@@ -200,7 +200,7 @@ Examples:
 - `let q' : Quantity (Unit.meter-Unit.second) Float := q.as (m/s)`
 -/
 def as [Coe ℚ α] [Mul α] [Add α] [HasDimension δ] [HasConversion δ]
- (q : Quantity d₁ α) (_ : Quantity d₂ α) (_ : 𝒟 d₁ = 𝒟 d₂ := by dimension_check) :
+ (q : Quantity d₁ α) (_ : Quantity d₂ α) (_ : 𝒟 d₁ = 𝒟 d₂ := by auto_dim) :
  Quantity d₂ α := ⟨((𝒞 d₁)/(𝒞 d₂)) ⊙ q.val⟩
 
 

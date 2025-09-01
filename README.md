@@ -60,7 +60,7 @@ def Length : Dimension := ofString "L"
 def Time : Dimension := ofString "T"
 def Mass : Dimension := ofString "M"
 
--- derived dimensions
+-- derived dimensions should be marked with @[simp] to allow casting
 @[simp] def Acceleration := Length / Time^2
 @[simp] def Force := Mass * Acceleration
 ```
@@ -68,12 +68,13 @@ def Mass : Dimension := ofString "M"
 - defining new units:
 
 ```lean
-def light_year := defineDerivedUnit "ly" meter (Conversion.scale (9460728 * 10^9) (by simp))
+-- derived units should be marked with @[simp] to allow casting and conversions
+@[simp] def light_year := defineDerivedUnit "ly" meter (Conversion.scale (9460728 * 10^9) (by simp))
 ```
 - defining new quantities:
 
 ```lean
-abbrev SI {μ} (units : μ) := Quantity units Float
+abbrev SI (units : Unit) := Quantity units Float
 
 def ly : SI light_year := ⟨1.0⟩
 
@@ -83,6 +84,32 @@ def distance_to_alpha_centauri : SI light_year := 4.367 • ly
 #eval distance_to_alpha_centauri.into Unit.meter -- 4.132e16 (m)
 #eval distance_to_alpha_centauri.dimension -- L
 ```
+
+## Casting between units or dimensions
+
+### Dimensions
+
+The library provides a way to cast between two dimensions that guaranty that their dimensions are propositionaly the same by using the tactic `auto_equiv`.
+
+### Units
+
+The library provides a way to cast between two units that guaranty that :
+- their dimensions are the same (propositionaly)
+- their conversions are the same (propositionaly)
+These two rules form an equivalence relation on units.
+
+It uses by default the tactic `auto_equiv` to automatically prove that the units are the equivalent.
+You can provide your own proof if needed.
+
+## Conversion between units
+
+The library provides a way to convert between two units that guaranty that :
+- their dimensions are the same (propositionaly)
+
+Their conversions don't have to be the same, since the conversion is what we want to compute.
+
+It uses by default the tactic `auto_dim` to automatically prove that the dimensions are the same.
+You can provide your own proof if needed.
 
 ## Internal representation
 

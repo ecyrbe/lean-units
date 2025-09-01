@@ -75,7 +75,7 @@ def electron_mass_kg2 : SI Unit.kilogram := electron_mass_ev.convert
 #check_failure kg/s + ↑(s/kg)
 def computable := kg/s + ↑(s/kg)⁻¹
 
-def light_year := Unit.defineDerivedUnit "ly" Unit.meter (Conversion.scale (9460728 * 10^9) (by simp))
+@[simp] def light_year := Unit.defineDerivedUnit "ly" Unit.meter (Conversion.scale (9460728 * 10^9) (by simp))
 
 def ly : SI light_year := ⟨1.0⟩
 

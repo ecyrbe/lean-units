@@ -8,18 +8,19 @@ namespace Units
 namespace Internal
 open Unit
 
-def speed_of_light := Unit.defineDerivedUnit "c" (meter / second) (Conversion.scale (299792458))
-def planck_constant := Unit.defineDerivedUnit "h"
+@[simp] def speed_of_light := Unit.defineDerivedUnit "c" (meter / second)
+  (Conversion.scale (299792458))
+@[simp] def planck_constant := Unit.defineDerivedUnit "h"
   (joule * second) (Conversion.scale (662607015/10^42) (by simp))
-def hyperfine_transition_frequency_cesium := Unit.defineDerivedUnit "Δν_Cs"
+@[simp] def hyperfine_transition_frequency_cesium := Unit.defineDerivedUnit "Δν_Cs"
   (second^(-1)) (Conversion.scale (9192631770))
-def elementary_charge := Unit.defineDerivedUnit "e"
+@[simp] def elementary_charge := Unit.defineDerivedUnit "e"
   (coulomb) (Conversion.scale (1602176634/10^28) (by simp))
-def boltzmann_constant := Unit.defineDerivedUnit "k"
+@[simp] def boltzmann_constant := Unit.defineDerivedUnit "k"
   (joule / kelvin) (Conversion.scale (1380649/10^29) (by simp))
-def avogadro_constant := Unit.defineDerivedUnit "N_A"
+@[simp] def avogadro_constant := Unit.defineDerivedUnit "N_A"
   (mole^(-1)) (Conversion.scale (602214076/10^31) (by simp))
-def luminous_efficacy := Unit.defineDerivedUnit "K_cd"
+@[simp] def luminous_efficacy := Unit.defineDerivedUnit "K_cd"
   (lumen/watt) (Conversion.scale (683))
 
 end Internal

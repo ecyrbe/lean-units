@@ -1,37 +1,13 @@
 import LeanUnits.Framework.Dimensions.Basic
+import LeanUnits.Framework.Units.Basic
+import LeanUnits.Framework.Units.Lemmas
 import Mathlib.Tactic
 import Lean
 
 open Lean Meta Elab Tactic
 
-/--
-axiom that is emitted when `dimension_check` finds two terms are equal at runtime.
--/
-axiom runtime_equal.{u} {α : Sort u} {a b : α} : a = b
+namespace Units
 
-elab "dimension_check" : tactic => do
-  let goal ← withMainContext getMainTarget
-  match goal with
-  | .app (.app (.app (.const `Eq _) _) a) b => do
-    let a' ← instantiateMVars a
-    let b' ← instantiateMVars b
-    let α ← inferType a'
-    let beqType ← mkAppM ``BEq #[α]
-    let inst ←
-      try
-        synthInstance beqType
-      catch _ =>
-        throwError "dimension_check failed: no BEq instance for the term type"
-    let beqExpr ← mkAppOptM ``BEq.beq #[some α, some inst, some a', some b']
-    let ok ← unsafe evalExpr Bool (mkConst ``Bool) beqExpr
-    if ok then
-      evalTactic (← `(tactic| exact runtime_equal))
-    else
-      -- eval left and right so we can prettry print them
-      let left ← ppExpr a'
-      let right ← ppExpr b'
-      throwError s!"dimension_check failed: terms are not equal `{left}` and `{right}`"
-  | _ => throwError "Goal must be an equality"
 
 axiom runtime_equiv.{u} {α : Sort u} [HasEquiv α] {a b : α} : a ≈ b
 
@@ -62,9 +38,25 @@ elab "equiv_check" : tactic => do
       throwError s!"equiv_check failed: terms are not equivalent `{left}` and `{right}`"
   | _ => throwError "Goal must be an equivalence"
 
+/--
+Helper tactic that tries to prove equalities or equivalences between dimensions or units.
+It tries the following strategies in order:
+1. propositional equality check using `module` tactic
+2. compile time equivalence check using `equiv_check` tactic that
+   only works if the dimensions or units are fully instantiated (no free variables)
+-/
 macro "auto_equiv" : tactic =>
   `(tactic|
-    (first |
-            (first | apply eq_imp_equiv; dsimp [instHMul, instHDiv, instHPow]; module
-                   | apply eq_imp_equiv; module )
+    (first | (first | apply eq_imp_equiv; module
+                    | apply eq_imp_equiv; dsimp [instHMul, instHDiv, instHPow]; module )
            | equiv_check ))
+
+macro "auto_dim" : tactic =>
+  `(tactic|
+    (first | rfl
+           | try simp [𝒟,HasDimension.dimension, instHMul, instHDiv, instHPow,
+                      HasEquiv.Equiv,Unit.instSetoidUnit]
+             try module
+    ))
+
+end Units
