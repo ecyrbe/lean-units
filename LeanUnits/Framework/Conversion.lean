@@ -34,7 +34,7 @@ def identity : Conversion := ⟨1,0, by decide⟩
 instance : Inhabited Conversion where
   default := identity
 
-def scale (s : ℚ) (h : s ≠ 0 := by decide) : Conversion := ⟨s,0, h⟩
+def scale (s : ℚ) (h : s ≠ 0 := by simp) : Conversion := ⟨s,0, h⟩
 def translate (t : ℚ) : Conversion := ⟨1,t, by decide⟩
 
 -- proper affine transformations
@@ -50,12 +50,15 @@ def inv (c : Conversion) : Conversion :=
 
 def div (c1 c2 : Conversion) : Conversion := mul c1 (inv c2)
 
+@[simp]
 instance : Mul Conversion where
   mul := mul
 
+@[simp]
 instance : Div Conversion where
   div := div
 
+@[simp]
 instance : Inv Conversion where
   inv := inv
 

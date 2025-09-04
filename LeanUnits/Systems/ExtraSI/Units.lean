@@ -4,34 +4,30 @@ import LeanUnits.Systems.SI.Units
 
 -- non SI units, but used a lot
 namespace Units.Unit
-
+open Conversion
 -- length
-@[simp] def astronomical_unit := defineDerivedUnit "au" meter
-  (Conversion.scale (149597870700) (by simp))
+def_derived_unit astronomical_unit := "au" meter with scale 149597870700
 -- area
-@[simp] def hectare := defineDerivedUnit "ha" (meter^2) (Conversion.scale (10^4) (by simp))
+def_derived_unit hectare := "ha" meter^2 with scale (10^4)
 -- volume
-@[simp] def liter := defineDerivedUnit "L" (meter^3) (Conversion.scale (1/1000) (by simp))
+def_derived_unit liter := "L" (meter^3) with scale (1/1000)
 -- time
-@[simp] def minute := defineDerivedUnit "min" second (Conversion.scale 60 (by simp))
-@[simp] def hour := defineDerivedUnit "h" minute (Conversion.scale 60 (by simp))
-@[simp] def day := defineDerivedUnit "d" hour (Conversion.scale 24 (by simp))
-@[simp] def week := defineDerivedUnit "wk" day (Conversion.scale 7 (by simp))
-@[simp] def year := defineDerivedUnit "yr" day (Conversion.scale (36525/100) (by simp))
+def_derived_unit minute := "min" second with scale 60
+def_derived_unit hour := "h" minute with scale 60
+def_derived_unit day := "d" hour with scale 24
+def_derived_unit week := "wk" day with scale 7
+def_derived_unit year := "yr" day with scale (36525/100)
 -- mass
-@[simp] def tonne := defineDerivedUnit "t" kilogram (Conversion.scale (10^3) (by simp))
-@[simp] def dalton := defineDerivedUnit "Da" kilogram
-  (Conversion.scale (166053906892 / 10^38) (by simp))
+def_derived_unit tonne := "t" kilogram with scale (10^3)
+def_derived_unit dalton := "Da" kilogram with scale (166053906892 / 10^38)
 -- pressure
-@[simp] def bar := defineDerivedUnit "bar" pascal (Conversion.scale (10^5) (by simp))
-@[simp] def atmosphere := defineDerivedUnit "atm" pascal (Conversion.scale (101325) (by simp))
+def_derived_unit bar := "bar" pascal with scale (10^5)
+def_derived_unit atmosphere := "atm" pascal with scale 101325
 -- energy
-@[simp] def electronvolt := defineDerivedUnit "eV" joule
-  (Conversion.scale (1602176634/10^28) (by simp))
+def_derived_unit electronvolt := "eV" joule with scale (1602176634/10^28)
 -- angle
-@[simp] def degree := defineDerivedUnit "°" radian
-  (Conversion.scale (314159265358979323846/(180*10^20) ) (by simp))
-@[simp] def arcminute := defineDerivedUnit "′" degree (Conversion.scale (1/60) (by simp))
-@[simp] def arcsecond := defineDerivedUnit "″" arcminute (Conversion.scale (1/60) (by simp))
+def_derived_unit degree := "°" radian with scale (314159265358979323846/(180*10^20))
+def_derived_unit arcminute := "′" degree with scale (1/60)
+def_derived_unit arcsecond := "″" arcminute with scale (1/60)
 
 end Units.Unit

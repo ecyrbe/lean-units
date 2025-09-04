@@ -47,15 +47,18 @@ It tries the following strategies in order:
 -/
 macro "auto_equiv" : tactic =>
   `(tactic|
-    (first | (first | apply eq_imp_equiv; module
-                    | apply eq_imp_equiv; dsimp [instHMul, instHDiv, instHPow]; module )
+    (first | (first | apply eq_imp_equiv
+                      module
+                    | apply eq_imp_equiv
+                      dsimp [instHMul, instHDiv, instHPow, dimension_set, derived_unit_set]
+                      module )
            | equiv_check ))
 
 macro "auto_dim" : tactic =>
   `(tactic|
     (first | rfl
            | try simp [𝒟,HasDimension.dimension, instHMul, instHDiv, instHPow,
-                      HasEquiv.Equiv,Unit.instSetoidUnit]
+                      HasEquiv.Equiv,Unit.instSetoidUnit, derived_unit_set]
              try module
     ))
 
