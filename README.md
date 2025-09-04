@@ -29,7 +29,7 @@ open Units
 
 def solar_mass_kepler_formula
 (period : SI Unit.second) (semi_major_axis : SI Unit.meter): SI Unit.kilogram :=
-  ↑(4.0 * pi^2  * semi_major_axis³ / (G * period²))
+  ↑(4.0 • pi^2 • semi_major_axis³ / (G * period²))
 
 #eval solar_mass_kepler_formula year earth_semi_major_axis
 -- 1.9884098707065004e30 (kg)
@@ -56,20 +56,27 @@ def electron_mass_kg := electron_mass_ev.into Unit.kilogram
 
 ```lean
 -- base dimensions
-def Length : Dimension := ofString "L"
-def Time : Dimension := ofString "T"
-def Mass : Dimension := ofString "M"
+def_base_dimension Length := "L"
+def_base_dimension Time := "T"
+def_base_dimension Mass := "M"
 
--- derived dimensions should be marked with @[simp] to allow casting
-@[simp] def Acceleration := Length / Time^2
-@[simp] def Force := Mass * Acceleration
+-- derived dimensions
+def_derived_dimension Acceleration := Length / Time^2
+def_derived_dimension Force := Mass * Acceleration
 ```
 
-- defining new units:
+- defining base units:
 
 ```lean
--- derived units should be marked with @[simp] to allow casting and conversions
-@[simp] def light_year := defineDerivedUnit "ly" meter (Conversion.scale (9460728 * 10^9) (by simp))
+-- base SI units
+def_base_unit meter := "m" = Dimension.Length
+def_base_unit second := "s" = Dimension.Time
+def_base_unit kilogram := "kg" = Dimension.Mass
+
+-- derived SI units
+def_derived_unit newton := "N" ≈ kilogram*meter/second^2
+-- derived unit with conversion
+def_derived_unit celsius := "°C" ≈ kelvin with Conversion.translate (27315/100)
 ```
 - defining new quantities:
 
