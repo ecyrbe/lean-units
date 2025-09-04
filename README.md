@@ -69,14 +69,14 @@ def_derived_dimension Force := Mass * Acceleration
 
 ```lean
 -- base SI units
-def_base_unit meter := "m" = Dimension.Length
-def_base_unit second := "s" = Dimension.Time
-def_base_unit kilogram := "kg" = Dimension.Mass
+def_base_unit meter := "m" from Dimension.Length
+def_base_unit second := "s" from Dimension.Time
+def_base_unit kilogram := "kg" from Dimension.Mass
 
 -- derived SI units
-def_derived_unit newton := "N" ≈ kilogram*meter/second^2
+def_derived_unit newton := "N" from kilogram*meter/second^2
 -- derived unit with conversion
-def_derived_unit celsius := "°C" ≈ kelvin with Conversion.translate (27315/100)
+def_derived_unit celsius := "°C" from kelvin with Conversion.translate (27315/100)
 ```
 - defining new quantities:
 

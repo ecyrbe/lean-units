@@ -37,7 +37,7 @@ Define a base unit.
 Example:
 - `def_base_unit meter := "m" = Dimension.Length`
 -/
-macro "def_base_unit" name:ident ":=" sym:str "=" dim:term : command => do
+macro "def_base_unit" name:ident ":=" sym:str "from" dim:term : command => do
     `(command| @[base_unit_set] def $name := defineUnit $sym $dim)
 
 /--
@@ -46,7 +46,7 @@ Define a derived unit.
 Example:
 - `def_derived_unit newton := "N" ≈ kilogram * meter / second^2`
 -/
-macro "def_derived_unit" name:ident ":=" sym:str "≈" base:term : command => do
+macro "def_derived_unit" name:ident ":=" sym:str "from" base:term : command => do
   `(command| @[derived_unit_set] def $name := defineDerivedUnit $sym $base)
 
 /--
@@ -55,7 +55,7 @@ Define a derived unit with conversion.
 Example:
 - `def_derived_unit celsius := "°C" ≈ kelvin with Conversion.translate (27315/100)`
 -/
-macro "def_derived_unit" name:ident ":=" sym:str "≈" base:term "with" conv:term : command => do
+macro "def_derived_unit" name:ident ":=" sym:str "from" base:term "with" conv:term : command => do
   `(command| @[derived_unit_set] def $name := defineDerivedUnit $sym $base $conv)
 
 end unit
