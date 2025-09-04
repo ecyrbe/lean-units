@@ -78,7 +78,7 @@ macro "define_si_prefixes_with_offset" prefix_symbol:str unit_symbol:ident offse
       let name := mkIdent (Name.mkSimple s!"{sym}{unit_symbol.getId}")
       let target_symbol := mkIdent (Name.mkSimple s!"{prefix_symbol.getString}{unit_symbol.getId}")
       let valIdent := mkIdent (Name.mkSimple val)
-      `(@[inline] def $name := $offset * $valIdent • $target_symbol)
+      `(@[inline] def $name := ($offset * $valIdent) • $target_symbol)
   return TSyntax.mk <| mkNullNode defs
 
 end Prefix

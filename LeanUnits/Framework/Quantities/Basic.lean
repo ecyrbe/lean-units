@@ -55,9 +55,6 @@ def hMul [Mul α] (q1 : Quantity d₁ α) (q2 : Quantity d₂ α) : Quantity (d�
 instance [Mul α] : HMul (Quantity d₁ α) (Quantity d₂ α) (Quantity (d₁ + d₂) α) where
   hMul := hMul
 
-instance [Mul α] : HMul (Quantity d₁ α) (Quantity d₂ α) (Quantity (d₁ + d₂) α) where
-  hMul := hMul
-
 def hDiv [Div α] (q1 : Quantity d₁ α) (q2 : Quantity d₂ α) : Quantity (d₁ - d₂) α :=
     { val := q1.val / q2.val }
 
@@ -67,26 +64,8 @@ instance [Div α] : HDiv (Quantity d₁ α) (Quantity d₂ α) (Quantity (d₁ -
 def sMul [SMul α α] (s : α) (q : Quantity d α) : Quantity d α :=
     { val := s • q.val }
 
-instance [Mul α] : HMul α (Quantity d α) (Quantity d α) where
-    hMul := sMul
-
-instance [Mul α] : HMul (Quantity d α) α (Quantity d α) where
-    hMul q s := sMul s q
-
 instance [SMul α α] : SMul α (Quantity d α) where
     smul := sMul
-
-def divS [Div α] (q : Quantity d α) (s : α) : Quantity d α :=
-    { val := q.val / s }
-
-instance [Div α] : HDiv (Quantity d α) α (Quantity d α) where
-    hDiv := divS
-
-def sDiv [Div α] (s : α) (q : Quantity d α) : Quantity (-d) α :=
-    { val := s / q.val }
-
-instance [Div α] : HDiv α (Quantity d α) (Quantity (-d) α) where
-    hDiv := sDiv
 
 def hInvSquare [Inv α] [Mul α] (q : Quantity d α) : Quantity (-2•d) α :=
     let inverse := q.val⁻¹
