@@ -12,10 +12,10 @@ initialize SimpDimensionSet : SimpExtension ←
 
 initialize SimpBaseUnitSet : SimpExtension ←
   registerSimpAttr `base_unit_set
-    "definitions and lemmas for base simplification"
+    "definitions and lemmas for base units simplification"
 
 initialize SimpDerivedUnitSet : SimpExtension ←
   registerSimpAttr `derived_unit_set
-    "definitions and lemmas for base simplification"
+    "definitions and lemmas for derived units simplification"
 
 end Units
