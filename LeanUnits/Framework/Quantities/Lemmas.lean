@@ -51,6 +51,9 @@ theorem cast_val (q : Quantity d₁ α) (h : d₁ = d₂ := by module)
 @[simp]
 theorem val_zero : (0:Quantity d α).val = 0 := rfl
 
+@[simp]
+theorem val_one : (1:Quantity d α).val = 1 := rfl
+
 theorem neZero_iff (q : Quantity d α) : NeZero q ↔ q.val ≠ 0 := by
   simp only [_root_.neZero_iff, ne_eq, ← val_inj, val_zero]
 
@@ -171,8 +174,13 @@ theorem coe_sub (a b : α) :
   simp only [ofField]
   rfl
 
-def qDifferentiable [NontriviallyNormedField α]
+def differentiable [NontriviallyNormedField α]
   (f : Quantity d₁ α → Quantity d₂ α) : Prop := Differentiable α (fun t : α => (f ⟨t⟩).val)
+
+theorem differentiable_fun_id [NontriviallyNormedField α] :
+  differentiable (fun t : Quantity d₁ α => t) := by
+  rw [differentiable]
+  exact _root_.differentiable_fun_id
 
 theorem deriv_qconst [NontriviallyNormedField α] (x : Quantity d₁ α) (c : Quantity d₂ α) :
   deriv (fun _ => c ) x = 0 := by
@@ -189,7 +197,7 @@ theorem deriv_id [NontriviallyNormedField α] (x : Quantity d₁ α) :
 -- to do generalize to α, but we get errors for now
 theorem deriv_const_smul_real
   {f : Quantity d₁ ℝ → Quantity d₂ ℝ} {x : Quantity d₁ ℝ}
-  (c : ℝ) (h_f_diff : qDifferentiable f) :
+  (c : ℝ) (h_f_diff : differentiable f) :
   deriv (fun t => c • f t) x = c • deriv f x := by
   rw [← val_inj]
   simp only [deriv, val_smul]
@@ -197,7 +205,7 @@ theorem deriv_const_smul_real
 
 theorem deriv_qconst_mul_real
   (c : Quantity d₃ ℝ) (f : Quantity d₁ ℝ → Quantity d₂ ℝ) (x : Quantity d₁ ℝ)
-  (h_f_diff : qDifferentiable f) :
+  (h_f_diff : differentiable f) :
   deriv (fun t => c * (f t) ) x = ↑(c * deriv f x) := by
   rw [← val_inj]
   simp only [deriv]
@@ -205,7 +213,7 @@ theorem deriv_qconst_mul_real
 
 theorem deriv_add_real
   (f g : Quantity d₁ ℝ → Quantity d₂ ℝ) (x : Quantity d₁ ℝ)
-  (h_f_diff : qDifferentiable f) (h_g_diff : qDifferentiable g) :
+  (h_f_diff : differentiable f) (h_g_diff : differentiable g) :
   deriv (fun t => (f t) + (g t)) x = deriv f x + deriv g x := by
   rw [← val_inj]
   simp only [deriv, val_add]
@@ -213,13 +221,12 @@ theorem deriv_add_real
 
 theorem deriv_mul_real
   (f : Quantity d₁ ℝ → Quantity d₂ ℝ) (g : Quantity d₁ ℝ → Quantity d₃ ℝ) (x : Quantity d₁ ℝ)
-  (h_f_diff : qDifferentiable f) (h_g_diff : qDifferentiable g) :
+  (h_f_diff : differentiable f) (h_g_diff : differentiable g) :
   deriv (fun t => (f t) * (g t)) x =
     ↑(deriv f x * g x + ↑(f x * deriv g x)) := by
   rw [← val_inj]
   simp only [deriv]
   exact deriv_mul (h_f_diff.differentiableAt) (h_g_diff.differentiableAt)
-
 
 /--
 A Quantity can be formalized into an AddMonoidAlgebra
@@ -358,6 +365,25 @@ theorem toFormal_zsmul (c : ℤ) (q : Quantity d α)
 theorem toFormal_mul (q₁ : Quantity d₁ α) (q₂ : Quantity d₂ α) :
   ((q₁ * q₂:Quantity (d₁+d₂) α):Formal δ α) = (q₁:Formal δ α) * (q₂:Formal δ α) := by
   simp [Formal.toFormal, AddMonoidAlgebra.single_mul_single]
+
+theorem mul_one (a : Quantity d₁ α) (h : d₁ = d₁ + d₂ := by module) :
+  a * (1: Quantity (d₂:δ) α) = a.cast (eq_imp_equiv h) := by
+  rw [←val_inj,val_mul, val_one,_root_.mul_one]
+  rfl
+
+theorem mul_one' (a : Quantity d α) :
+  a * (1: Quantity (0:δ) α) = a.cast := by
+  rw [mul_one]
+
+theorem one_mul (a : Quantity d₂ α) (h : d₂ = d₁ + d₂ := by module) :
+  (1: Quantity (d₁:δ) α) * a = a.cast (eq_imp_equiv h) := by
+  rw [←val_inj,val_mul, val_one,_root_.one_mul]
+  rfl
+
+theorem one_mul' (a : Quantity d α) :
+  (1: Quantity (0:δ) α) * a = a.cast := by
+  rw [one_mul]
+
 
 theorem mul_comm (a : Quantity d₁ α) (b : Quantity d₂ α) :
   a * b = (b * a).cast := by
