@@ -11,12 +11,14 @@ noncomputable def speed_from_pos_over_time
   (t : SI Dimension.Time) (v0 : SI Dimension.Speed) (angle : ℝ) : SI Dimension.Speed :=
   ↑Quantity.deriv (fun t => Real.cos angle • v0 * t) t
 
+-- proof using Quantities lemmas
 theorem simp_over_time (t : SI Dimension.Time) (v0 : SI Dimension.Speed) (angle : ℝ) :
     Quantity.deriv (fun t => Real.cos angle • v0 * t) t = ↑(Real.cos angle•v0) := by
     rw [Quantity.deriv_qconst_mul_real,Quantity.deriv_id, Quantity.mul_one]
     · rfl
     · exact Quantity.differentiable_fun_id
 
+-- proof using only mathlib lemmas
 theorem simp_over_time' (t : SI Dimension.Time) (v0 : SI Dimension.Speed) (angle : ℝ) :
     Quantity.deriv (fun t => Real.cos angle • v0 * t) t = ↑(Real.cos angle•v0) := by
   simp [Quantity.deriv, Quantity.cast]
