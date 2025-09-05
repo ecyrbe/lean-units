@@ -77,6 +77,74 @@ theorem zsmul_unit_dim (c : ℤ) (u : Unit) :
   | negSucc n =>
       simp only [negSucc_zsmul, neg_unit_dim, nsmul_unit_dim]
 
+@[simp]
+theorem base_unit_conv_eq_conv (d : Dimension) (s : String) :
+  (defineUnit s d).conversion = 0 := by
+  rw [defineUnit, conversion]
+  apply DFinsupp.sum_single_index
+  rw [Prod.snd_zero, Prod.fst_zero]
 
+theorem conv_zero_eq_conv_identity : Conversion.identity = 0 := rfl
+
+-- @[simp]
+-- theorem conv_div_zero (c : Conversion) :
+--   c.div 0 = c := by
+--   simp [←conv_zero_eq_conv_identity,Conversion.div, Conversion.inv,
+--       Conversion.mul, Conversion.identity]
+
+-- @[simp]
+-- theorem zero_div_conv (c : Conversion) {h : c.offset = 0} :
+--   Conversion.div 0 c = -c := by
+--   simp [Conversion.div, Conversion.inv, Conversion.mul, ←conv_zero_eq_conv_identity,
+--     Conversion.identity, h, Conversion.instNeg, Conversion.neg]
+
+
+@[simp]
+theorem derived_unit_conv_eq_conv (u : Unit) (s : String) (c : Conversion) :
+  (defineDerivedUnit s u c).conversion = c-u.conversion := by
+  rw [defineDerivedUnit, conversion]
+  apply DFinsupp.sum_single_index
+  rw [Prod.snd_zero, Prod.fst_zero]
+
+@[simp]
+theorem add_unit_conv {u1 u2 : Unit} :
+  (u1 + u2).conversion = u1.conversion + u2.conversion := by
+  rw [conversion, conversion, conversion]
+  apply DFinsupp.sum_add_index
+  · intro
+    rw [Prod.snd_zero, Prod.fst_zero]
+  · intros
+    rw [Prod.snd_add, Prod.fst_add]
+
+@[simp]
+theorem sub_unit_conv {u1 u2 : Unit} :
+  (u1 - u2).conversion = u1.conversion - u2.conversion := by
+  rw [conversion, conversion, conversion]
+  apply DFinsupp.sum_sub_index
+  intros
+  rw [Prod.snd_sub, Prod.fst_sub]
+
+@[simp]
+theorem neg_unit_conv {u : Unit} :
+  (-u).conversion = -u.conversion := by
+  rw [←zero_sub, sub_unit_conv, sub_eq_neg_self]
+  rfl
+
+@[simp]
+theorem nsmul_unit_conv (c : ℕ) (u : Unit) :
+  (c • u).conversion = c • u.conversion := by
+  induction' c with c ih
+  · repeat rw [zero_nsmul]
+    rfl
+  · simp [succ_nsmul, add_unit_conv, ih]
+
+@[simp]
+theorem zsmul_unit_conv (c : ℤ) (u : Unit) :
+  (c • u).conversion = c • u.conversion := by
+  cases c with
+  | ofNat n =>
+      simp only [Int.ofNat_eq_coe, natCast_zsmul, nsmul_unit_conv n u]
+  | negSucc n =>
+      simp only [negSucc_zsmul, neg_unit_conv, nsmul_unit_conv]
 
 end Units.Unit

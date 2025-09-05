@@ -2,9 +2,8 @@ import LeanUnits.Framework.Dimensions.Basic
 import LeanUnits.Framework.Dimensions.Tactic
 import LeanUnits.Framework.Conversion
 import LeanUnits.Math
--- import ring tactic
-import Mathlib.Tactic
-
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.MeasureTheory.MeasurableSpace.Defs
 namespace Units
 
 variable {α δ : Type} [AddCommGroup δ] [Repr δ]
@@ -112,6 +111,20 @@ def hSqrt [HSqrt α α] [SMul ℚ δ] (q : Quantity d α) : Quantity ((1/2:ℚ)�
 instance [HSqrt α α] [SMul ℚ δ] : HSqrt (Quantity d α) (Quantity ((1/2:ℚ)•d) α) where
     hSqrt := hSqrt
 
+def fun_to_val (f : Quantity d₁ α → Quantity d₂ α) : α → α :=
+    fun x => (f ⟨x⟩).val
+
+-- derivative
+noncomputable def deriv [NontriviallyNormedField α]
+  (f : Quantity d₁ α → Quantity d₂ α) (x : Quantity d₁ α) : Quantity (d₂-d₁) α :=
+  ⟨_root_.deriv (fun_to_val f) x.val⟩
+
+-- integral
+noncomputable def integral [NormedAddCommGroup α] [NormedSpace ℝ α] [MeasurableSpace α]
+  (f : Quantity d₁ α → Quantity d₂ α) (μ : MeasureTheory.Measure α) : Quantity (d₁+d₂) α :=
+  ⟨MeasureTheory.integral μ (fun_to_val f)⟩
+
+-- order
 def lt [LT α] (q1 q2 : Quantity d α) : Prop :=
     q1.val < q2.val
 

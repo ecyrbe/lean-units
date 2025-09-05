@@ -2,6 +2,7 @@ import Mathlib.Algebra.MonoidAlgebra.Basic
 import Mathlib.Data.Real.Basic
 import Mathlib.Algebra.Group.InjSurj
 import LeanUnits.Framework.Quantities.Basic
+import Mathlib.Tactic
 
 /-!
 Credit to @TerrenceTao for these lemmas about Fomalizing quantities into the AddMonoidAlgebra.
@@ -20,7 +21,7 @@ variable {α : Type} [Field α]
 -- we require δ to be an AddCommGroup with an equivalence relation
 variable {δ : Type} [AddCommGroup δ] [Setoid δ]
 -- here d, d₁, d₂, d₃ can be any dimensions or units in δ
-variable {d d₁ d₂ d₃ : δ}
+variable {d d₁ d₂ d₃ d₄ : δ}
 
 
 theorem eq_imp_equiv {μ} [Setoid μ] {u1 u2 : μ} (h : u1 = u2) : u1 ≈ u2 := by
@@ -68,6 +69,17 @@ theorem val_sub (q₁ q₂ : Quantity d α) : (q₁ - q₂).val = q₁.val - q�
 
 @[simp]
 theorem val_smul [SMul α α] (n : α) (q : Quantity d α) : (n • q).val = n • q.val := rfl
+
+@[simp]
+theorem val_mul [Mul α] (q₁ : Quantity d₁ α) (q₂ : Quantity d₂ α) :
+  (q₁ * q₂).val = q₁.val * q₂.val := rfl
+
+@[simp]
+theorem val_div [Div α] (q₁ : Quantity d₁ α) (q₂ : Quantity d₂ α) :
+  (q₁ / q₂).val = q₁.val / q₂.val := rfl
+
+@[simp]
+theorem val_inv [Inv α] (q : Quantity d α) : (q⁻¹).val = Inv.inv q.val := rfl
 
 instance instAddGroup : AddGroup (Quantity d α) where
   zero := Zero.zero
@@ -159,6 +171,56 @@ theorem coe_sub (a b : α) :
   simp only [ofField]
   rfl
 
+def qDifferentiable [NontriviallyNormedField α]
+  (f : Quantity d₁ α → Quantity d₂ α) : Prop := Differentiable α (fun t : α => (f ⟨t⟩).val)
+
+theorem deriv_qconst [NontriviallyNormedField α] (x : Quantity d₁ α) (c : Quantity d₂ α) :
+  deriv (fun _ => c ) x = 0 := by
+  rw [← val_inj]
+  simp only [deriv]
+  exact _root_.deriv_const x.val c.val
+
+theorem deriv_id [NontriviallyNormedField α] (x : Quantity d₁ α) :
+  deriv (fun t => t) x = 1 := by
+  rw [← val_inj]
+  simp only [deriv]
+  exact _root_.deriv_id x.val
+
+-- to do generalize to α, but we get errors for now
+theorem deriv_const_smul_real
+  {f : Quantity d₁ ℝ → Quantity d₂ ℝ} {x : Quantity d₁ ℝ}
+  (c : ℝ) (h_f_diff : qDifferentiable f) :
+  deriv (fun t => c • f t) x = c • deriv f x := by
+  rw [← val_inj]
+  simp only [deriv, val_smul]
+  exact deriv_const_smul c h_f_diff.differentiableAt
+
+theorem deriv_qconst_mul_real
+  (c : Quantity d₃ ℝ) (f : Quantity d₁ ℝ → Quantity d₂ ℝ) (x : Quantity d₁ ℝ)
+  (h_f_diff : qDifferentiable f) :
+  deriv (fun t => c * (f t) ) x = ↑(c * deriv f x) := by
+  rw [← val_inj]
+  simp only [deriv]
+  exact deriv_const_mul c.val h_f_diff.differentiableAt
+
+theorem deriv_add_real
+  (f g : Quantity d₁ ℝ → Quantity d₂ ℝ) (x : Quantity d₁ ℝ)
+  (h_f_diff : qDifferentiable f) (h_g_diff : qDifferentiable g) :
+  deriv (fun t => (f t) + (g t)) x = deriv f x + deriv g x := by
+  rw [← val_inj]
+  simp only [deriv, val_add]
+  exact deriv_add (h_f_diff.differentiableAt) (h_g_diff.differentiableAt)
+
+theorem deriv_mul_real
+  (f : Quantity d₁ ℝ → Quantity d₂ ℝ) (g : Quantity d₁ ℝ → Quantity d₃ ℝ) (x : Quantity d₁ ℝ)
+  (h_f_diff : qDifferentiable f) (h_g_diff : qDifferentiable g) :
+  deriv (fun t => (f t) * (g t)) x =
+    ↑(deriv f x * g x + ↑(f x * deriv g x)) := by
+  rw [← val_inj]
+  simp only [deriv]
+  exact deriv_mul (h_f_diff.differentiableAt) (h_g_diff.differentiableAt)
+
+
 /--
 A Quantity can be formalized into an AddMonoidAlgebra
 `Formal δ α = AddMonoidAlgebra α δ`
@@ -243,14 +305,70 @@ theorem toFormal_smul (c : α) (q : Quantity d α)
   simp only [toFormal, val_smul, _root_.smul_eq_mul, coe_val, AddMonoidAlgebra.single_mul_single,
     zero_add]
 
+@[simp]
+theorem smul_eq_mul (c : α) (x : Formal δ α) : c • x = (c:Formal δ α) * x := by
+  ext n
+  simp [toFormal]
+  rw [Finsupp.smul_apply, AddMonoidAlgebra.single_zero_mul_apply, _root_.smul_eq_mul]
+
+@[simp]
+theorem smul_eq_mul' (c : ℕ) (x : Formal δ α) : c • x = (c:Formal δ α) * x := by
+  simp only [nsmul_eq_mul]
+
+@[simp]
+theorem smul_eq_mul'' (c : ℤ) (x : Formal δ α) : c • x = (c : Formal δ α) * x := by
+  simp only [zsmul_eq_mul]
+
+
 end Formal
 
+@[norm_cast, simp]
+theorem coe_mul (a b : α) : ((a*b:α):Quantity (0: δ) α) = a • (b:Quantity (0:δ) α) := by
+  simp only [ofField]
+  rfl
+
+instance instModule : Module α (Quantity d α) where
+  smul_add c q₁ q₂ := by simp [←Formal.toFormal_inj]; ring
+  add_smul c1 c2 q := by simp [←Formal.toFormal_inj]; ring
+  one_smul q := by simp [←Formal.toFormal_inj]
+  zero_smul q := by simp [←Formal.toFormal_inj]
+  mul_smul c1 c2 q := by simp [←Formal.toFormal_inj]; ring
+  smul_zero c := by simp [←Formal.toFormal_inj]
 
 
-theorem hMul_assoc (a : Quantity d₁ α) (b : Quantity d₂ α) (c : Quantity d₃ α) :
-  a * (b * c) = ((a * b) * c).cast := by
-  rw [←toFormal_inj, toFormal_cast]
+@[simp]
+theorem val_nsmul (c : ℕ) (q : Quantity d α) : (c • q).val = c * q.val := by
+  simp [←Nat.cast_smul_eq_nsmul α]
+
+@[simp]
+theorem val_zsmul (c : ℤ) (q : Quantity d α) : (c • q).val = c * q.val := by
+  simp [←Int.cast_smul_eq_zsmul α]
+
+@[norm_cast, simp]
+theorem toFormal_nsmul (c : ℕ) (q : Quantity d α)
+  : ((c • q:Quantity d α):Formal δ α) = (c:Formal δ α) * (q:Formal δ α) := by
+  simp [←Nat.cast_smul_eq_nsmul α]
+
+@[norm_cast, simp]
+theorem toFormal_zsmul (c : ℤ) (q : Quantity d α)
+  : ((c • q:Quantity d α):Formal δ α) = (c:Formal δ α) * (q:Formal δ α) := by
+  simp [←Int.cast_smul_eq_zsmul α]
+
+@[norm_cast, simp]
+theorem toFormal_mul (q₁ : Quantity d₁ α) (q₂ : Quantity d₂ α) :
+  ((q₁ * q₂:Quantity (d₁+d₂) α):Formal δ α) = (q₁:Formal δ α) * (q₂:Formal δ α) := by
+  simp [Formal.toFormal, AddMonoidAlgebra.single_mul_single]
+
+theorem mul_comm (a : Quantity d₁ α) (b : Quantity d₂ α) :
+  a * b = (b * a).cast := by
+  rw [←Formal.toFormal_inj, Formal.toFormal_cast]
+  repeat rw [toFormal_mul]
   ring
-  sorry
+
+theorem mul_assoc (a : Quantity d₁ α) (b : Quantity d₂ α) (c : Quantity d₃ α) :
+  a * (b * c) = ((a * b) * c).cast := by
+  rw [←Formal.toFormal_inj, Formal.toFormal_cast]
+  repeat rw [toFormal_mul]
+  ring
 
 end Units.Quantity
