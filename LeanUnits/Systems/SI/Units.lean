@@ -13,10 +13,10 @@ def_base_unit ampere := "A" from Dimension.Current
 def_base_unit kelvin := "K" from Dimension.Temperature
 def_base_unit mole := "mol" from Dimension.AmountOfSubstance
 def_base_unit candela := "cd" from Dimension.LuminousIntensity
-def_base_unit radian := "rad" from Dimension.dimensionless
-def_base_unit steradian := "sr" from Dimension.dimensionless
+def_base_unit radian := "rad" from 0
+def_base_unit steradian := "sr" from 0
 
--- derived SI units
+-- derived SI unitss
 def_derived_unit hertz := "Hz" from second⁻¹
 def_derived_unit newton := "N" from kilogram * meter / second^2
 def_derived_unit pascal := "Pa" from newton / meter^2
