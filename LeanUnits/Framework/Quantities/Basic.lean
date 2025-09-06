@@ -167,9 +167,10 @@ prefix:100 (priority := high) "↑" => cast
 @[inherit_doc convert]
 postfix:100 (priority := high) "→" => convert
 
-postfix:max (priority := high) "^ⁿ" => npow
-postfix:max (priority := high) "^ᶻ" => zpow
-postfix:max (priority := high) "^ℚ" => qpow
+-- notation for dependent power
+-- example (q : Quantity d ℝ) (n : ℕ) : q^ᵈn = q.npow n := rfl
+-- example (q : Quantity d ℝ) (n : ℤ) : q^ᵈn = q.zpow n := rfl
+-- example [Pow ℝ ℚ] [SMul ℚ δ] (q : Quantity d ℝ) (n : ℚ) : q ^ᵈ n * q = q.qpow n * q := rfl
 
 -- positive powers as superscript
 postfix:max (priority := high) "²" => npow (n := 2)
