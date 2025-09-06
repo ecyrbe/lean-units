@@ -1,7 +1,6 @@
 import LeanUnits.Framework.Dimensions.Basic
 import LeanUnits.Framework.Dimensions.Tactic
 import LeanUnits.Framework.Conversion
-import LeanUnits.Math
 import Mathlib.MeasureTheory.Integral.Bochner.Basic
 import Mathlib.MeasureTheory.MeasurableSpace.Defs
 namespace Units
@@ -13,7 +12,6 @@ structure Quantity (dim : δ) (α : Type) [AddCommGroup δ] where
     deriving Inhabited, BEq, DecidableEq
 
 namespace Quantity
-open Units.Math
 
 -- ### Operations on Quantities
 variable {d d₁ d₂ : δ}
@@ -66,50 +64,17 @@ def sMul [SMul α α] (s : α) (q : Quantity d α) : Quantity d α :=
 instance [SMul α α] : SMul α (Quantity d α) where
     smul := sMul
 
-def hInvSquare [Inv α] [Mul α] (q : Quantity d α) : Quantity (-2•d) α :=
-    let inverse := q.val⁻¹
-    { val := inverse * inverse }
+def npow [Pow α ℕ] (q : Quantity d α) (n : ℕ) : Quantity (n•d) α :=
+    { val := q.val ^ n }
 
-instance [Inv α] [Mul α] : HIntPow (Quantity d α) (-2) (Quantity (-2•d) α) where
-    hIntPow := hInvSquare
+def zpow [Pow α ℤ] (q : Quantity d α) (n : ℤ) : Quantity (n•d) α :=
+    { val := q.val ^ n }
 
-def hInv [Inv α] (q : Quantity d α) : Quantity (-d) α :=
-    { val := Inv.inv q.val }
+def qpow [Pow α ℚ] [SMul ℚ δ] (q : Quantity d α) (n : ℚ) : Quantity (n•d) α :=
+    { val := q.val ^ n }
 
-instance [Inv α] : HIntPow (Quantity d α) (-1) (Quantity (-d) α) where
-    hIntPow := hInv
-
-
-def hSquare [Mul α] (q : Quantity d α) : Quantity (2•d) α :=
-    { val := q.val * q.val }
-
-instance [Mul α] : HIntPow (Quantity d α) 2 (Quantity (2•d) α) where
-    hIntPow := hSquare
-
-def hCubic [Mul α] (q : Quantity d α) : Quantity (3•d) α :=
-    { val := q.val * q.val * q.val }
-
-instance [Mul α] : HIntPow (Quantity d α) 3 (Quantity (3•d) α) where
-    hIntPow := hCubic
-
-def hQuartic [Mul α] (q : Quantity d α) : Quantity (4•d) α :=
-    { val := q.val * q.val * q.val * q.val }
-
-instance [Mul α] : HIntPow (Quantity d α) 4 (Quantity (4•d) α) where
-    hIntPow := hQuartic
-
-def hQuintic [Mul α] (q : Quantity d α) : Quantity (5•d) α :=
-    { val := q.val * q.val * q.val * q.val * q.val }
-
-instance [Mul α] : HIntPow (Quantity d α) 5 (Quantity (5•d) α) where
-    hIntPow := hQuintic
-
--- square root
-def hSqrt [HSqrt α α] [SMul ℚ δ] (q : Quantity d α) : Quantity ((1/2:ℚ)•d) α :=
-    { val := √q.val }
-
-instance [HSqrt α α] [SMul ℚ δ] : HSqrt (Quantity d α) (Quantity ((1/2:ℚ)•d) α) where
-    hSqrt := hSqrt
+def inv [Inv α] (q : Quantity d α) : Quantity (-d) α :=
+    { val := q.val⁻¹ }
 
 def fun_to_val (f : Quantity d₁ α → Quantity d₂ α) : α → α :=
     fun x => (f ⟨x⟩).val
@@ -201,6 +166,29 @@ prefix:100 (priority := high) "↑" => cast
 
 @[inherit_doc convert]
 postfix:100 (priority := high) "→" => convert
+
+postfix:max (priority := high) "^ⁿ" => npow
+postfix:max (priority := high) "^ᶻ" => zpow
+postfix:max (priority := high) "^ℚ" => qpow
+
+-- positive powers as superscript
+postfix:max (priority := high) "²" => npow (n := 2)
+postfix:max (priority := high) "³" => npow (n := 3)
+postfix:max (priority := high) "⁴" => npow (n := 4)
+postfix:max (priority := high) "⁵" => npow (n := 5)
+postfix:max (priority := high) "⁶" => npow (n := 6)
+postfix:max (priority := high) "⁷" => npow (n := 7)
+postfix:max (priority := high) "⁸" => npow (n := 8)
+postfix:max (priority := high) "⁹" => npow (n := 9)
+-- negative powers as superscript
+postfix:max (priority := high) "⁻²" => zpow (n := -2)
+postfix:max (priority := high) "⁻³" => zpow (n := -3)
+postfix:max (priority := high) "⁻⁴" => zpow (n := -4)
+postfix:max (priority := high) "⁻⁵" => zpow (n := -5)
+postfix:max (priority := high) "⁻⁶" => zpow (n := -6)
+postfix:max (priority := high) "⁻⁷" => zpow (n := -7)
+postfix:max (priority := high) "⁻⁸" => zpow (n := -8)
+postfix:max (priority := high) "⁻⁹" => zpow (n := -9)
 
 end Quantity
 
