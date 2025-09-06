@@ -47,27 +47,15 @@ elab_rules : term
       let ne ← elabTerm n none
       let nty ← whnf (← inferType ne)
 
-      let tryDot (field : Name) : TermElabM (Option Expr) := do
+      let makeDot (field : Name) : TermElabM (Expr) := do
         let stx ← `(($q).$(mkIdent field) $n)
-        try
-          return some (← elabTerm stx none)
-        catch _ =>
-          return none
+        elabTerm stx none
 
-      let attempt (field : Name) : TermElabM Expr := do
-        if let some e ← tryDot field then
-        return e
-        else
-        throwErrorAt q m!"missing .{field} on base; cannot apply dependent power"
-
-      if nty.isConstOf ``Nat then
-        attempt `npow
-      else if nty.isConstOf ``Int then
-        attempt `zpow
-      else if nty.isConstOf ``Rat then
-        attempt `qpow
-      else
-        throwErrorAt n m!"exponent must be ℕ, ℤ, or ℚ; got type {nty}"
+      match nty with
+      | .const ``Nat _ => makeDot `npow
+      | .const ``Int _ => makeDot `zpow
+      | .const ``Rat _ => makeDot `qpow
+      | _ => throwErrorAt n m!"exponent must be ℕ, ℤ, or ℚ; got type {nty}"
 
 end power
 
