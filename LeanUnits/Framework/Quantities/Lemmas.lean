@@ -130,6 +130,19 @@ instance : AddCommGroup (Quantity d α) where
     rw [← val_inj]
     simp only [val_add, add_comm]
 
+@[simp]
+theorem val_mul [Mul α] (q₁ : Quantity d₁ α) (q₂ : Quantity d₂ α) :
+  (q₁ * q₂).val = q₁.val * q₂.val := rfl
+
+@[simp]
+theorem val_div [Div α] (q₁ : Quantity d₁ α) (q₂ : Quantity d₂ α) :
+  (q₁ / q₂).val = q₁.val / q₂.val := rfl
+
+@[simp]
+theorem val_inv [Inv α] (q : Quantity d α) : (q⁻¹).val = Inv.inv q.val := rfl
+
+theorem val_sq [Mul α] (q : Quantity d α) : (q²).val = q.val * q.val := by rfl
+
 @[coe]
 def ofField {α} [Field α] (a : α) : Quantity (0: δ) α := ⟨ a ⟩
 
@@ -215,6 +228,18 @@ theorem deriv_mul_real
   rw [← val_inj]
   simp only [deriv]
   exact deriv_mul (h_f_diff.differentiableAt) (h_g_diff.differentiableAt)
+
+theorem deriv_div_real
+  (f : Quantity d₁ ℝ → Quantity d₂ ℝ) (g : Quantity d₁ ℝ → Quantity d₃ ℝ) (x : Quantity d₁ ℝ)
+  (h_f_diff : differentiable f) (h_g_diff : differentiable g) [h_gx : NeZero (g x)] :
+  deriv (fun t => (f t) / (g t)) x =
+    ↑((deriv f x * g x - ↑(f x * deriv g x)) / (g x)²) := by
+  rw [← val_inj]
+  simp [deriv, cast]
+  have h_g_sq : (g x).val * (g x).val = (g x).val^2 := by ring
+  rw [val_sq, h_g_sq]
+  rw [neZero_iff] at h_gx
+  exact deriv_div (h_f_diff.differentiableAt) (h_g_diff.differentiableAt) h_gx
 
 /--
 A Quantity can be formalized into an AddMonoidAlgebra
@@ -333,17 +358,6 @@ instance instModule : Module α (Quantity d α) where
   zero_smul q := by simp [←Formal.toFormal_inj]
   mul_smul c1 c2 q := by simp [←Formal.toFormal_inj]; ring
   smul_zero c := by simp [←Formal.toFormal_inj]
-
-@[simp]
-theorem val_mul [Mul α] (q₁ : Quantity d₁ α) (q₂ : Quantity d₂ α) :
-  (q₁ * q₂).val = q₁.val * q₂.val := rfl
-
-@[simp]
-theorem val_div [Div α] (q₁ : Quantity d₁ α) (q₂ : Quantity d₂ α) :
-  (q₁ / q₂).val = q₁.val / q₂.val := rfl
-
-@[simp]
-theorem val_inv [Inv α] (q : Quantity d α) : (q⁻¹).val = Inv.inv q.val := rfl
 
 @[simp]
 theorem val_nsmul (c : ℕ) (q : Quantity d α) : (c • q).val = c * q.val := by
