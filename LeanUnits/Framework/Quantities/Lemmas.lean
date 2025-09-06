@@ -263,7 +263,7 @@ theorem toFormal_zero : ((0:Quantity d α): Formal δ α) = 0 := by
 @[simp, norm_cast]
 theorem toFormal_one : ((1:Quantity (0:δ) α): Formal δ α) = 1 := by
   simp only [toFormal, val_one]
-  congr
+  rfl
 
 @[simp, norm_cast]
 theorem toFormal_add (q₁ q₂ : Quantity d α) :
