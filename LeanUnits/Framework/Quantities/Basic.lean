@@ -66,6 +66,15 @@ def zpow [Pow α ℤ] (q : Quantity d α) (n : ℤ) : Quantity (n•d) α := ⟨
 
 def qpow [Pow α ℚ] [SMul ℚ δ] (q : Quantity d α) (n : ℚ) : Quantity (n•d) α := ⟨ q.val ^ n ⟩
 
+instance [Pow α ℕ] : DPow (Quantity d α) ℕ (fun n => Quantity (n • d) α) where
+  pow := npow
+
+instance [Pow α ℤ] : DPow (Quantity d α) ℤ (fun n => Quantity (n • d) α) where
+  pow := zpow
+
+instance [Pow α ℚ] [SMul ℚ δ] : DPow (Quantity d α) ℚ (fun n => Quantity (n • d) α) where
+  pow := qpow
+
 def inv [Inv α] (q : Quantity d α) : Quantity (-d) α := ⟨ q.val⁻¹ ⟩
 
 def fun_to_val (f : Quantity d₁ α → Quantity d₂ α) : α → α := fun x => (f ⟨x⟩).val
@@ -178,6 +187,8 @@ postfix:max (priority := high) "⁻⁶" => zpow (n := -6)
 postfix:max (priority := high) "⁻⁷" => zpow (n := -7)
 postfix:max (priority := high) "⁻⁸" => zpow (n := -8)
 postfix:max (priority := high) "⁻⁹" => zpow (n := -9)
+-- inverse as superscript
+postfix:max (priority := high) "⁻¹" => inv
 
 end Quantity
 

@@ -26,7 +26,7 @@ def formatExp (e : String) (n : Rat) : String :=
 
 section power
 -- Single "power" notation that dispatches by exponent type (ℕ, ℤ, or ℚ)
-open Lean Meta Elab Term
+universe u v w
 
 /--
 Dependent power operator, allows to have the output type depend on the exponent.
@@ -40,22 +40,10 @@ Examples:
 - `q ^ᵈ (-2 : ℤ)`   -- zpow
 - `q ^ᵈ (1/3 : ℚ)`  -- qpow
 -/
-syntax:80 (name := dependentPow) term:80 " ^ᵈ " term:81 : term
+class DPow (α : Type u) (γ : Type v) (Out: outParam (γ → Type w)) where
+  pow : (q : α) → (n : γ) → Out n
 
-elab_rules : term
-  | `($q:term ^ᵈ $n:term) => do
-      let ne ← elabTerm n none
-      let nty ← whnf (← inferType ne)
-
-      let makeDot (field : Name) : TermElabM (Expr) := do
-        let stx ← `(($q).$(mkIdent field) $n)
-        elabTerm stx none
-
-      match nty with
-      | .const ``Nat _ => makeDot `npow
-      | .const ``Int _ => makeDot `zpow
-      | .const ``Rat _ => makeDot `qpow
-      | _ => throwErrorAt n m!"exponent must be ℕ, ℤ, or ℚ; got type {nty}"
+infixr:80 " ^ᵈ " => DPow.pow
 
 end power
 

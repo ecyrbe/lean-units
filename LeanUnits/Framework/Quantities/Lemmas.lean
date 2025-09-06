@@ -139,7 +139,7 @@ theorem val_div [Div α] (q₁ : Quantity d₁ α) (q₂ : Quantity d₂ α) :
   (q₁ / q₂).val = q₁.val / q₂.val := rfl
 
 @[simp]
-theorem val_inv [Inv α] (q : Quantity d α) : (q.inv).val = Inv.inv q.val := rfl
+theorem val_inv [Inv α] (q : Quantity d α) : (q⁻¹).val = Inv.inv q.val := rfl
 
 theorem val_sq [Mul α] (q : Quantity d α) : (q²).val = q.val^2 := by rfl
 
@@ -423,14 +423,14 @@ theorem mul_eq_zero {a : Quantity d₁ α} {b : Quantity d₂ α} :
 
 @[simp]
 theorem mul_inv_cancel (a : Quantity d α) [h : NeZero a] :
-  a * a.inv = (1: Quantity (0:δ) α).cast := by
+  a * a⁻¹ = (1: Quantity (0:δ) α).cast := by
   rw [neZero_iff] at h
   rw [← val_inj, val_mul, val_inv, cast_val, val_one]
   exact mul_inv_cancel₀ h
 
 @[simp]
 theorem inv_mul_cancel (a : Quantity d α) [h : NeZero a] :
-  a.inv * a = (1: Quantity (0:δ) α).cast := by
+  a⁻¹ * a = (1: Quantity (0:δ) α).cast := by
   rw [neZero_iff] at h
   rw [← val_inj, val_mul, val_inv, cast_val, val_one]
   exact inv_mul_cancel₀ h
@@ -448,12 +448,12 @@ theorem mul_assoc (a : Quantity d₁ α) (b : Quantity d₂ α) (c : Quantity d�
   ring
 
 theorem conj_eq_self (a : Quantity d₁ α) (b : Quantity d₂ α) [h : NeZero a] :
-  a.inv * b * a = ↑b := by
+  a⁻¹ * b * a = ↑b := by
   rw [mul_comm, mul_assoc, mul_inv_cancel, ← Formal.toFormal_inj]
   simp
 
 theorem conj_eq_self' (a : Quantity d₁ α) (b : Quantity d₂ α) [h : NeZero a] :
-  a * b * a.inv = ↑b := by
+  a * b * a⁻¹ = ↑b := by
   rw [mul_comm, mul_assoc, inv_mul_cancel, ← Formal.toFormal_inj]
   simp
 
