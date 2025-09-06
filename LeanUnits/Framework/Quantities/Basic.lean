@@ -74,7 +74,7 @@ instance [Inv α] [Mul α] : HIntPow (Quantity d α) (-2) (Quantity (-2•d) α)
     hIntPow := hInvSquare
 
 def hInv [Inv α] (q : Quantity d α) : Quantity (-d) α :=
-    { val := q.val⁻¹ }
+    { val := Inv.inv q.val }
 
 instance [Inv α] : HIntPow (Quantity d α) (-1) (Quantity (-d) α) where
     hIntPow := hInv

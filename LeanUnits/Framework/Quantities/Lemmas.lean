@@ -73,17 +73,6 @@ theorem val_sub (q₁ q₂ : Quantity d α) : (q₁ - q₂).val = q₁.val - q�
 @[simp]
 theorem val_smul [SMul α α] (n : α) (q : Quantity d α) : (n • q).val = n • q.val := rfl
 
-@[simp]
-theorem val_mul [Mul α] (q₁ : Quantity d₁ α) (q₂ : Quantity d₂ α) :
-  (q₁ * q₂).val = q₁.val * q₂.val := rfl
-
-@[simp]
-theorem val_div [Div α] (q₁ : Quantity d₁ α) (q₂ : Quantity d₂ α) :
-  (q₁ / q₂).val = q₁.val / q₂.val := rfl
-
-@[simp]
-theorem val_inv [Inv α] (q : Quantity d α) : (q⁻¹).val = Inv.inv q.val := rfl
-
 instance instAddGroup : AddGroup (Quantity d α) where
   zero := Zero.zero
   add := Add.add
@@ -159,7 +148,7 @@ theorem neZero_coe_iff {a : α} : NeZero (a: Quantity (0: δ) α) ↔ a ≠ 0 :=
 @[simp]
 theorem coe_inj {a b : α} :
   (a:Quantity (0: δ) α) = (b:Quantity (0: δ) α) ↔ a = b := by
-  rw [ofField, ofField, mk.injEq]
+  rw [ofField, ofField, ←val_inj]
 
 @[norm_cast, simp]
 theorem coe_add (a b : α) :
@@ -214,7 +203,7 @@ theorem deriv_qconst_mul_real
 theorem deriv_add_real
   (f g : Quantity d₁ ℝ → Quantity d₂ ℝ) (x : Quantity d₁ ℝ)
   (h_f_diff : differentiable f) (h_g_diff : differentiable g) :
-  deriv (fun t => (f t) + (g t)) x = deriv f x + deriv g x := by
+  deriv (f + g) x = deriv f x + deriv g x := by
   rw [← val_inj]
   simp only [deriv, val_add]
   exact deriv_add (h_f_diff.differentiableAt) (h_g_diff.differentiableAt)
@@ -222,8 +211,7 @@ theorem deriv_add_real
 theorem deriv_mul_real
   (f : Quantity d₁ ℝ → Quantity d₂ ℝ) (g : Quantity d₁ ℝ → Quantity d₃ ℝ) (x : Quantity d₁ ℝ)
   (h_f_diff : differentiable f) (h_g_diff : differentiable g) :
-  deriv (fun t => (f t) * (g t)) x =
-    ↑(deriv f x * g x + ↑(f x * deriv g x)) := by
+  deriv (fun t => (f t) * (g t)) x = ↑(deriv f x * g x + ↑(f x * deriv g x)) := by
   rw [← val_inj]
   simp only [deriv]
   exact deriv_mul (h_f_diff.differentiableAt) (h_g_diff.differentiableAt)
@@ -284,7 +272,7 @@ theorem toFormal_neg (q : Quantity d α) :
 
 @[simp, norm_cast]
 theorem toFormal_sub (q₁ q₂ : Quantity d α) :
-  ((q₁ - q₂ :Quantity d α):Formal δ α) = (q₁:Formal δ α) - q₂ := by
+  ((q₁ - q₂ :Quantity d α):Formal δ α) = (q₁:Formal δ α) - (q₂:Formal δ α) := by
   simp only [toFormal, val_sub, Finsupp.single_sub]
 
 noncomputable instance instCoeReal : Coe α (Formal δ α) where
@@ -315,17 +303,16 @@ theorem toFormal_smul (c : α) (q : Quantity d α)
 @[simp]
 theorem smul_eq_mul (c : α) (x : Formal δ α) : c • x = (c:Formal δ α) * x := by
   ext n
-  simp [toFormal]
+  rw [toFormal, coe_val]
   rw [Finsupp.smul_apply, AddMonoidAlgebra.single_zero_mul_apply, _root_.smul_eq_mul]
 
 @[simp]
-theorem smul_eq_mul' (c : ℕ) (x : Formal δ α) : c • x = (c:Formal δ α) * x := by
-  simp only [nsmul_eq_mul]
+theorem nsmul_eq_mul (c : ℕ) (x : Formal δ α) : c • x = (c:Formal δ α) * x := by
+  rw [_root_.nsmul_eq_mul]
 
 @[simp]
-theorem smul_eq_mul'' (c : ℤ) (x : Formal δ α) : c • x = (c : Formal δ α) * x := by
-  simp only [zsmul_eq_mul]
-
+theorem zsmul_eq_mul (c : ℤ) (x : Formal δ α) : c • x = (c : Formal δ α) * x := by
+  rw [_root_.zsmul_eq_mul]
 
 end Formal
 
@@ -342,6 +329,16 @@ instance instModule : Module α (Quantity d α) where
   mul_smul c1 c2 q := by simp [←Formal.toFormal_inj]; ring
   smul_zero c := by simp [←Formal.toFormal_inj]
 
+@[simp]
+theorem val_mul [Mul α] (q₁ : Quantity d₁ α) (q₂ : Quantity d₂ α) :
+  (q₁ * q₂).val = q₁.val * q₂.val := rfl
+
+@[simp]
+theorem val_div [Div α] (q₁ : Quantity d₁ α) (q₂ : Quantity d₂ α) :
+  (q₁ / q₂).val = q₁.val / q₂.val := rfl
+
+@[simp]
+theorem val_inv [Inv α] (q : Quantity d α) : (q⁻¹).val = Inv.inv q.val := rfl
 
 @[simp]
 theorem val_nsmul (c : ℕ) (q : Quantity d α) : (c • q).val = c * q.val := by
@@ -377,13 +374,48 @@ theorem mul_one' (a : Quantity d α) :
 
 theorem one_mul (a : Quantity d₂ α) (h : d₂ = d₁ + d₂ := by module) :
   (1: Quantity (d₁:δ) α) * a = a.cast (eq_imp_equiv h) := by
-  rw [←val_inj,val_mul, val_one,_root_.one_mul]
+  rw [← val_inj, val_mul, val_one, _root_.one_mul]
   rfl
 
 theorem one_mul' (a : Quantity d α) :
   (1: Quantity (0:δ) α) * a = a.cast := by
   rw [one_mul]
 
+theorem mul_zero (a : Quantity d₁ α) (h : d₁ = d₁ + d₂ := by module) :
+  a * (0: Quantity (d₂:δ) α) = (0: Quantity d₁ α).cast (eq_imp_equiv h) := by
+  rw [← val_inj, val_mul, val_zero, MulZeroClass.mul_zero]
+  rfl
+
+theorem mul_zero' (a : Quantity d α) :
+  a * (0: Quantity (0:δ) α) = (0: Quantity d α).cast := by
+  rw [mul_zero]
+
+theorem zero_mul (a : Quantity d₂ α) (h : d₂ = d₁ + d₂ := by module) :
+  (0: Quantity (d₁:δ) α) * a = (0: Quantity d₂ α).cast (eq_imp_equiv h) := by
+  rw [← val_inj, val_mul, val_zero, MulZeroClass.zero_mul]
+  rfl
+
+theorem zero_mul' (a : Quantity d α) :
+  (0: Quantity (0:δ) α) * a = (0: Quantity d α).cast := by
+  rw [zero_mul]
+
+theorem mul_eq_zero {a : Quantity d₁ α} {b : Quantity d₂ α} :
+  a * b = 0 ↔ a = 0 ∨ b = 0 := by
+  simp only [← val_inj, val_mul, val_zero, _root_.mul_eq_zero]
+
+@[simp]
+theorem mul_inv_cancel (a : Quantity d α) [h : NeZero a] :
+  a * a⁻¹ = (1: Quantity (0:δ) α).cast := by
+  rw [neZero_iff] at h
+  rw [← val_inj, val_mul, val_inv, cast_val, val_one]
+  exact mul_inv_cancel₀ h
+
+@[simp]
+theorem inv_mul_cancel (a : Quantity d α) [h : NeZero a] :
+  a⁻¹ * a = (1: Quantity (0:δ) α).cast := by
+  rw [neZero_iff] at h
+  rw [← val_inj, val_mul, val_inv, cast_val, val_one]
+  exact inv_mul_cancel₀ h
 
 theorem mul_comm (a : Quantity d₁ α) (b : Quantity d₂ α) :
   a * b = (b * a).cast := by
