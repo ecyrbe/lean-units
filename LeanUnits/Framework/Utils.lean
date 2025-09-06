@@ -24,6 +24,7 @@ def formatExp (e : String) (n : Rat) : String :=
   | -9  => s!"{e}⁻⁹"
   | n   => s!"{e}^{n}"
 
+section power
 -- Single "power" notation that dispatches by exponent type (ℕ, ℤ, or ℚ)
 open Lean Meta Elab Term
 
@@ -67,5 +68,7 @@ elab_rules : term
         attempt `qpow
       else
         throwErrorAt n m!"exponent must be ℕ, ℤ, or ℚ; got type {nty}"
+
+end power
 
 end Units
