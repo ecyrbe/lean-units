@@ -28,56 +28,47 @@ instance [Zero α] : Zero (Quantity d α) where
 instance [One α] : One (Quantity d α) where
   one := ⟨ 1 ⟩
 
-def add [Add α] (q1 q2 : Quantity d α) : Quantity d α :=
-    { val := q1.val + q2.val }
+def add [Add α] (q1 q2 : Quantity d α) : Quantity d α := ⟨ q1.val + q2.val ⟩
 
 instance [Add α] : Add (Quantity d α) where
   add := add
 
-def sub [Sub α] (q1 q2 : Quantity d α) : Quantity d α :=
-    { val := q1.val - q2.val }
+def sub [Sub α] (q1 q2 : Quantity d α) : Quantity d α := ⟨ q1.val - q2.val ⟩
 
 instance [Sub α] : Sub (Quantity d α) where
   sub := sub
 
-def neg [Neg α] (q : Quantity d α) : Quantity d α :=
-    { val := -q.val }
+def neg [Neg α] (q : Quantity d α) : Quantity d α := ⟨ - q.val ⟩
 
 instance [Neg α] : Neg (Quantity d α) where
   neg := neg
 
 def hMul [Mul α] (q1 : Quantity d₁ α) (q2 : Quantity d₂ α) : Quantity (d₁ + d₂) α :=
-    { val := q1.val * q2.val }
+  ⟨ q1.val * q2.val ⟩
 
 instance [Mul α] : HMul (Quantity d₁ α) (Quantity d₂ α) (Quantity (d₁ + d₂) α) where
   hMul := hMul
 
 def hDiv [Div α] (q1 : Quantity d₁ α) (q2 : Quantity d₂ α) : Quantity (d₁ - d₂) α :=
-    { val := q1.val / q2.val }
+    ⟨ q1.val / q2.val ⟩
 
 instance [Div α] : HDiv (Quantity d₁ α) (Quantity d₂ α) (Quantity (d₁ - d₂) α) where
   hDiv := hDiv
 
-def sMul [SMul α α] (s : α) (q : Quantity d α) : Quantity d α :=
-    { val := s • q.val }
+def sMul [SMul α α] (s : α) (q : Quantity d α) : Quantity d α := ⟨ s • q.val ⟩
 
 instance [SMul α α] : SMul α (Quantity d α) where
     smul := sMul
 
-def npow [Pow α ℕ] (q : Quantity d α) (n : ℕ) : Quantity (n•d) α :=
-    { val := q.val ^ n }
+def npow [Pow α ℕ] (q : Quantity d α) (n : ℕ) : Quantity (n•d) α := ⟨ q.val ^ n ⟩
 
-def zpow [Pow α ℤ] (q : Quantity d α) (n : ℤ) : Quantity (n•d) α :=
-    { val := q.val ^ n }
+def zpow [Pow α ℤ] (q : Quantity d α) (n : ℤ) : Quantity (n•d) α := ⟨ q.val ^ n ⟩
 
-def qpow [Pow α ℚ] [SMul ℚ δ] (q : Quantity d α) (n : ℚ) : Quantity (n•d) α :=
-    { val := q.val ^ n }
+def qpow [Pow α ℚ] [SMul ℚ δ] (q : Quantity d α) (n : ℚ) : Quantity (n•d) α := ⟨ q.val ^ n ⟩
 
-def inv [Inv α] (q : Quantity d α) : Quantity (-d) α :=
-    { val := q.val⁻¹ }
+def inv [Inv α] (q : Quantity d α) : Quantity (-d) α := ⟨ q.val⁻¹ ⟩
 
-def fun_to_val (f : Quantity d₁ α → Quantity d₂ α) : α → α :=
-    fun x => (f ⟨x⟩).val
+def fun_to_val (f : Quantity d₁ α → Quantity d₂ α) : α → α := fun x => (f ⟨x⟩).val
 
 -- derivative
 noncomputable def deriv [NontriviallyNormedField α]
@@ -90,14 +81,12 @@ noncomputable def integral [NormedAddCommGroup α] [NormedSpace ℝ α] [Measura
   ⟨MeasureTheory.integral μ (fun_to_val f)⟩
 
 -- order
-def lt [LT α] (q1 q2 : Quantity d α) : Prop :=
-    q1.val < q2.val
+def lt [LT α] (q1 q2 : Quantity d α) : Prop := q1.val < q2.val
 
 instance [LT α] : LT (Quantity d α) where
     lt := lt
 
-def le [LE α] (q1 q2 : Quantity d α) : Prop :=
-    q1.val ≤ q2.val
+def le [LE α] (q1 q2 : Quantity d α) : Prop := q1.val ≤ q2.val
 
 instance [LE α] : LE (Quantity d α) where
     le := le
@@ -120,8 +109,7 @@ Examples:
 - `let q' : Quantity β := ↑q`    -- preferred
 - -- instead of: `cast q`
 -/
-def cast [HasEquiv δ] (q : Quantity d₁ α) (_ : d₁ ≈ d₂ := by auto_equiv)
- : Quantity d₂ α := ⟨q.val⟩
+def cast [HasEquiv δ] (q : Quantity d₁ α) (_ : d₁ ≈ d₂ := by auto_equiv) : Quantity d₂ α := ⟨q.val⟩
 
 /--
 convert from one quantity to another of the same dimension
@@ -135,8 +123,8 @@ Examples:
 - -- instead of: `convert q`
 -/
 def convert [Coe ℚ α] [Mul α] [Add α] [HasDimension δ] [HasConversion δ]
- (q : Quantity d₁ α) (_ : 𝒟 d₁ = 𝒟 d₂ := by auto_dim) :
- Quantity d₂ α := ⟨((𝒞 d₁)/(𝒞 d₂) ) ⊙ q.val⟩
+ (q : Quantity d₁ α) (_ : 𝒟 d₁ = 𝒟 d₂ := by auto_dim) : Quantity d₂ α :=
+  ⟨((𝒞 d₁)/(𝒞 d₂) ) ⊙ q.val⟩
 
 /--
 convert and cast in one step from one quantity to another of the same dimension
@@ -146,8 +134,8 @@ Examples:
  convert constant c from natural unit to meter per second: c.into (Unit.meter-Unit.second)
 -/
 def into [Coe ℚ α] [Mul α] [Add α] [HasDimension δ] [HasConversion δ]
- (q : Quantity d α) (target : δ) (_ : 𝒟 d = 𝒟 target := by auto_dim) :
- Quantity target α := ⟨((𝒞 d)/(𝒞 target)) ⊙ q.val⟩
+ (q : Quantity d α) (target : δ) (_ : 𝒟 d = 𝒟 target := by auto_dim) : Quantity target α :=
+  ⟨((𝒞 d)/(𝒞 target)) ⊙ q.val⟩
 
 /--
 convert and cast in one step from one quantity to another of the same dimension
@@ -157,8 +145,8 @@ Examples:
 - `let q' : Quantity (Unit.meter-Unit.second) Float := q.as (m/s)`
 -/
 def as [Coe ℚ α] [Mul α] [Add α] [HasDimension δ] [HasConversion δ]
- (q : Quantity d₁ α) (_ : Quantity d₂ α) (_ : 𝒟 d₁ = 𝒟 d₂ := by auto_dim) :
- Quantity d₂ α := ⟨((𝒞 d₁)/(𝒞 d₂)) ⊙ q.val⟩
+ (q : Quantity d₁ α) (_ : Quantity d₂ α) (_ : 𝒟 d₁ = 𝒟 d₂ := by auto_dim) : Quantity d₂ α :=
+  ⟨((𝒞 d₁)/(𝒞 d₂)) ⊙ q.val⟩
 
 
 @[inherit_doc cast]
