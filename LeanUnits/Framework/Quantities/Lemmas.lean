@@ -261,6 +261,11 @@ theorem toFormal_zero : ((0:Quantity d α): Formal δ α) = 0 := by
   simp only [toFormal, val_zero, Finsupp.single_zero]
 
 @[simp, norm_cast]
+theorem toFormal_one : ((1:Quantity (0:δ) α): Formal δ α) = 1 := by
+  simp only [toFormal, val_one]
+  congr
+
+@[simp, norm_cast]
 theorem toFormal_add (q₁ q₂ : Quantity d α) :
   ((q₁ + q₂:Quantity d α):Formal δ α) = (q₁:Formal δ α) + (q₂:Formal δ α) := by
   simp only [toFormal, val_add, Finsupp.single_add]
@@ -427,6 +432,26 @@ theorem mul_assoc (a : Quantity d₁ α) (b : Quantity d₂ α) (c : Quantity d�
   a * (b * c) = ((a * b) * c).cast := by
   rw [←Formal.toFormal_inj, Formal.toFormal_cast]
   repeat rw [toFormal_mul]
+  ring
+
+theorem conj_eq_self (a : Quantity d₁ α) (b : Quantity d₂ α) [h : NeZero a] :
+  a⁻¹ * b * a = ↑b := by
+  rw [mul_comm, mul_assoc, mul_inv_cancel, ← Formal.toFormal_inj]
+  simp
+
+theorem conj_eq_self' (a : Quantity d₁ α) (b : Quantity d₂ α) [h : NeZero a] :
+  a * b * a⁻¹ = ↑b := by
+  rw [mul_comm, mul_assoc, inv_mul_cancel, ← Formal.toFormal_inj]
+  simp
+
+theorem left_distrib (a : Quantity d₁ α) (b c : Quantity d₂ α) :
+  a * (b + c) = (a * b + a * c).cast := by
+  simp [←Formal.toFormal_inj]
+  ring
+
+theorem right_distrib (a b : Quantity d₁ α) (c : Quantity d₂ α) :
+  (a + b) * c = (a * c + b * c).cast := by
+  simp [←Formal.toFormal_inj]
   ring
 
 end Units.Quantity
