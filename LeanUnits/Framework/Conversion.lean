@@ -9,11 +9,17 @@ namespace Units
 /--
 Affine conversion between units.
 
-⚠️ Warning :
-Offset factor works properly while factor is 1 so mixing many offset conversions is not supported
-So as a rule of thumb, avoid using offset units and work with base units as much as possible.
-All base units have a scaling factor of 1 and an offset of 0. So mixing one offset unit with just base units is safe.
-In the end, you should only convert to offset units when displaying results and work with base units internally.
+⚠️ Warning : Affine composition works when offset is zero `or` factor is 1
+ie :
+abbrev Affinable (c1 c2 : Conversion) : Prop :=
+  (c1.factor = 1 ∧ c2.factor = 1) ∨ (c1.offset = 0 ∧ c2.offset = 0)
+
+instance (c₁ c₂ : Conversion) : Decidable (Affinable c₁ c₂) := by infer_instance
+
+But we can't eforce it in the instances below because there is no way to attach
+the proof to the standard typeclasses.
+We could attach it to `Conversion` but that would restrict it too much.
+Indeed, it would prevent converting from celsius to fahrenheit directly.
 -/
 @[ext]
 structure Conversion where
@@ -67,7 +73,10 @@ def apply {α} [Coe ℚ α] [Mul α] [Add α] (c : Conversion) (x : α) : α := 
 -- infix for apply with a good unicode symbol
 infix:100 "⊙" => apply
 
--- AddCommGroup operations, not proper affine transformations when offset is not zero `AND` factor is not 1
+/-
+AddCommGroup operations
+-/
+
 def add (c1 c2 : Conversion) : Conversion :=
   ⟨c1.factor * c2.factor, c1.offset + c2.offset, by
     simp only [ne_eq, mul_eq_zero, not_or]; exact ⟨c1.factor_ne_zero, c2.factor_ne_zero⟩
