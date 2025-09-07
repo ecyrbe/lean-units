@@ -1,5 +1,5 @@
 import LeanUnits.Framework.Dimensions.Basic
-import LeanUnits.Framework.Conversion
+import LeanUnits.Framework.Conversions.Basic
 import LeanUnits.Framework.Utils
 import Mathlib.Data.DFinsupp.Defs
 import Mathlib.Data.DFinsupp.BigOperators

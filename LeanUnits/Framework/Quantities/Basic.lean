@@ -1,6 +1,6 @@
 import LeanUnits.Framework.Dimensions.Basic
 import LeanUnits.Framework.Dimensions.Tactic
-import LeanUnits.Framework.Conversion
+import LeanUnits.Framework.Conversions.Basic
 import Mathlib.MeasureTheory.Integral.Bochner.Basic
 import Mathlib.MeasureTheory.MeasurableSpace.Defs
 namespace Units
