@@ -40,8 +40,8 @@ Examples:
 - `q ^ᵈ (-2 : ℤ)`   -- zpow
 - `q ^ᵈ (1/3 : ℚ)`  -- qpow
 -/
-class DPow (α : Type u) (γ : Type v) (Out: outParam (γ → Type w)) where
-  pow : (q : α) → (n : γ) → Out n
+class DPow (α : Type u) (β : Type v) (γ: outParam (β → Type w)) where
+  pow : α → (n : β) → γ n
 
 infixr:80 " ^ᵈ " => DPow.pow
 
