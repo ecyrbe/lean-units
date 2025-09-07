@@ -24,6 +24,8 @@ def cinetic_energy (mass : SI Unit.kilogram) (velocity : SI (Unit.meter / Unit.s
 
 -- c² is a constant in it's own scaled unit, so we need to convert, cast would not work
 def e_eq_mc2 (mass : SI Unit.kilogram) : SI Unit.joule := (mass * c²).as J
+-- but we can convert at c level and then cast if we want
+def e_eq_mc2' (mass : SI Unit.kilogram) : SI Unit.joule := ↑(mass * (c.as (m/s))²)
 
 def earth_semi_major_axis := 1.496e11 • m
 def minute := 60.0 • s
@@ -34,3 +36,5 @@ def year := 365.25 • day
 #eval solar_mass_kepler_formula year earth_semi_major_axis
 #eval cinetic_energy (80.0 • kg) (10.0 • (m/s))
 #eval e_eq_mc2 (1.0 • kg) -- 1 kg of mass is equivalent to 8.9875517873681760e16 J of energy
+#eval e_eq_mc2' (1.0 • kg) -- same result
+#eval e_eq_mc2 (1.0 • kg) == e_eq_mc2' (1.0 • kg) -- true
