@@ -86,25 +86,18 @@ theorem base_unit_conv_eq_conv (d : Dimension) (s : String) :
 
 theorem conv_zero_eq_conv_identity : Conversion.identity = 0 := rfl
 
--- @[simp]
--- theorem conv_div_zero (c : Conversion) :
---   c.div 0 = c := by
---   simp [←conv_zero_eq_conv_identity,Conversion.div, Conversion.inv,
---       Conversion.mul, Conversion.identity]
+@[simp]
+theorem conv_div_zero (c : Conversion) :
+  c.div 0 = c := by
+  simp [←conv_zero_eq_conv_identity,Conversion.div, Conversion.inv,
+      Conversion.mul, Conversion.identity]
 
--- @[simp]
--- theorem zero_div_conv (c : Conversion) {h : c.offset = 0} :
---   Conversion.div 0 c = -c := by
---   simp [Conversion.div, Conversion.inv, Conversion.mul, ←conv_zero_eq_conv_identity,
---     Conversion.identity, h, Conversion.instNeg, Conversion.neg]
-
-
--- @[simp]
--- theorem derived_unit_conv_eq_conv (u : Unit) (s : String) (c : Conversion) :
---   (defineDerivedUnit s u c).conversion = c-u.conversion := by
---   rw [defineDerivedUnit, conversion]
---   apply DFinsupp.sum_single_index
---   rw [Prod.snd_zero, Prod.fst_zero]
+@[simp]
+theorem derived_unit_conv_eq_conv (u : Unit) (s : String) (c : Conversion) :
+  (defineDerivedUnit s u c).conversion = c/u.conversion := by
+  rw [defineDerivedUnit, conversion]
+  apply DFinsupp.sum_single_index
+  rw [Prod.snd_zero, Prod.fst_zero]
 
 @[simp]
 theorem add_unit_conv {u1 u2 : Unit} :

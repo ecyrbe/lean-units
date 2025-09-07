@@ -16,20 +16,22 @@ set_option linter.style.nativeDecide false
 Helper tactic that tries to prove equalities or equivalences between dimensions or units.
 It tries the following strategies in order:
 1. propositional equality check using `module` tactic
-2. compile time equivalence check using `native_decide` tactic that
-   only works if the dimensions or units are fully instantiated (no free variables)
+2. propositional equivalence on units using `module` tactic
 -/
 macro "auto_equiv" : tactic =>
   `(tactic|
-    (first | (first | apply eq_imp_equiv
-                      module
-                    | apply eq_imp_equiv
-                      dsimp [instHMul, instHDiv, instHPow, dimension_set, derived_unit_set]
-                      module)
-             trace s!"✅ Formaly proved equivalence"
-           | native_decide
-             trace s!"⚠️  Checked equivalence using `native_decide`"
-           ))
+    (first | apply eq_imp_equiv
+             module
+             trace s!"✅ Formaly proved equality"
+           | apply eq_imp_equiv
+             dsimp [instHMul, instHDiv, instHPow, dimension_set, derived_unit_set]
+             module
+             trace s!"✅ Formaly proved equality"
+           | try (dsimp [HasEquiv.Equiv]
+                  constructor
+                  · simp [instHMul, instHDiv, instHPow, derived_unit_set]; module
+                  · simp [instHMul, instHDiv, instHPow, derived_unit_set, base_unit_set]
+                  trace s!"✅ Formaly proved equivalence")))
 
 /--
 Helper tactic that tries to prove equalities between dimensions or units.
@@ -43,7 +45,7 @@ macro "auto_dim" : tactic =>
   `(tactic|
     (first | rfl
            | try simp [𝒟,HasDimension.dimension, instHMul, instHDiv, instHPow,
-                      HasEquiv.Equiv,Unit.instSetoidUnit, derived_unit_set]
+                      HasEquiv.Equiv, derived_unit_set]
              try module
     ))
 

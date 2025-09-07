@@ -87,6 +87,7 @@ regardless of their representation.
 
 For example, `N` and `kg•m/s²` are considered equivalent
 -/
+@[simp]
 instance instSetoidUnit : Setoid Unit where
   r:= fun u₁ u₂ => u₁.dimension = u₂.dimension ∧ u₁.conversion = u₂.conversion
   iseqv := ⟨
