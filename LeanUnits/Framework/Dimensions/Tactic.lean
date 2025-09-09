@@ -12,6 +12,16 @@ theorem eq_imp_equiv {μ} [Setoid μ] {u1 u2 : μ} (h : u1 = u2) : u1 ≈ u2 := 
   simp only [h, Setoid.refl]
 
 set_option linter.style.nativeDecide false
+
+/--
+macro that reduces expressions involving dimensions or units
+by simplifying using the lemmas tagged with the attributes
+`dimension_set`, `derived_unit_set` or `base_unit_set`.
+-/
+macro "simp_dim" : tactic =>
+  `(tactic| simp [𝒟,HasDimension.dimension,instHMul, instHDiv, instHPow,
+      derived_unit_set, base_unit_set, dimension_set] )
+
 /--
 Helper tactic that tries to prove equalities or equivalences between dimensions or units.
 It tries the following strategies in order:

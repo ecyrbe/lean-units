@@ -16,6 +16,12 @@ theorem kepler_third_law
     T² =  (4•π^2) • ↑(a³/ (G *(M + m)))  := by
   sorry
 
+theorem kepler_third_law_dim_check
+    (T : SI Dimension.Time) (a : SI Dimension.Length) (M m : SI Dimension.Mass) :
+    𝒟 T² = 𝒟 ((4•π^2) • (a³/ (G *(M + m))))  := by
+    simp_dim
+    module
+
 theorem e_equal_mc2 (E : SI Dimension.Energy) (m : SI Dimension.Mass) :
     E =  ↑(m * c²) := by
     sorry

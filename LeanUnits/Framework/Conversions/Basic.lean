@@ -28,7 +28,7 @@ structure Conversion where
   factor_ne_zero : factor ≠ 0
 deriving Repr, DecidableEq, BEq
 
-class HasConversion (μ : Type) [AddCommGroup μ] where
+class HasConversion (μ : Type) where
   conversion (u : μ) : Conversion
 
 alias 𝒞 := HasConversion.conversion

@@ -467,4 +467,7 @@ theorem right_distrib (a b : Quantity d₁ α) (c : Quantity d₂ α) :
   simp [←Formal.toFormal_inj]
   ring
 
+@[simp]
+theorem dim_def [HasDimension δ] (q : Quantity d α) : q.dimension = HasDimension.dimension d := rfl
+
 end Units.Quantity

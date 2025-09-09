@@ -14,7 +14,7 @@ structure Dimension where
   _impl : DFinsupp (fun _ : String => ℚ)
   deriving DecidableEq, BEq
 
-class HasDimension (μ : Type) [AddCommGroup μ] where
+class HasDimension (μ : Type) where
   dimension (u : μ) : Dimension
 
 alias 𝒟 := HasDimension.dimension

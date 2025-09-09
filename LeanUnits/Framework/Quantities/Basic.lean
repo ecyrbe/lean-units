@@ -104,6 +104,12 @@ def dimension [HasDimension δ] (_ : Quantity d α) : Dimension := 𝒟 d
 def conversion [HasConversion δ] (_ : Quantity d α) : Conversion := 𝒞 d
 def units (_ : Quantity d α) : δ := d
 
+instance [HasDimension δ] : HasDimension (Quantity d α) where
+  dimension := dimension
+
+instance [HasConversion δ] : HasConversion (Quantity d α) where
+  conversion := conversion
+
 -- cast operator prefix
 /--
 Preferred notation for casting: write `↑x` instead of `cast x`.
