@@ -11,8 +11,6 @@ namespace Units
 theorem eq_imp_equiv {μ} [Setoid μ] {u1 u2 : μ} (h : u1 = u2) : u1 ≈ u2 := by
   simp only [h, Setoid.refl]
 
-set_option linter.style.nativeDecide false
-
 /--
 macro that reduces expressions involving dimensions or units
 by simplifying using the lemmas tagged with the attributes
