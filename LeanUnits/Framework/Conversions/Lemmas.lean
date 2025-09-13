@@ -107,9 +107,7 @@ theorem scalable_convert_same_eq_id {α} [Coe ℚ α] [Field α]
   (h_coe_zero : Coe.coe (0 : ℚ) = (0 : α) := by simp)
   (h_coe_one : Coe.coe (1 : ℚ) = (1 : α) := by simp) :
   convert c c x = x := by
-  have h_offset_zero: (c / c).offset = 0 := by exact scalable_div h h
-  simp only [convert,apply, factor_div_self_cancel, h_coe_one,mul_one, h_offset_zero, h_coe_zero]
-  field_simp
+  simp only [scalable_convert, h, h_coe_zero, div_self c.factor_ne_zero, h_coe_one, mul_one]
 
 theorem convert_zero_eq_id {α} [Coe ℚ α] [Field α] (x : α)
   (h_coe_zero : Coe.coe (0 : ℚ) = (0 : α) := by simp)
