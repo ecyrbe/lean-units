@@ -387,7 +387,7 @@ theorem mul_one (a : Quantity d₁ α) (h : d₁ = d₁ + d₂ := by module) :
   rfl
 
 theorem mul_one' (a : Quantity d α) :
-  a * (1: Quantity (0:δ) α) = a.cast := by
+  a * (1: Quantity (0:δ) α) = ↑a := by
   rw [mul_one]
 
 theorem one_mul (a : Quantity d₂ α) (h : d₂ = d₁ + d₂ := by module) :
@@ -396,7 +396,7 @@ theorem one_mul (a : Quantity d₂ α) (h : d₂ = d₁ + d₂ := by module) :
   rfl
 
 theorem one_mul' (a : Quantity d α) :
-  (1: Quantity (0:δ) α) * a = a.cast := by
+  (1: Quantity (0:δ) α) * a = ↑a := by
   rw [one_mul]
 
 theorem mul_zero (a : Quantity d₁ α) (h : d₁ = d₁ + d₂ := by module) :
@@ -405,7 +405,7 @@ theorem mul_zero (a : Quantity d₁ α) (h : d₁ = d₁ + d₂ := by module) :
   rfl
 
 theorem mul_zero' (a : Quantity d α) :
-  a * (0: Quantity (0:δ) α) = (0: Quantity d α).cast := by
+  a * (0: Quantity (0:δ) α) = ↑(0: Quantity d α) := by
   rw [mul_zero]
 
 theorem zero_mul (a : Quantity d₂ α) (h : d₂ = d₁ + d₂ := by module) :
@@ -414,7 +414,7 @@ theorem zero_mul (a : Quantity d₂ α) (h : d₂ = d₁ + d₂ := by module) :
   rfl
 
 theorem zero_mul' (a : Quantity d α) :
-  (0: Quantity (0:δ) α) * a = (0: Quantity d α).cast := by
+  (0: Quantity (0:δ) α) * a = ↑(0: Quantity d α) := by
   rw [zero_mul]
 
 theorem mul_eq_zero {a : Quantity d₁ α} {b : Quantity d₂ α} :
@@ -423,26 +423,26 @@ theorem mul_eq_zero {a : Quantity d₁ α} {b : Quantity d₂ α} :
 
 @[simp]
 theorem mul_inv_cancel (a : Quantity d α) [h : NeZero a] :
-  a * a⁻¹ = (1: Quantity (0:δ) α).cast := by
+  a * a⁻¹ = ↑(1: Quantity (0:δ) α) := by
   rw [neZero_iff] at h
   rw [← val_inj, val_mul, val_inv, cast_val, val_one]
   exact mul_inv_cancel₀ h
 
 @[simp]
 theorem inv_mul_cancel (a : Quantity d α) [h : NeZero a] :
-  a⁻¹ * a = (1: Quantity (0:δ) α).cast := by
+  a⁻¹ * a = ↑(1: Quantity (0:δ) α) := by
   rw [neZero_iff] at h
   rw [← val_inj, val_mul, val_inv, cast_val, val_one]
   exact inv_mul_cancel₀ h
 
 theorem mul_comm (a : Quantity d₁ α) (b : Quantity d₂ α) :
-  a * b = (b * a).cast := by
+  a * b = ↑(b * a) := by
   rw [←Formal.toFormal_inj, Formal.toFormal_cast]
   repeat rw [toFormal_mul]
   ring
 
 theorem mul_assoc (a : Quantity d₁ α) (b : Quantity d₂ α) (c : Quantity d₃ α) :
-  a * (b * c) = ((a * b) * c).cast := by
+  a * (b * c) = ↑((a * b) * c) := by
   rw [←Formal.toFormal_inj, Formal.toFormal_cast]
   repeat rw [toFormal_mul]
   ring
@@ -458,12 +458,12 @@ theorem conj_eq_self' (a : Quantity d₁ α) (b : Quantity d₂ α) [h : NeZero 
   simp
 
 theorem left_distrib (a : Quantity d₁ α) (b c : Quantity d₂ α) :
-  a * (b + c) = (a * b + a * c).cast := by
+  a * (b + c) = ↑(a * b + a * c) := by
   simp [←Formal.toFormal_inj]
   ring
 
 theorem right_distrib (a b : Quantity d₁ α) (c : Quantity d₂ α) :
-  (a + b) * c = (a * c + b * c).cast := by
+  (a + b) * c = ↑(a * c + b * c) := by
   simp [←Formal.toFormal_inj]
   ring
 
