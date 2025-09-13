@@ -43,6 +43,8 @@ instance : Inhabited Conversion where
 def scale (s : ℚ) (h : s ≠ 0 := by simp) : Conversion := ⟨s,0, h⟩
 def translate (t : ℚ) : Conversion := ⟨1,t, by decide⟩
 
+def Scalable (c : Conversion) : Prop := c.offset = 0
+
 -- proper affine transformations
 def mul (c1 c2 : Conversion) : Conversion :=
   ⟨c1.factor * c2.factor, c1.offset * c2.factor + c2.offset, by
