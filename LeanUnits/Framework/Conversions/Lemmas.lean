@@ -95,8 +95,6 @@ theorem scalable_convert {α} [Coe ℚ α] [Field α]
   (c1 c2 : Conversion) (x : α) (h1 : Scalable c1) (h2 : Scalable c2)
   (h_coe_zero : Coe.coe (0 : ℚ) = (0 : α) := by simp) :
   convert c1 c2 x = x * Coe.coe (c1.factor/c2.factor) := by
-  have h_offset_zero: (c1 / c2).offset = 0 := by exact scalable_div h1 h2
-  simp only [convert, apply, factor_div, h_offset_zero, h_coe_zero]
-  field_simp
+  simp only [convert, scalable_apply, scalable_div h1 h2, h_coe_zero, factor_div]
 
 end Units.Conversion
