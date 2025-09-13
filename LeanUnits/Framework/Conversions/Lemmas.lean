@@ -116,4 +116,18 @@ theorem convert_zero_eq_id {α} [RatCast α] [Field α] (x : α)
   convert 0 0 x = x := by
   simp only [scalable_convert_same_eq_id, scalable_zero, h_coe_zero, h_coe_one]
 
+-- Some useful specializations for Real
+
+theorem scalable_convert_real (c1 c2 : Conversion) (x : ℝ)
+  (h1 : Scalable c1) (h2 : Scalable c2) :
+  convert c1 c2 x = x * ↑(c1.factor/c2.factor) := by
+  exact scalable_convert c1 c2 x h1 h2
+
+theorem scalable_convert_same_eq_id_real (c : Conversion) (x : ℝ) (h : Scalable c) :
+  convert c c x = x := by
+  exact scalable_convert_same_eq_id c x h
+
+theorem convert_zero_eq_id_real (x : ℝ) : convert 0 0 x = x := by
+  exact convert_zero_eq_id x
+
 end Units.Conversion
