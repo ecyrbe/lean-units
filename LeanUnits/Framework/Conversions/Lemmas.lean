@@ -66,6 +66,8 @@ theorem scalable_sub_eq_div {c1 c2 : Conversion} (h1 : Scalable c1) (h2 : Scalab
   simp [sub, div, inv,mul, h1, h2]
   rfl
 
+theorem factor_zero : (0 : Conversion).factor = 1 := by rfl
+
 theorem factor_div {c1 c2 : Conversion} :
   (c1 / c2).factor = c1.factor / c2.factor := by
   rw [HDiv.hDiv,instHDiv, Div.div]
@@ -84,6 +86,9 @@ theorem factor_nsmul {c : Conversion} (s : ℕ) : (s • c).factor = c.factor ^ 
 
 theorem factor_zsmul {c : Conversion} (s : ℤ) : (s • c).factor = c.factor ^ s := by rfl
 
+theorem factor_div_self_cancel {c : Conversion} : (c/c).factor = 1 := by
+  rw [factor_div, div_self c.factor_ne_zero]
+
 theorem scalable_apply {α} [Coe ℚ α] [Field α]
   (c : Conversion) (x : α) (h : Scalable c) (h_coe_zero : Coe.coe (0 : ℚ) = (0 : α) := by simp) :
   c.apply x = x * Coe.coe c.factor := by
@@ -96,5 +101,22 @@ theorem scalable_convert {α} [Coe ℚ α] [Field α]
   (h_coe_zero : Coe.coe (0 : ℚ) = (0 : α) := by simp) :
   convert c1 c2 x = x * Coe.coe (c1.factor/c2.factor) := by
   simp only [convert, scalable_apply, scalable_div, h1, h2, h_coe_zero, factor_div]
+
+theorem convert_one_eq_id {α} [Coe ℚ α] [Field α] (x : α)
+  (h_coe_zero : Coe.coe (0 : ℚ) = (0 : α) := by simp)
+  (h_coe_one : Coe.coe (1 : ℚ) = (1 : α) := by simp) :
+  convert 0 0 x = x := by
+  simp only [scalable_convert, scalable_zero, h_coe_zero, factor_zero, one_div_one,
+    h_coe_one, mul_one]
+
+theorem convert_same_eq_id {α} [Coe ℚ α] [Field α]
+  (c : Conversion) (x : α) (h : Scalable c)
+  (h_coe_zero : Coe.coe (0 : ℚ) = (0 : α) := by simp)
+  (h_coe_one : Coe.coe (1 : ℚ) = (1 : α) := by simp) :
+  convert c c x = x := by
+  have h_offset_zero: (c / c).offset = 0 := by exact scalable_div h h
+  simp only [convert,apply, factor_div_self_cancel, h_coe_one,mul_one, h_offset_zero, h_coe_zero]
+  field_simp
+
 
 end Units.Conversion
