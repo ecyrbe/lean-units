@@ -102,14 +102,7 @@ theorem scalable_convert {α} [Coe ℚ α] [Field α]
   convert c1 c2 x = x * Coe.coe (c1.factor/c2.factor) := by
   simp only [convert, scalable_apply, scalable_div, h1, h2, h_coe_zero, factor_div]
 
-theorem convert_one_eq_id {α} [Coe ℚ α] [Field α] (x : α)
-  (h_coe_zero : Coe.coe (0 : ℚ) = (0 : α) := by simp)
-  (h_coe_one : Coe.coe (1 : ℚ) = (1 : α) := by simp) :
-  convert 0 0 x = x := by
-  simp only [scalable_convert, scalable_zero, h_coe_zero, factor_zero, one_div_one,
-    h_coe_one, mul_one]
-
-theorem convert_same_eq_id {α} [Coe ℚ α] [Field α]
+theorem scalable_convert_same_eq_id {α} [Coe ℚ α] [Field α]
   (c : Conversion) (x : α) (h : Scalable c)
   (h_coe_zero : Coe.coe (0 : ℚ) = (0 : α) := by simp)
   (h_coe_one : Coe.coe (1 : ℚ) = (1 : α) := by simp) :
@@ -118,5 +111,10 @@ theorem convert_same_eq_id {α} [Coe ℚ α] [Field α]
   simp only [convert,apply, factor_div_self_cancel, h_coe_one,mul_one, h_offset_zero, h_coe_zero]
   field_simp
 
+theorem convert_zero_eq_id {α} [Coe ℚ α] [Field α] (x : α)
+  (h_coe_zero : Coe.coe (0 : ℚ) = (0 : α) := by simp)
+  (h_coe_one : Coe.coe (1 : ℚ) = (1 : α) := by simp) :
+  convert 0 0 x = x := by
+  simp only [scalable_convert_same_eq_id, scalable_zero, h_coe_zero, h_coe_one]
 
 end Units.Conversion
