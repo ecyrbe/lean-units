@@ -77,12 +77,12 @@ instance : Inv Conversion where
 /--
 Apply the conversion to a value x
 -/
-def apply {α} [Coe ℚ α] [Mul α] [Add α] (c : Conversion) (x : α) : α := x * c.factor  + c.offset
+def apply {α} [RatCast α] [Mul α] [Add α] (c : Conversion) (x : α) : α := x * c.factor  + c.offset
 
 /--
 Convert x from c1 to c2
 -/
-def convert {α} [Coe ℚ α] [Mul α] [Add α] (c1 c2 : Conversion) (x : α) : α :=
+def convert {α} [RatCast α] [Mul α] [Add α] (c1 c2 : Conversion) (x : α) : α :=
   (c1 / c2).apply x
 
 /-

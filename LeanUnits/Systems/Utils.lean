@@ -1,4 +1,6 @@
 import Batteries.Data.Rat.Basic
+import Batteries.Classes.RatCast
+import Batteries.Data.Rat.Float
 
 namespace Units
 
@@ -13,5 +15,8 @@ instance : Pow Float Int where
 
 instance : Pow Float Rat where
   pow v n := v.pow (Float.ofInt n.num / Float.ofNat n.den)
+
+instance : RatCast Float where
+  ratCast q := q.toFloat
 
 end Units
