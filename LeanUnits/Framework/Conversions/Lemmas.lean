@@ -53,4 +53,18 @@ theorem scalable_inv {c : Conversion} (h : Scalable c) : Scalable (c⁻¹) := by
   unfold Scalable at *
   simp [Inv.inv,inv, h]
 
+theorem scalable_add_eq_mul {c1 c2 : Conversion} (h1 : Scalable c1) (h2 : Scalable c2) :
+  c1 + c2 = c1 * c2 := by
+  unfold Scalable at *
+  rw [HAdd.hAdd,instHAdd, Add.add,instAdd, HMul.hMul,instHMul, Mul.mul]
+  simp [add, mul, h1, h2]
+
+theorem scalable_sub_eq_div {c1 c2 : Conversion} (h1 : Scalable c1) (h2 : Scalable c2) :
+  c1 - c2 = c1 / c2 := by
+  unfold Scalable at *
+  rw [HSub.hSub,instHSub, Sub.sub,instSub, HDiv.hDiv,instHDiv, Div.div]
+  simp [sub, div, inv,mul, h1, h2]
+  rfl
+
+
 end Units.Conversion
