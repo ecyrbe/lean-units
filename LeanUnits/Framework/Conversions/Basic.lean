@@ -74,10 +74,16 @@ instance : Div Conversion where
 instance : Inv Conversion where
   inv := inv
 
+/--
+Apply the conversion to a value x
+-/
 def apply {α} [Coe ℚ α] [Mul α] [Add α] (c : Conversion) (x : α) : α := x * c.factor  + c.offset
 
--- infix for apply with a good unicode symbol
-infix:100 "⊙" => apply
+/--
+Convert x from c1 to c2
+-/
+def convert {α} [Coe ℚ α] [Mul α] [Add α] (c1 c2 : Conversion) (x : α) : α :=
+  (c1 / c2).apply x
 
 /-
 AddCommGroup operations

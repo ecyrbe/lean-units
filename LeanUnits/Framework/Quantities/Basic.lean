@@ -139,7 +139,7 @@ Examples:
 -/
 def convert [Coe ℚ α] [Mul α] [Add α] [HasDimension δ] [HasConversion δ]
  (q : Quantity d₁ α) (_ : 𝒟 d₁ = 𝒟 d₂ := by auto_dim) : Quantity d₂ α :=
-  ⟨((𝒞 d₁)/(𝒞 d₂) ) ⊙ q.val⟩
+  ⟨Conversion.convert (𝒞 d₁) (𝒞 d₂) q.val⟩
 
 /--
 convert and cast in one step from one quantity to another of the same dimension
@@ -150,7 +150,7 @@ Examples:
 -/
 def into [Coe ℚ α] [Mul α] [Add α] [HasDimension δ] [HasConversion δ]
  (q : Quantity d α) (target : δ) (_ : 𝒟 d = 𝒟 target := by auto_dim) : Quantity target α :=
-  ⟨((𝒞 d)/(𝒞 target)) ⊙ q.val⟩
+  ⟨Conversion.convert (𝒞 d) (𝒞 target) q.val⟩
 
 /--
 convert and cast in one step from one quantity to another of the same dimension
@@ -161,7 +161,7 @@ Examples:
 -/
 def as [Coe ℚ α] [Mul α] [Add α] [HasDimension δ] [HasConversion δ]
  (q : Quantity d₁ α) (_ : Quantity d₂ α) (_ : 𝒟 d₁ = 𝒟 d₂ := by auto_dim) : Quantity d₂ α :=
-  ⟨((𝒞 d₁)/(𝒞 d₂)) ⊙ q.val⟩
+  ⟨Conversion.convert (𝒞 d₁) (𝒞 d₂) q.val⟩
 
 
 @[inherit_doc cast]
