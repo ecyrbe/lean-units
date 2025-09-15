@@ -1,11 +1,12 @@
 import Mathlib.Data.DFinsupp.Defs
 import Mathlib.Data.DFinsupp.Module
 import Mathlib.Data.DFinsupp.Notation
+import Mathlib.Data.DFinsupp.BigOperators
 import Batteries.Data.Rat
 import Mathlib.Data.Rat.Init
 import Mathlib.Data.Rat.Lemmas
 import Mathlib.Algebra.Group.TransferInstance
-import LeanUnits.Framework.Utils
+import LeanUnits.Framework.Dimensions.PrimeScale
 
 namespace Units
 
@@ -77,6 +78,10 @@ instance : Pow Dimension ℤ where
 @[simp]
 instance : Pow Dimension ℚ where
   pow u n := n • u
+
+
+noncomputable def PrimeScale (d : Dimension) : ℝ := d._impl.prod PrimeScale.prime_pow
+noncomputable def OneScale (_ : Dimension) : ℝ := 1
 
 section Repr
 open Lean Parser Term
