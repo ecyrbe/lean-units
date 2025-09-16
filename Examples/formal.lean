@@ -25,6 +25,12 @@ theorem kepler_third_law_dim_check
     simp_dim
     module
 
+theorem not_kepler_third_law_dim_check
+    (T : WithDim Dimension.Time) (a : WithDim Dimension.Length) (M m : WithDim Dimension.Mass) :
+    ¬ 𝒟 T = 𝒟 ((4•π^2) • (a³/ (G *(M + m))))  := by
+    simp_dim
+    decide +kernel
+
 theorem e_equal_mc2 (E : WithDim Dimension.Energy) (m : WithDim Dimension.Mass) :
     E =  ↑(m * c²) := by
     sorry
