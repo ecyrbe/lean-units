@@ -10,21 +10,50 @@ import LeanUnits.Framework.Dimensions.PrimeScale
 
 namespace Units
 
+/--
+A dimension is a product of base dimensions raised to rational powers.
+For example, the dimension of force in the SI system is `Mass•Length•Time⁻²`
+can be represented as :
+- `force = {"Mass" ↦ 1, "Length" ↦ 1, "Time" ↦ -2}`
+you build it by combining base dimensions using multiplication and division.
+- To build a base dimension, use the helper macro `def_base_dimension Length := "L"`
+- To build a derived dimension, use multiplication `*`, division `/` and exponentiation `^`.
+
+For example, the dimension of Area can be built using the helper macro:
+- `def_derived_dimension Area := Length^2`
+
+Note that using macros is encouraged to ensure correct simplification of dimensions when casting.
+-/
 @[ext]
 structure Dimension where
   _impl : DFinsupp (fun _ : String => ℚ)
   deriving DecidableEq, BEq
 
+/--
+A typeclass for types that have an associated dimension.
+-/
 class HasDimension (μ : Type) where
   dimension (u : μ) : Dimension
 
 alias 𝒟 := HasDimension.dimension
 namespace Dimension
 
+/--
+Create a dimension from a string identifier.
+Each unique string represents a different fundamental dimension.
+For example, "L" for Length, "M" for Mass, "T" for Time, etc.
+-/
 def ofString (s : String) : Dimension := ⟨DFinsupp.single s 1⟩
 
+/--
+The dimension with no fundamental dimensions, representing a dimensionless quantity.
+-/
 def dimensionless : Dimension := ⟨0⟩
 
+/--
+A dimension is a base dimension if it corresponds to a single fundamental dimension,
+represented by a string identifier and has an exponent of 1.
+-/
 def IsBase (d : Dimension) : Prop := ∃ s : String, d = ofString s
 
 def DecidableNEqZero.{u} (α : Type u) [Zero α] :=
