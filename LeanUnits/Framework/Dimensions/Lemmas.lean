@@ -2,6 +2,20 @@ import LeanUnits.Framework.Dimensions.Basic
 
 namespace Units.Dimension.PrimeScale
 
+theorem base_ne_zero (s : String) : Dimension.ofString s ≠ 0 := by
+  have h_zero: 0 = Dimension.dimensionless := by rfl
+  rw [h_zero]
+  unfold Dimension.ofString Dimension.dimensionless
+  intro h
+  simpa [DFinsupp.single_eq_zero] using congrArg Dimension._impl h
+
+theorem smul_ne_zero (d : Dimension) (q : ℚ) (hd : d ≠ 0) (hq : q ≠ 0) : q • d ≠ 0 := by
+  intro h
+  replace h := congrArg (fun x => q⁻¹ • x) h
+  simp only at h
+  rw [smul_zero, smul_smul, inv_mul_cancel₀ hq, one_smul] at h
+  contradiction
+
 theorem scaler_zero : PrimeScale (0 : Dimension) = 1 := by
   exact DFinsupp.prod_zero_index
 
