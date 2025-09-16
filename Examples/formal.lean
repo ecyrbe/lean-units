@@ -29,9 +29,11 @@ theorem e_equal_mc2 (E : WithDim Dimension.Energy) (m : WithDim Dimension.Mass) 
     E =  ↑(m * c²) := by
     sorry
 
--- theorem e_equal_mc (E : SI Dimension.Energy) (m : SI Dimension.Mass) :
---     E =  ↑(m * c) := by -- statement is wrong and is directly catched by the type checker
---     sorry
+theorem not_e_equal_mc_dim_check (E : WithDim Dimension.Energy) (m : WithDim Dimension.Mass) :
+   ¬ 𝒟 E =  𝒟 (m * c) := by
+    simp_dim
+    decide +kernel
+
 end WithDim
 
 section SI
