@@ -25,6 +25,8 @@ def ofString (s : String) : Dimension := ⟨DFinsupp.single s 1⟩
 
 def dimensionless : Dimension := ⟨0⟩
 
+def IsBase (d : Dimension) : Prop := ∃ s : String, d = ofString s
+
 def DecidableNEqZero.{u} (α : Type u) [Zero α] :=
   (x : α) → Decidable (x ≠ 0)
 
@@ -40,7 +42,8 @@ instance instSMul : SMul ℚ Dimension :=
 instance instMulAction : MulAction ℚ Dimension :=
   Dimension.instEquiv.mulAction ℚ
 
-instance instSmulZeroClass : SMulZeroClass ℚ Dimension where
+instance instSMulWithZero : SMulWithZero ℚ Dimension where
+  zero_smul d := congrArg Dimension.mk (zero_smul ℚ d._impl)
   smul_zero q := congrArg Dimension.mk (smul_zero q)
 
 instance instDecidableNeqZero : DecidableNEqZero Dimension :=

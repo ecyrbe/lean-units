@@ -1,20 +1,64 @@
 import LeanUnits.Framework.Dimensions.Basic
 
-namespace Units.Dimension.PrimeScale
+namespace Units.Dimension
 
-theorem base_ne_zero (s : String) : Dimension.ofString s ≠ 0 := by
+
+theorem base_is_base (s : String) : IsBase (Dimension.ofString s) := by use s
+
+theorem base_ne_zero (d : Dimension) (h : IsBase d) : d ≠ 0 := by
+  obtain ⟨s, rfl⟩ := h
   have h_zero: 0 = Dimension.dimensionless := by rfl
   rw [h_zero]
   unfold Dimension.ofString Dimension.dimensionless
   intro h
   simpa [DFinsupp.single_eq_zero] using congrArg Dimension._impl h
 
-theorem smul_ne_zero (d : Dimension) (q : ℚ) (hd : d ≠ 0) (hq : q ≠ 0) : q • d ≠ 0 := by
+theorem smul_ne_zero {d : Dimension} {q : ℚ} (hd : d ≠ 0) (hq : q ≠ 0) : q • d ≠ 0 := by
   intro h
-  replace h := congrArg (fun x => q⁻¹ • x) h
-  simp only at h
+  replace h : q⁻¹ • q • d = q⁻¹ • 0 := by rw [h]
   rw [smul_zero, smul_smul, inv_mul_cancel₀ hq, one_smul] at h
   contradiction
+
+theorem neg_ne_zero {d : Dimension} (hd : d ≠ 0) : -d ≠ 0 := by
+  intro h
+  exact hd (neg_eq_zero.mp h)
+
+theorem sub_ne_zero_of_ne {d1 d2 : Dimension} (h : d1 ≠ d2) : d1 - d2 ≠ 0 := by
+  intro h0
+  have h1 := congrArg (fun x => x + d2) h0
+  simp [sub_eq_add_neg, add_comm, add_left_comm] at h1
+  exact h h1
+
+theorem add_ne_zero_of_ne_neg {d1 d2 : Dimension} (h : d1 ≠ -d2) : d1 + d2 ≠ 0 := by
+  intro h0
+  have : d1 = -d2 := by
+    have h1 := congrArg (fun x => x + -d2) h0
+    simp [add_comm, add_assoc] at h1
+    exact h1
+  exact h this
+
+theorem smul_eq_zero_iff {d : Dimension} {q : ℚ} :
+  q • d = 0 ↔ q = 0 ∨  d = 0 := by
+  constructor
+  · intro h
+    by_contra h'
+    have hq : q ≠ 0 := (not_or.mp h').1
+    have hd : d ≠ 0 := (not_or.mp h').2
+    exact (smul_ne_zero hd hq) h
+  · intro hd
+    cases hd with
+    | inl hq => rw [hq, zero_smul]
+    | inr hd => rw [hd, smul_zero]
+
+theorem smul_ne_zero_iff {d : Dimension} {q : ℚ} :
+  q • d ≠ 0 ↔ q ≠ 0 ∧ d ≠ 0 := by
+  simpa [not_or] using (not_congr smul_eq_zero_iff)
+
+namespace PrimeScale
+
+/-!
+PrimeScale lemmas
+-/
 
 theorem scaler_zero : PrimeScale (0 : Dimension) = 1 := by
   exact DFinsupp.prod_zero_index
