@@ -37,6 +37,12 @@ instance instAddCommGroup : AddCommGroup Dimension :=
 instance instSMul : SMul ℚ Dimension :=
   Dimension.instEquiv.smul ℚ
 
+instance instMulAction : MulAction ℚ Dimension :=
+  Dimension.instEquiv.mulAction ℚ
+
+instance instSmulZeroClass : SMulZeroClass ℚ Dimension where
+  smul_zero q := congrArg Dimension.mk (smul_zero q)
+
 instance instDecidableNeqZero : DecidableNEqZero Dimension :=
   fun x => (inferInstance : Decidable (x ≠ 0))
 
