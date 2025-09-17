@@ -117,6 +117,12 @@ instance instSMulWithZero : SMulWithZero ℚ Dimension where
   zero_smul d := congrArg Dimension.mk (zero_smul ℚ d._impl)
   smul_zero q := congrArg Dimension.mk (smul_zero q)
 
+instance instModule : Module ℚ Dimension where
+  zero_smul d := congrArg Dimension.mk (zero_smul ℚ d._impl)
+  smul_zero q := congrArg Dimension.mk (smul_zero q)
+  smul_add q a b:= congrArg Dimension.mk (smul_add q a._impl b._impl)
+  add_smul q1 q2 a := congrArg Dimension.mk (add_smul q1 q2 a._impl)
+
 instance instDecidableNeqZero : DecidableNEqZero Dimension :=
   fun x => (inferInstance : Decidable (x ≠ 0))
 
