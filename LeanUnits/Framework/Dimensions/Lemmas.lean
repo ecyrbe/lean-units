@@ -130,16 +130,10 @@ theorem single_smul_single.name_exponent {d : Dimension} (h : IsSingle d) (q : �
   rw (occs := [1]) [hd] at hdsmul
   simp only [hsmul_simp,hsmul'_simp, mk.injEq] at hdsmul
   have hcases := (DFinsupp.single_eq_single_iff _ _ _ _).mp hdsmul.symm
-  constructor <;> cases hcases <;> rename_i h'
-  · exact h'.1
-  · obtain ⟨hname, hexp⟩ := h'
-    rw [←heq_iff_eq] at hexp
-    contradiction
-  · rw [heq_iff_eq] at h'
-    exact h'.2
-  · obtain ⟨hsmulexp, hexp⟩ := h'
-    rw [←heq_iff_eq] at hexp
-    contradiction
+  constructor <;> cases hcases <;> rename_i h' <;> obtain ⟨hname, hexp⟩ := h' <;> try contradiction
+  · exact hname
+  · rw [heq_iff_eq] at hexp
+    exact hexp
 
 /--
 Negation of a single dimension is a single dimension.
@@ -166,16 +160,10 @@ theorem single_neg_single.name_exponent {d : Dimension} (h : IsSingle d) :
   rw (occs := [1]) [hd] at hdneg
   simp only [hneg_simp,hneg'_simp,mk.injEq] at hdneg
   have hcases := (DFinsupp.single_eq_single_iff _ _ _ _).mp hdneg.symm
-  constructor <;> cases hcases <;> rename_i h'
-  · exact h'.1
-  · obtain ⟨hname, hexp⟩ := h'
-    rw [←heq_iff_eq] at hexp
-    contradiction
-  · rw [heq_iff_eq] at h'
-    exact h'.2
-  · obtain ⟨hnegexp, hexp⟩ := h'
-    rw [←heq_iff_eq] at hexp
-    contradiction
+  constructor <;> cases hcases <;> rename_i h' <;> obtain ⟨hname, hexp⟩ := h' <;> try contradiction
+  · exact hname
+  · rw [heq_iff_eq] at hexp
+    exact hexp
 
 /--
 Negation of a base dimension is a single dimension.
@@ -207,12 +195,11 @@ theorem single_add_ne_zero {d1 d2 : Dimension}
   simp only at hd
   rw [←DFinsupp.single_neg] at hd
   have hcases := (DFinsupp.single_eq_single_iff _ _ _ _).mp hd
-  have hexp_mp : h1.exponent ≍ -h2.exponent → h1.exponent = -h2.exponent:= by exact eq_of_heq
   cases hcases <;> rename_i h'
   · cases h <;> rename_i h
     · exact h h'.1
     · obtain ⟨hname, hexp⟩ := h'
-      replace hexp := hexp_mp hexp
+      rw [heq_iff_eq] at hexp
       contradiction
   · cases h'; contradiction
 
