@@ -88,7 +88,7 @@ iff both the dimension and the rational are non-zero
 -/
 theorem smul_ne_zero_iff {d : Dimension} {q : ℚ} :
   q • d ≠ 0 ↔ q ≠ 0 ∧ d ≠ 0 := by
-  simpa [not_or] using (not_congr smul_eq_zero_iff)
+  simp only [not_congr smul_eq_zero_iff, not_or, ne_eq]
 
 /--
 Base dimensions are single dimensions.
