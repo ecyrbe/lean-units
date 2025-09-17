@@ -2,9 +2,14 @@ import LeanUnits.Framework.Dimensions.Basic
 
 namespace Units.Dimension
 
-
+/--
+Dimension built from a string identifier is a base dimension.
+-/
 theorem base_is_base (s : String) : IsBase (Dimension.ofString s) := by use s
 
+/--
+Base dimensions are non-zero.
+-/
 theorem base_ne_zero (d : Dimension) (h : IsBase d) : d ≠ 0 := by
   obtain ⟨s, rfl⟩ := h
   have h_zero: 0 = Dimension.dimensionless := by rfl
@@ -12,6 +17,9 @@ theorem base_ne_zero (d : Dimension) (h : IsBase d) : d ≠ 0 := by
   intro h
   simpa [DFinsupp.single_eq_zero] using congrArg Dimension._impl h
 
+/--
+Single dimensions are non-zero.
+-/
 theorem single_ne_zero {d : Dimension} (h : IsSingle d) : d ≠ 0 := by
   obtain ⟨s, q, hq, rfl⟩ := h
   have h_zero: 0 = Dimension.dimensionless := by rfl
@@ -21,22 +29,34 @@ theorem single_ne_zero {d : Dimension} (h : IsSingle d) : d ≠ 0 := by
   simp only [DFinsupp.single_eq_zero] at h
   contradiction
 
+/--
+Scalar multiplication of a non-zero dimension by a non-zero rational is non-zero.
+-/
 theorem smul_ne_zero {d : Dimension} {q : ℚ} (hd : d ≠ 0) (hq : q ≠ 0) : q • d ≠ 0 := by
   intro h
   replace h : q⁻¹ • q • d = q⁻¹ • 0 := by rw [h]
   rw [smul_zero, smul_smul, inv_mul_cancel₀ hq, one_smul] at h
   contradiction
 
+/--
+Negation of a non-zero dimension is non-zero.
+-/
 theorem neg_ne_zero {d : Dimension} (hd : d ≠ 0) : -d ≠ 0 := by
   intro h
   exact hd (neg_eq_zero.mp h)
 
+/--
+Subtraction of two different dimensions is non-zero.
+-/
 theorem sub_ne_zero_of_ne {d1 d2 : Dimension} (h : d1 ≠ d2) : d1 - d2 ≠ 0 := by
   intro h0
   have h1 := congrArg (fun x => x + d2) h0
   simp [sub_eq_add_neg, add_comm, add_left_comm] at h1
   exact h h1
 
+/--
+Addition of two dimensions that are not negatives of each other is non-zero.
+-/
 theorem add_ne_zero_of_ne_neg {d1 d2 : Dimension} (h : d1 ≠ -d2) : d1 + d2 ≠ 0 := by
   intro h0
   have : d1 = -d2 := by
@@ -45,6 +65,10 @@ theorem add_ne_zero_of_ne_neg {d1 d2 : Dimension} (h : d1 ≠ -d2) : d1 + d2 ≠
     exact h1
   exact h this
 
+/--
+Multiplying a dimension by a rational is zero
+iff either the dimension is zero or the rational is zero
+-/
 theorem smul_eq_zero_iff {d : Dimension} {q : ℚ} :
   q • d = 0 ↔ q = 0 ∨  d = 0 := by
   constructor
@@ -58,10 +82,17 @@ theorem smul_eq_zero_iff {d : Dimension} {q : ℚ} :
     | inl hq => rw [hq, zero_smul]
     | inr hd => rw [hd, smul_zero]
 
+/--
+Multiplying a dimension by a rational is non-zero
+iff both the dimension and the rational are non-zero
+-/
 theorem smul_ne_zero_iff {d : Dimension} {q : ℚ} :
   q • d ≠ 0 ↔ q ≠ 0 ∧ d ≠ 0 := by
   simpa [not_or] using (not_congr smul_eq_zero_iff)
 
+/--
+Base dimensions are single dimensions.
+-/
 theorem base_is_single (d : Dimension) (h : IsBase d) : IsSingle d := by
   obtain ⟨s, rfl⟩ := h
   use s, 1
@@ -69,6 +100,9 @@ theorem base_is_single (d : Dimension) (h : IsBase d) : IsSingle d := by
   · norm_num
   · rfl
 
+/--
+Negation of a single dimension is a single dimension.
+-/
 theorem single_neg_single {d : Dimension} (h : IsSingle d) : IsSingle (-d) := by
   obtain ⟨s, q, hq, rfl⟩ := h
   use s, -q
@@ -106,6 +140,9 @@ theorem single_neg_single.name_exponent {d : Dimension} (h : IsSingle d) :
     rw [←heq_iff_eq] at hexp
     contradiction
 
+/--
+Scalar multiplication of a single dimension by a non-zero rational is a single dimension.
+-/
 theorem single_smul_single {d : Dimension} (h : IsSingle d) (q : ℚ) (hq : q ≠ 0) :
   IsSingle (q • d) := by
   obtain ⟨s, r, hr, rfl⟩ := h
@@ -115,6 +152,9 @@ theorem single_smul_single {d : Dimension} (h : IsSingle d) (q : ℚ) (hq : q �
   · rw [DFinsupp.single_smul]
     rfl
 
+/--
+companion to `single_smul_single`, giving the names and exponents of the dimensions
+-/
 theorem single_smul_single.name_exponent {d : Dimension} (h : IsSingle d) (q : ℚ) (hq : q ≠ 0) :
   (single_smul_single h q hq).name = h.name ∧
   (single_smul_single h q hq).exponent = q • h.exponent := by
@@ -141,13 +181,23 @@ theorem single_smul_single.name_exponent {d : Dimension} (h : IsSingle d) (q : �
     rw [←heq_iff_eq] at hexp
     contradiction
 
+/--
+Negation of a base dimension is a single dimension.
+-/
 theorem base_neg_single (d : Dimension) (h : IsBase d) : IsSingle (-d) := by
   exact single_neg_single (base_is_single d h)
 
+/--
+Scalar multiplication of a base dimension by a non-zero rational is a single dimension.
+-/
 theorem base_smul_single (d : Dimension) (h : IsBase d) (q : ℚ) (hq : q ≠ 0) :
   IsSingle (q • d) := by
   exact single_smul_single (base_is_single d h) q hq
 
+/--
+Addition of two single dimensions that have different names or that don't have
+exponents negative of each other is non-zero.
+-/
 theorem single_add_ne_zero {d1 d2 : Dimension}
   (h1 : IsSingle d1) (h2 : IsSingle d2) (h : h1.name ≠ h2.name ∨ h1.exponent ≠ -h2.exponent) :
   d1 + d2 ≠ 0 := by
@@ -170,6 +220,9 @@ theorem single_add_ne_zero {d1 d2 : Dimension}
       contradiction
   · cases h'; contradiction
 
+/--
+Subtraction of two single dimensions that have different names or exponents is non-zero.
+-/
 theorem single_sub_ne_zero {d1 d2 : Dimension}
   (h1 : IsSingle d1) (h2 : IsSingle d2) (h : h1.name ≠ h2.name ∨ h1.exponent ≠ h2.exponent) :
   d1 - d2 ≠ 0 := by
@@ -184,18 +237,13 @@ theorem single_sub_ne_zero {d1 d2 : Dimension}
   rw [sub_eq_add_neg]
   exact single_add_ne_zero h1 h2 h
 
+/--
+Multiplying a single dimension by a non-zero rational is non-zero.
+-/
 theorem single_smul_ne_zero {d : Dimension} {q : ℚ}
   (hd : IsSingle d) (hq : q ≠ 0) : q • d ≠ 0 := by
-  intro h
-  have hd_zero : d = 0 := by
-    calc
-      d = (1 : ℚ) • d := by rw [one_smul]
-      _ = (q⁻¹ * q) • d := by rw [inv_mul_cancel₀ hq]
-      _ = q⁻¹ • q • d := by rw [smul_smul]
-      _ = q⁻¹ • 0 := by rw [h]
-      _ = 0 := by rw [smul_zero]
   have hd_ne_zero : d ≠ 0 := single_ne_zero hd
-  contradiction
+  exact smul_ne_zero hd_ne_zero hq
 
 namespace PrimeScale
 
