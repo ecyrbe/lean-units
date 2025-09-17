@@ -101,46 +101,6 @@ theorem base_is_single (d : Dimension) (h : IsBase d) : IsSingle d := by
   · rfl
 
 /--
-Negation of a single dimension is a single dimension.
--/
-theorem single_neg_single {d : Dimension} (h : IsSingle d) : IsSingle (-d) := by
-  obtain ⟨s, q, hq, rfl⟩ := h
-  use s, -q
-  constructor
-  · rw [_root_.neg_ne_zero]
-    exact hq
-  · rw [DFinsupp.single_neg]
-    rfl
-
-/--
-companion to `single_neg_single`, giving the names and exponents of the dimensions
--/
-theorem single_neg_single.name_exponent {d : Dimension} (h : IsSingle d) :
-  (single_neg_single h).name = h.name ∧ (single_neg_single h).exponent = -h.exponent := by
-  set hneg := single_neg_single h
-  obtain ⟨hq,hd⟩:= h.name_exponent_spec
-  obtain ⟨hqneg,hdneg⟩:= hneg.name_exponent_spec
-  have hneg_simp :
-    ∀ s: String, ∀ q: ℚ, -({ _impl := fun₀ | s => q }: Dimension) = { _impl := -fun₀ | s => q } :=
-      by intros; rfl
-  have hneg'_simp :
-    ∀ s: String, ∀ q: ℚ, ({ _impl := -fun₀ | s => q }: Dimension) = { _impl := fun₀ | s => -q } :=
-      by intros; rw [DFinsupp.single_neg]
-  rw (occs := [1]) [hd] at hdneg
-  simp only [hneg_simp,hneg'_simp,mk.injEq] at hdneg
-  have hcases := (DFinsupp.single_eq_single_iff _ _ _ _).mp hdneg.symm
-  constructor <;> cases hcases <;> rename_i h'
-  · exact h'.1
-  · obtain ⟨hname, hexp⟩ := h'
-    rw [←heq_iff_eq] at hexp
-    contradiction
-  · rw [heq_iff_eq] at h'
-    exact h'.2
-  · obtain ⟨hnegexp, hexp⟩ := h'
-    rw [←heq_iff_eq] at hexp
-    contradiction
-
-/--
 Scalar multiplication of a single dimension by a non-zero rational is a single dimension.
 -/
 theorem single_smul_single {d : Dimension} (h : IsSingle d) (q : ℚ) (hq : q ≠ 0) :
@@ -178,6 +138,42 @@ theorem single_smul_single.name_exponent {d : Dimension} (h : IsSingle d) (q : �
   · rw [heq_iff_eq] at h'
     exact h'.2
   · obtain ⟨hsmulexp, hexp⟩ := h'
+    rw [←heq_iff_eq] at hexp
+    contradiction
+
+/--
+Negation of a single dimension is a single dimension.
+-/
+theorem single_neg_single {d : Dimension} (h : IsSingle d) : IsSingle (-d) := by
+  have h_neg : -d = (-1: ℚ) • d := by module
+  rw [h_neg]
+  exact single_smul_single h (-1) (by norm_num)
+
+/--
+companion to `single_neg_single`, giving the names and exponents of the dimensions
+-/
+theorem single_neg_single.name_exponent {d : Dimension} (h : IsSingle d) :
+  (single_neg_single h).name = h.name ∧ (single_neg_single h).exponent = -h.exponent := by
+  set hneg := single_neg_single h
+  obtain ⟨hq,hd⟩:= h.name_exponent_spec
+  obtain ⟨hqneg,hdneg⟩:= hneg.name_exponent_spec
+  have hneg_simp :
+    ∀ s: String, ∀ q: ℚ, -({ _impl := fun₀ | s => q }: Dimension) = { _impl := -fun₀ | s => q } :=
+      by intros; rfl
+  have hneg'_simp :
+    ∀ s: String, ∀ q: ℚ, ({ _impl := -fun₀ | s => q }: Dimension) = { _impl := fun₀ | s => -q } :=
+      by intros; rw [DFinsupp.single_neg]
+  rw (occs := [1]) [hd] at hdneg
+  simp only [hneg_simp,hneg'_simp,mk.injEq] at hdneg
+  have hcases := (DFinsupp.single_eq_single_iff _ _ _ _).mp hdneg.symm
+  constructor <;> cases hcases <;> rename_i h'
+  · exact h'.1
+  · obtain ⟨hname, hexp⟩ := h'
+    rw [←heq_iff_eq] at hexp
+    contradiction
+  · rw [heq_iff_eq] at h'
+    exact h'.2
+  · obtain ⟨hnegexp, hexp⟩ := h'
     rw [←heq_iff_eq] at hexp
     contradiction
 
