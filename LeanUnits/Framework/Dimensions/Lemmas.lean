@@ -128,7 +128,7 @@ theorem single_smul_single.name_exponent {d : Dimension} (h : IsSingle d) (q : �
     ({ _impl := r' • fun₀ | s => r }: Dimension) = { _impl := fun₀ | s => r' • r } :=
       by intros; rw [DFinsupp.single_smul]
   rw (occs := [1]) [hd] at hdsmul
-  simp only [hsmul_simp,hsmul'_simp, mk.injEq] at hdsmul
+  simp only [hsmul_simp, hsmul'_simp, mk.injEq] at hdsmul
   have hcases := (DFinsupp.single_eq_single_iff _ _ _ _).mp hdsmul.symm
   constructor <;> cases hcases <;> rename_i h' <;> obtain ⟨hname, hexp⟩ := h' <;> try contradiction
   · exact hname
@@ -158,7 +158,7 @@ theorem single_neg_single.name_exponent {d : Dimension} (h : IsSingle d) :
     ∀ s: String, ∀ q: ℚ, ({ _impl := -fun₀ | s => q }: Dimension) = { _impl := fun₀ | s => -q } :=
       by intros; rw [DFinsupp.single_neg]
   rw (occs := [1]) [hd] at hdneg
-  simp only [hneg_simp,hneg'_simp,mk.injEq] at hdneg
+  simp only [hneg_simp, hneg'_simp, mk.injEq] at hdneg
   have hcases := (DFinsupp.single_eq_single_iff _ _ _ _).mp hdneg.symm
   constructor <;> cases hcases <;> rename_i h' <;> obtain ⟨hname, hexp⟩ := h' <;> try contradiction
   · exact hname
@@ -168,15 +168,15 @@ theorem single_neg_single.name_exponent {d : Dimension} (h : IsSingle d) :
 /--
 Negation of a base dimension is a single dimension.
 -/
-theorem base_neg_single (d : Dimension) (h : IsBase d) : IsSingle (-d) := by
-  exact single_neg_single (base_is_single d h)
+theorem base_neg_single (d : Dimension) (h : IsBase d) : IsSingle (-d) :=
+  single_neg_single (base_is_single d h)
 
 /--
 Scalar multiplication of a base dimension by a non-zero rational is a single dimension.
 -/
 theorem base_smul_single (d : Dimension) (h : IsBase d) (q : ℚ) (hq : q ≠ 0) :
-  IsSingle (q • d) := by
-  exact single_smul_single (base_is_single d h) q hq
+  IsSingle (q • d) :=
+  single_smul_single (base_is_single d h) q hq
 
 /--
 Addition of two single dimensions that have different names or that don't have
@@ -224,9 +224,8 @@ theorem single_sub_ne_zero {d1 d2 : Dimension}
 Multiplying a single dimension by a non-zero rational is non-zero.
 -/
 theorem single_smul_ne_zero {d : Dimension} {q : ℚ}
-  (hd : IsSingle d) (hq : q ≠ 0) : q • d ≠ 0 := by
-  have hd_ne_zero : d ≠ 0 := single_ne_zero hd
-  exact smul_ne_zero hd_ne_zero hq
+  (hd : IsSingle d) (hq : q ≠ 0) : q • d ≠ 0 :=
+  smul_ne_zero (single_ne_zero hd) hq
 
 namespace PrimeScale
 
