@@ -8,10 +8,18 @@ theorem base_is_base (s : String) : IsBase (Dimension.ofString s) := by use s
 theorem base_ne_zero (d : Dimension) (h : IsBase d) : d ≠ 0 := by
   obtain ⟨s, rfl⟩ := h
   have h_zero: 0 = Dimension.dimensionless := by rfl
-  rw [h_zero]
-  unfold Dimension.ofString Dimension.dimensionless
+  rw [h_zero, Dimension.dimensionless, Dimension.ofString]
   intro h
   simpa [DFinsupp.single_eq_zero] using congrArg Dimension._impl h
+
+theorem single_ne_zero {d : Dimension} (h : IsSingle d) : d ≠ 0 := by
+  obtain ⟨s, q, hq, rfl⟩ := h
+  have h_zero: 0 = Dimension.dimensionless := by rfl
+  rw [h_zero, Dimension.dimensionless]
+  intro h
+  apply congrArg Dimension._impl at h
+  simp only [DFinsupp.single_eq_zero] at h
+  contradiction
 
 theorem smul_ne_zero {d : Dimension} {q : ℚ} (hd : d ≠ 0) (hq : q ≠ 0) : q • d ≠ 0 := by
   intro h
@@ -53,6 +61,141 @@ theorem smul_eq_zero_iff {d : Dimension} {q : ℚ} :
 theorem smul_ne_zero_iff {d : Dimension} {q : ℚ} :
   q • d ≠ 0 ↔ q ≠ 0 ∧ d ≠ 0 := by
   simpa [not_or] using (not_congr smul_eq_zero_iff)
+
+theorem base_is_single (d : Dimension) (h : IsBase d) : IsSingle d := by
+  obtain ⟨s, rfl⟩ := h
+  use s, 1
+  constructor
+  · norm_num
+  · rfl
+
+theorem single_neg_single {d : Dimension} (h : IsSingle d) : IsSingle (-d) := by
+  obtain ⟨s, q, hq, rfl⟩ := h
+  use s, -q
+  constructor
+  · rw [_root_.neg_ne_zero]
+    exact hq
+  · rw [DFinsupp.single_neg]
+    rfl
+
+/--
+companion to `single_neg_single`, giving the names and exponents of the dimensions
+-/
+theorem single_neg_single.name_exponent {d : Dimension} (h : IsSingle d) :
+  (single_neg_single h).name = h.name ∧ (single_neg_single h).exponent = -h.exponent := by
+  set hneg := single_neg_single h
+  obtain ⟨hq,hd⟩:= h.name_exponent_spec
+  obtain ⟨hqneg,hdneg⟩:= hneg.name_exponent_spec
+  have hneg_simp :
+    ∀ s: String, ∀ q: ℚ, -({ _impl := fun₀ | s => q }: Dimension) = { _impl := -fun₀ | s => q } :=
+      by intros; rfl
+  have hneg'_simp :
+    ∀ s: String, ∀ q: ℚ, ({ _impl := -fun₀ | s => q }: Dimension) = { _impl := fun₀ | s => -q } :=
+      by intros; rw [DFinsupp.single_neg]
+  rw (occs := [1]) [hd] at hdneg
+  simp only [hneg_simp,hneg'_simp,mk.injEq] at hdneg
+  have hcases := (DFinsupp.single_eq_single_iff _ _ _ _).mp hdneg.symm
+  constructor <;> cases hcases <;> rename_i h'
+  · exact h'.1
+  · obtain ⟨hname, hexp⟩ := h'
+    rw [←heq_iff_eq] at hexp
+    contradiction
+  · rw [heq_iff_eq] at h'
+    exact h'.2
+  · obtain ⟨hnegexp, hexp⟩ := h'
+    rw [←heq_iff_eq] at hexp
+    contradiction
+
+theorem single_smul_single {d : Dimension} (h : IsSingle d) (q : ℚ) (hq : q ≠ 0) :
+  IsSingle (q • d) := by
+  obtain ⟨s, r, hr, rfl⟩ := h
+  use s, q • r
+  constructor
+  · apply mul_ne_zero hq hr
+  · rw [DFinsupp.single_smul]
+    rfl
+
+theorem single_smul_single.name_exponent {d : Dimension} (h : IsSingle d) (q : ℚ) (hq : q ≠ 0) :
+  (single_smul_single h q hq).name = h.name ∧
+  (single_smul_single h q hq).exponent = q • h.exponent := by
+  set hsmul := single_smul_single h q hq
+  obtain ⟨hq,hd⟩:= h.name_exponent_spec
+  obtain ⟨hqsmul,hdsmul⟩:= hsmul.name_exponent_spec
+  have hsmul_simp : ∀ s: String, ∀ r r': ℚ,
+    (r' • ({ _impl := fun₀ | s => r }: Dimension)) = { _impl := r' • fun₀ | s => r } :=
+      by intros; rfl
+  have hsmul'_simp : ∀ s: String, ∀ r r': ℚ,
+    ({ _impl := r' • fun₀ | s => r }: Dimension) = { _impl := fun₀ | s => r' • r } :=
+      by intros; rw [DFinsupp.single_smul]
+  rw (occs := [1]) [hd] at hdsmul
+  simp only [hsmul_simp,hsmul'_simp, mk.injEq] at hdsmul
+  have hcases := (DFinsupp.single_eq_single_iff _ _ _ _).mp hdsmul.symm
+  constructor <;> cases hcases <;> rename_i h'
+  · exact h'.1
+  · obtain ⟨hname, hexp⟩ := h'
+    rw [←heq_iff_eq] at hexp
+    contradiction
+  · rw [heq_iff_eq] at h'
+    exact h'.2
+  · obtain ⟨hsmulexp, hexp⟩ := h'
+    rw [←heq_iff_eq] at hexp
+    contradiction
+
+theorem base_neg_single (d : Dimension) (h : IsBase d) : IsSingle (-d) := by
+  exact single_neg_single (base_is_single d h)
+
+theorem base_smul_single (d : Dimension) (h : IsBase d) (q : ℚ) (hq : q ≠ 0) :
+  IsSingle (q • d) := by
+  exact single_smul_single (base_is_single d h) q hq
+
+theorem single_add_ne_zero {d1 d2 : Dimension}
+  (h1 : IsSingle d1) (h2 : IsSingle d2) (h : h1.name ≠ h2.name ∨ h1.exponent ≠ -h2.exponent) :
+  d1 + d2 ≠ 0 := by
+  intro hd
+  apply congrArg Dimension._impl at hd
+  replace hd : d1._impl + d2._impl = 0 := by exact hd
+  replace hd : d1._impl = -d2._impl := by apply congrArg (· - d2._impl) at hd; simp at hd; exact hd
+  obtain ⟨hq1, hd1⟩ := h1.name_exponent_spec
+  obtain ⟨hq2, hd2⟩ := h2.name_exponent_spec
+  rw [hd1, hd2] at hd
+  simp only at hd
+  rw [←DFinsupp.single_neg] at hd
+  have hcases := (DFinsupp.single_eq_single_iff _ _ _ _).mp hd
+  have hexp_mp : h1.exponent ≍ -h2.exponent → h1.exponent = -h2.exponent:= by exact eq_of_heq
+  cases hcases <;> rename_i h'
+  · cases h <;> rename_i h
+    · exact h h'.1
+    · obtain ⟨hname, hexp⟩ := h'
+      replace hexp := hexp_mp hexp
+      contradiction
+  · cases h'; contradiction
+
+theorem single_sub_ne_zero {d1 d2 : Dimension}
+  (h1 : IsSingle d1) (h2 : IsSingle d2) (h : h1.name ≠ h2.name ∨ h1.exponent ≠ h2.exponent) :
+  d1 - d2 ≠ 0 := by
+  have h2_neg_single: IsSingle (-d2) := single_neg_single h2
+  have h2_neg_name_exponent := single_neg_single.name_exponent h2
+  have h2_neg_name : h2.name = h2_neg_single.name := by
+    exact h2_neg_name_exponent.1.symm
+  have h2_neg_exponent : h2.exponent = -h2_neg_single.exponent := by
+    rw [h2_neg_name_exponent.2, neg_neg]
+  replace h2 := h2_neg_single
+  rw [h2_neg_name, h2_neg_exponent ] at h
+  rw [sub_eq_add_neg]
+  exact single_add_ne_zero h1 h2 h
+
+theorem single_smul_ne_zero {d : Dimension} {q : ℚ}
+  (hd : IsSingle d) (hq : q ≠ 0) : q • d ≠ 0 := by
+  intro h
+  have hd_zero : d = 0 := by
+    calc
+      d = (1 : ℚ) • d := by rw [one_smul]
+      _ = (q⁻¹ * q) • d := by rw [inv_mul_cancel₀ hq]
+      _ = q⁻¹ • q • d := by rw [smul_smul]
+      _ = q⁻¹ • 0 := by rw [h]
+      _ = 0 := by rw [smul_zero]
+  have hd_ne_zero : d ≠ 0 := single_ne_zero hd
+  contradiction
 
 namespace PrimeScale
 

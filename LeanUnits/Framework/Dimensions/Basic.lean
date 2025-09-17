@@ -56,12 +56,54 @@ represented by a string identifier and has an exponent of 1.
 -/
 def IsBase (d : Dimension) : Prop := ∃ s : String, d = ofString s
 
+/--
+A dimension is a single dimension if it corresponds to a single fundamental dimension,
+represented by a string identifier and a rational exponent.
+-/
+def IsSingle (d : Dimension) : Prop := ∃ s : String, ∃ q: ℚ, q ≠ 0 ∧ d = ⟨DFinsupp.single s q⟩
+
+/--
+Non computable function to extract the name of the base dimension.
+-/
+noncomputable def IsBase.name {d : Dimension} (h : d.IsBase) : String :=
+  Classical.choose h
+
+/--
+The specification that the name corresponds to the base dimension.
+-/
+lemma IsBase.name_spec {d : Dimension} (h : d.IsBase) : d = Dimension.ofString (h.name) :=
+  Classical.choose_spec h
+
+/--
+Non computable function to extract the name and exponent of the single dimension.
+
+ie: dimensions like `Length^2` or `Time^-1`
+-/
+noncomputable def IsSingle.name {d : Dimension} (h : d.IsSingle) : String :=
+  Classical.choose h
+
+/--
+Non computable function to extract the exponent of the single dimension.
+
+ie: dimensions like `Length^2` or `Time^-1`
+-/
+noncomputable def IsSingle.exponent {d : Dimension} (h : d.IsSingle) : ℚ :=
+  Classical.choose (Classical.choose_spec h)
+
+/--
+The specification that the name and exponent correspond to the single dimension.
+-/
+lemma IsSingle.name_exponent_spec {d : Dimension} (h : d.IsSingle) :
+  h.exponent ≠ 0 ∧ d = ⟨DFinsupp.single h.name h.exponent⟩ :=
+  Classical.choose_spec (Classical.choose_spec h)
+
 def DecidableNEqZero.{u} (α : Type u) [Zero α] :=
   (x : α) → Decidable (x ≠ 0)
 
 instance instEquiv : Dimension ≃ DFinsupp (fun _ : String => ℚ) :=
   ⟨Dimension._impl, Dimension.mk, by intro x; cases x; rfl, by intro y; rfl⟩
 
+@[simp]
 instance instAddCommGroup : AddCommGroup Dimension :=
   Dimension.instEquiv.addCommGroup
 
