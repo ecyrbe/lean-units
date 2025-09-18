@@ -143,6 +143,10 @@ theorem val_inv [Inv α] (q : Quantity d α) : (q⁻¹).val = Inv.inv q.val := r
 
 theorem val_sq [Mul α] (q : Quantity d α) : (q²).val = q.val^2 := by rfl
 
+@[simp]
+theorem Scalar.val_pow (q : Quantity d α) (n : ℕ) :
+  (q ^ᵈ n).val = q.val ^ n := rfl
+
 @[coe]
 def ofField {α} [Field α] (a : α) : Quantity (0: δ) α := ⟨ a ⟩
 
@@ -303,6 +307,15 @@ theorem toFormal_neg (q : Quantity d α) :
 theorem toFormal_sub (q₁ q₂ : Quantity d α) :
   ((q₁ - q₂ :Quantity d α):Formal δ α) = (q₁:Formal δ α) - (q₂:Formal δ α) := by
   simp only [toFormal, val_sub, Finsupp.single_sub]
+
+@[norm_cast, simp]
+theorem toFormal_pow (q : Quantity d α) (n : ℕ) :
+  ((q ^ᵈ n):Formal δ α) = (q:Formal δ α) ^ n := by
+  simp [toFormal, AddMonoidAlgebra.single_pow]
+
+@[simp]
+theorem pow_inv (q : Quantity d α) (n : ℕ) : (q ^ᵈ n)⁻¹ = ↑(q⁻¹ ^ᵈ n) := by
+  simp [←toFormal_inj, toFormal]
 
 noncomputable instance instCoeReal : Coe α (Formal δ α) where
   coe a := ((a:Quantity (0:δ) α):Formal δ α)
@@ -465,6 +478,11 @@ theorem left_distrib (a : Quantity d₁ α) (b c : Quantity d₂ α) :
 theorem right_distrib (a b : Quantity d₁ α) (c : Quantity d₂ α) :
   (a + b) * c = ↑(a * c + b * c) := by
   simp [←Formal.toFormal_inj]
+  ring
+
+theorem square_add (a b : Quantity d α) : (a + b) ^ᵈ (2:ℕ) = a ^ᵈ 2 + ↑(2 • a * b) + b ^ᵈ 2 := by
+  simp only [← Formal.toFormal_inj, Formal.toFormal_pow, Formal.toFormal_add]
+  rw [Formal.toFormal_cast, toFormal_mul, toFormal_nsmul, Nat.cast_ofNat]
   ring
 
 @[simp]
