@@ -3,33 +3,6 @@ import LeanUnits.Framework.Dimensions.Basic
 namespace Units.Dimension
 
 /--
-Dimension built from a string identifier is a base dimension.
--/
-theorem base_is_base (s : String) : IsBase (Dimension.ofString s) := by use s
-
-/--
-Base dimensions are non-zero.
--/
-theorem base_ne_zero (d : Dimension) (h : IsBase d) : d ≠ 0 := by
-  obtain ⟨s, rfl⟩ := h
-  have h_zero: 0 = Dimension.dimensionless := by rfl
-  rw [h_zero, Dimension.dimensionless, Dimension.ofString]
-  intro h
-  simpa [DFinsupp.single_eq_zero] using congrArg Dimension._impl h
-
-/--
-Single dimensions are non-zero.
--/
-theorem single_ne_zero {d : Dimension} (h : IsSingle d) : d ≠ 0 := by
-  obtain ⟨s, q, hq, rfl⟩ := h
-  have h_zero: 0 = Dimension.dimensionless := by rfl
-  rw [h_zero, Dimension.dimensionless]
-  intro h
-  apply congrArg Dimension._impl at h
-  simp only [DFinsupp.single_eq_zero] at h
-  contradiction
-
-/--
 Negation of a non-zero dimension is non-zero.
 -/
 theorem neg_ne_zero {d : Dimension} (hd : d ≠ 0) : -d ≠ 0 := by
@@ -82,14 +55,36 @@ theorem smul_ne_zero_iff {d : Dimension} {q : ℚ} :
   simp only [not_congr smul_eq_zero_iff, not_or, ne_eq]
 
 /--
+Dimension built from a string identifier is a base dimension.
+-/
+theorem base_is_base (s : String) : IsBase (Dimension.ofString s) := by use s
+
+/--
 Base dimensions are single dimensions.
 -/
-theorem IsBase.is_single {d : Dimension} (h : IsBase d) : IsSingle d := by
+theorem IsBase.to_single {d : Dimension} (h : IsBase d) : IsSingle d := by
   obtain ⟨s, rfl⟩ := h
   use s, 1
   constructor
   · norm_num
   · rfl
+
+/--
+Single dimensions are non-zero.
+-/
+theorem IsSingle.ne_zero {d : Dimension} (h : IsSingle d) : d ≠ 0 := by
+  obtain ⟨s, q, hq, rfl⟩ := h
+  have h_zero: 0 = Dimension.dimensionless := by rfl
+  rw [h_zero, Dimension.dimensionless]
+  intro h
+  apply congrArg Dimension._impl at h
+  simp only [DFinsupp.single_eq_zero] at h
+  contradiction
+
+/--
+Base dimensions are non-zero.
+-/
+theorem IsBase.ne_zero (d : Dimension) (h : IsBase d) : d ≠ 0 := h.to_single.ne_zero
 
 /--
 Scalar multiplication of a single dimension by a non-zero rational is a single dimension.
@@ -158,13 +153,13 @@ theorem IsSingle.neg_name_exponent {d : Dimension} (h : IsSingle d) :
 /--
 Negation of a base dimension is a single dimension.
 -/
-theorem IsBase.neg (d : Dimension) (h : IsBase d) : IsSingle (-d) := h.is_single.neg
+theorem IsBase.neg (d : Dimension) (h : IsBase d) : IsSingle (-d) := h.to_single.neg
 
 /--
 Scalar multiplication of a base dimension by a non-zero rational is a single dimension.
 -/
 theorem IsBase.smul (d : Dimension) (h : IsBase d) (q : ℚ) (hq : q ≠ 0) : IsSingle (q • d) :=
-  h.is_single.smul q hq
+  h.to_single.smul q hq
 
 /--
 Addition of two single dimensions that have different names or that don't have
@@ -208,7 +203,7 @@ Multiplying a single dimension by a non-zero rational is non-zero.
 -/
 theorem IsSingle.smul_ne_zero {d : Dimension} {q : ℚ}
   (hd : IsSingle d) (hq : q ≠ 0) : q • d ≠ 0 :=
-  _root_.smul_ne_zero hq (single_ne_zero hd)
+  _root_.smul_ne_zero hq hd.ne_zero
 
 namespace PrimeScale
 
