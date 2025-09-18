@@ -104,9 +104,9 @@ theorem IsSingle.smul {d : Dimension} (h : IsSingle d) (q : ℚ) (hq : q ≠ 0) 
     rfl
 
 /--
-companion to `single_smul_single`, giving the names and exponents of the dimensions
+companion to `IsSingle.smul`, giving the names and exponents of the dimensions
 -/
-theorem IsSingle.smul.name_exponent {d : Dimension} (h : IsSingle d) (q : ℚ) (hq : q ≠ 0) :
+theorem IsSingle.smul_name_exponent {d : Dimension} (h : IsSingle d) (q : ℚ) (hq : q ≠ 0) :
   (h.smul q hq).name = h.name ∧ (h.smul q hq).exponent = q • h.exponent := by
   set hsmul := h.smul q hq
   obtain ⟨hq,hd⟩:= h.name_exponent_spec
@@ -134,9 +134,9 @@ theorem IsSingle.neg {d : Dimension} (h : IsSingle d) : IsSingle (-d) := by
   exact IsSingle.smul h (-1) (by norm_num)
 
 /--
-companion to `single_neg_single`, giving the names and exponents of the dimensions
+companion to `IsSingle.neg`, giving the names and exponents of the dimensions
 -/
-theorem IsSingle.neg.name_exponent {d : Dimension} (h : IsSingle d) :
+theorem IsSingle.neg_name_exponent {d : Dimension} (h : IsSingle d) :
   h.neg.name = h.name ∧ h.neg.exponent = -h.exponent := by
   set hneg := h.neg
   obtain ⟨hq,hd⟩:= h.name_exponent_spec
@@ -197,9 +197,8 @@ Subtraction of two single dimensions that have different names or exponents is n
 theorem IsSingle.sub_ne_zero {d1 d2 : Dimension}
   (h1 : IsSingle d1) (h2 : IsSingle d2) (h : h1.name ≠ h2.name ∨ h1.exponent ≠ h2.exponent) :
   d1 - d2 ≠ 0 := by
-  have h2_neg_name_exponent := IsSingle.neg.name_exponent h2
-  have h2_neg_name : h2.name = h2.neg.name := h2_neg_name_exponent.1.symm
-  have h2_neg_exponent : h2.exponent = -h2.neg.exponent := by rw [h2_neg_name_exponent.2, neg_neg]
+  have h2_neg_name : h2.name = h2.neg.name := h2.neg_name_exponent.1.symm
+  have h2_neg_exponent : h2.exponent = -h2.neg.exponent := by rw [h2.neg_name_exponent.2, neg_neg]
   rw [h2_neg_name, h2_neg_exponent ] at h
   rw [sub_eq_add_neg]
   exact IsSingle.add_ne_zero h1 h2.neg h
