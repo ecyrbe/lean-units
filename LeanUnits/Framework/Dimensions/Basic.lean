@@ -68,11 +68,22 @@ Non computable function to extract the name of the base dimension.
 noncomputable def IsBase.name {d : Dimension} (h : d.IsBase) : String :=
   Classical.choose h
 
+def IsBase.exponent {d : Dimension} (_ : d.IsBase) : ℚ := 1
+
 /--
 The specification that the name corresponds to the base dimension.
 -/
 lemma IsBase.name_spec {d : Dimension} (h : d.IsBase) : d = Dimension.ofString (h.name) :=
   Classical.choose_spec h
+
+/--
+The specification that the name and exponent correspond to the base dimension.
+-/
+lemma IsBase.name_exponent_spec {d : Dimension} (h : d.IsBase) :
+  h.exponent = 1 ∧ d = ⟨DFinsupp.single h.name h.exponent⟩ := by
+  constructor
+  · rfl
+  · exact h.name_spec
 
 /--
 Non computable function to extract the name and exponent of the single dimension.

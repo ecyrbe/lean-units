@@ -70,6 +70,23 @@ theorem IsBase.to_single {d : Dimension} (h : IsBase d) : IsSingle d := by
   · rfl
 
 /--
+Companion to `IsBase.to_single`, giving the names and exponents of the dimensions
+-/
+theorem IsBase.to_single_name_exponent {d : Dimension} (h : IsBase d) :
+  h.to_single.name = h.name ∧ h.to_single.exponent = 1 := by
+  set hsingle := h.to_single
+  obtain ⟨hq, hd⟩ := h.name_exponent_spec
+  obtain ⟨hqs, hds⟩ := hsingle.name_exponent_spec
+  rw (occs := [1]) [hd] at hds
+  simp only [mk.injEq] at hds
+  have hcases := (DFinsupp.single_eq_single_iff _ _ _ _).mp hds.symm
+  constructor <;> cases hcases <;> rename_i h' <;> obtain ⟨hname, hexp⟩ := h' <;> try contradiction
+  · exact hname
+  · rw [heq_iff_eq] at hexp
+    exact hexp
+
+
+/--
 Single dimensions are non-zero.
 -/
 theorem IsSingle.ne_zero {d : Dimension} (h : IsSingle d) : d ≠ 0 := by
@@ -104,7 +121,7 @@ companion to `IsSingle.smul`, giving the names and exponents of the dimensions
 theorem IsSingle.smul_name_exponent {d : Dimension} (h : IsSingle d) (q : ℚ) (hq : q ≠ 0) :
   (h.smul q hq).name = h.name ∧ (h.smul q hq).exponent = q • h.exponent := by
   set hsmul := h.smul q hq
-  obtain ⟨hq,hd⟩:= h.name_exponent_spec
+  obtain ⟨hq, hd⟩ := h.name_exponent_spec
   obtain ⟨hqsmul,hdsmul⟩:= hsmul.name_exponent_spec
   have hsmul_simp : ∀ s: String, ∀ r r': ℚ,
     (r' • ({ _impl := fun₀ | s => r }: Dimension)) = { _impl := r' • fun₀ | s => r } :=
@@ -134,8 +151,8 @@ companion to `IsSingle.neg`, giving the names and exponents of the dimensions
 theorem IsSingle.neg_name_exponent {d : Dimension} (h : IsSingle d) :
   h.neg.name = h.name ∧ h.neg.exponent = -h.exponent := by
   set hneg := h.neg
-  obtain ⟨hq,hd⟩:= h.name_exponent_spec
-  obtain ⟨hqneg,hdneg⟩:= hneg.name_exponent_spec
+  obtain ⟨hq, hd⟩ := h.name_exponent_spec
+  obtain ⟨hqneg, hdneg⟩ := hneg.name_exponent_spec
   have hneg_simp :
     ∀ s: String, ∀ q: ℚ, -({ _impl := fun₀ | s => q }: Dimension) = { _impl := -fun₀ | s => q } :=
       by intros; rfl
