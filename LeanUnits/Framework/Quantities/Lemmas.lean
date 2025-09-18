@@ -503,8 +503,7 @@ theorem square_add (a b : Quantity d α) : (a + b) ^ᵈ (2:ℕ) = a ^ᵈ 2 + ↑
 
 theorem sq_add (a b : Quantity d α) : (a + b)² = a² + ↑(2 • a * b) + b² := by
   simp [← Formal.toFormal_inj]
-  rw [Formal.toFormal_cast]
-  rw [toFormal_mul, toFormal_nsmul, Nat.cast_ofNat]
+  rw [Formal.toFormal_cast, toFormal_mul, toFormal_nsmul, Nat.cast_ofNat]
   ring
 
 @[simp]
