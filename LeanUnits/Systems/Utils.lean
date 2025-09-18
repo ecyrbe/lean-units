@@ -1,4 +1,4 @@
-import Batteries.Data.Rat.Basic
+import Batteries.Data.Rat
 import Batteries.Classes.RatCast
 import Batteries.Data.Rat.Float
 

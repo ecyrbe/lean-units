@@ -59,10 +59,12 @@ theorem neg_unit_dim {u : Unit} :
 @[simp]
 theorem nsmul_unit_dim (c : ℕ) (u : Unit) :
   (c • u).dimension = c • u.dimension := by
-  induction' c with c ih
-  · repeat rw [zero_nsmul]
+  induction c with
+  | zero =>
+    repeat rw [zero_nsmul]
     rfl
-  · simp [succ_nsmul, add_unit_dim, ih]
+  | succ c ih =>
+    simp [succ_nsmul, add_unit_dim, ih]
 
 @[simp]
 theorem zsmul_unit_dim (c : ℤ) (u : Unit) :
@@ -122,10 +124,12 @@ theorem neg_unit_conv {u : Unit} :
 @[simp]
 theorem nsmul_unit_conv (c : ℕ) (u : Unit) :
   (c • u).conversion = c • u.conversion := by
-  induction' c with c ih
-  · repeat rw [zero_nsmul]
+  induction c with
+  | zero =>
+    repeat rw [zero_nsmul]
     rfl
-  · simp [succ_nsmul, add_unit_conv, ih]
+  | succ c ih =>
+    simp [succ_nsmul, add_unit_conv, ih]
 
 @[simp]
 theorem zsmul_unit_conv (c : ℤ) (u : Unit) :

@@ -3,7 +3,7 @@ import LeanUnits.Framework.Conversions.Basic
 import LeanUnits.Framework.Utils
 import Mathlib.Data.DFinsupp.Defs
 import Mathlib.Data.DFinsupp.BigOperators
-import Batteries.Data.Rat.Basic
+import Batteries.Data.Rat
 import Mathlib.Data.Rat.Defs
 
 namespace Units

@@ -271,9 +271,9 @@ theorem scaler_div (d1 d2 : Dimension) :
 
 theorem scaler_nsmul (d : Dimension) (n : ℕ) :
   PrimeScale (n • d) = (PrimeScale d) ^ n := by
-  induction' n with n ih
-  · rw [zero_nsmul, scaler_zero, pow_zero]
-  · rw [succ_nsmul, scaler_add, ih, pow_succ]
+  induction n with
+  | zero => rw [zero_nsmul, scaler_zero, pow_zero]
+  | succ n ih => rw [succ_nsmul, scaler_add, ih, pow_succ]
 
 theorem scaler_npow (d : Dimension) (n : ℕ) :
   PrimeScale (d ^ n) = (PrimeScale d) ^ n := by

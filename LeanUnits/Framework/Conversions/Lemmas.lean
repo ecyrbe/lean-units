@@ -1,6 +1,5 @@
 import LeanUnits.Framework.Conversions.Basic
-import Batteries.Data.Rat.Basic
-import Batteries.Data.Rat.Lemmas
+import Batteries.Data.Rat
 import Mathlib.Data.Rat.Lemmas
 import Mathlib.Tactic
 
@@ -94,8 +93,7 @@ theorem scalable_apply {α} [RatCast α] [Field α]
   (h_coe_zero : (0 : ℚ) = (0 : α) := by norm_cast) :
   c.apply x = x * c.factor := by
   unfold Scalable at h
-  simp only [apply, h, h_coe_zero]
-  field_simp
+  simp only [apply, h, h_coe_zero, _root_.add_zero]
 
 theorem scalable_convert {α} [RatCast α] [Field α]
   (c1 c2 : Conversion) (x : α) (h1 : Scalable c1) (h2 : Scalable c2)

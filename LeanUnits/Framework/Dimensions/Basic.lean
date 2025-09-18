@@ -121,8 +121,9 @@ instance instAddCommGroup : AddCommGroup Dimension :=
 instance instSMul : SMul ℚ Dimension :=
   Dimension.instEquiv.smul ℚ
 
-instance instMulAction : MulAction ℚ Dimension :=
-  Dimension.instEquiv.mulAction ℚ
+instance instMulAction : MulAction ℚ Dimension where
+  one_smul d := congrArg Dimension.mk (one_smul ℚ d._impl)
+  mul_smul q1 q2 d := congrArg Dimension.mk (mul_smul q1 q2 d._impl)
 
 instance instSMulWithZero : SMulWithZero ℚ Dimension where
   zero_smul d := congrArg Dimension.mk (zero_smul ℚ d._impl)
