@@ -141,7 +141,13 @@ theorem val_div [Div α] (q₁ : Quantity d₁ α) (q₂ : Quantity d₂ α) :
 @[simp]
 theorem val_inv [Inv α] (q : Quantity d α) : (q⁻¹).val = Inv.inv q.val := rfl
 
-theorem val_sq [Mul α] (q : Quantity d α) : (q²).val = q.val^2 := by rfl
+@[simp]
+theorem val_npow [Pow α ℕ] (q : Quantity d α) (n : ℕ) :
+  (q.npow n).val = q.val ^ n := rfl
+
+@[simp]
+theorem val_zpow [Pow α ℤ] (q : Quantity d α) (n : ℤ) :
+  (q.zpow n).val = q.val ^ n := rfl
 
 @[simp]
 theorem Scalar.val_pow (q : Quantity d α) (n : ℕ) :
@@ -240,7 +246,6 @@ theorem deriv_div_real
     ↑((deriv f x * g x - ↑(f x * deriv g x)) / (g x)²) := by
   rw [← val_inj]
   simp [deriv, cast]
-  rw [val_sq]
   rw [neZero_iff] at h_gx
   exact deriv_div (h_f_diff.differentiableAt) (h_g_diff.differentiableAt) h_gx
 
@@ -312,6 +317,17 @@ theorem toFormal_sub (q₁ q₂ : Quantity d α) :
 theorem toFormal_pow (q : Quantity d α) (n : ℕ) :
   ((q ^ᵈ n):Formal δ α) = (q:Formal δ α) ^ n := by
   simp [toFormal, AddMonoidAlgebra.single_pow]
+
+@[norm_cast, simp]
+theorem toFormal_sq (q : Quantity d α) :
+  ((q²):Formal δ α) = (q:Formal δ α) ^ 2 := by
+  simp [toFormal, AddMonoidAlgebra.single_pow]
+
+@[norm_cast, simp]
+theorem toFormal_cube (q : Quantity d α) :
+  ((q³):Formal δ α) = (q:Formal δ α) ^ 3 := by
+  simp [toFormal, AddMonoidAlgebra.single_pow]
+
 
 @[simp]
 theorem pow_inv (q : Quantity d α) (n : ℕ) : (q ^ᵈ n)⁻¹ = ↑(q⁻¹ ^ᵈ n) := by
@@ -483,6 +499,12 @@ theorem right_distrib (a b : Quantity d₁ α) (c : Quantity d₂ α) :
 theorem square_add (a b : Quantity d α) : (a + b) ^ᵈ (2:ℕ) = a ^ᵈ 2 + ↑(2 • a * b) + b ^ᵈ 2 := by
   simp only [← Formal.toFormal_inj, Formal.toFormal_pow, Formal.toFormal_add]
   rw [Formal.toFormal_cast, toFormal_mul, toFormal_nsmul, Nat.cast_ofNat]
+  ring
+
+theorem sq_add (a b : Quantity d α) : (a + b)² = a² + ↑(2 • a * b) + b² := by
+  simp [← Formal.toFormal_inj]
+  rw [Formal.toFormal_cast]
+  rw [toFormal_mul, toFormal_nsmul, Nat.cast_ofNat]
   ring
 
 @[simp]
