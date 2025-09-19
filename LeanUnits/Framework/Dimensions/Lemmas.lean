@@ -235,6 +235,11 @@ theorem scaler_one : PrimeScale (1 : Dimension) = 1 := by
   have one_eq_zero : (1 : Dimension) = 0 := by rfl
   rw [one_eq_zero,scaler_zero]
 
+theorem scaler_ne_zero {d : Dimension} : PrimeScale d ≠ 0 := by
+  apply DFinsupp.prod_ne_zero_iff.mpr
+  intro i hi
+  exact prime_pow_ne_zero (d._impl i)
+
 theorem scaler_add (d1 d2 : Dimension) : PrimeScale (d1 + d2) = PrimeScale d1 * PrimeScale d2 := by
   exact DFinsupp.prod_add_index @prime_pow_zero @prime_pow_add
 

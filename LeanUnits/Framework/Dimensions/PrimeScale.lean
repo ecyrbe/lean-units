@@ -92,4 +92,10 @@ theorem prime_pow_neg {i : String} (q : ℚ) :
   rw [prime_pow, prime_pow, q_cast, Real.rpow_neg]
   positivity
 
+theorem prime_pow_ne_zero {s : String} (q : ℚ) : prime_pow s q ≠ 0 := by
+  have hxNat : 0 < prime_from_str s := Nat.pos_of_ne_zero (prime_from_str_ne_zero s)
+  have hx : 0 < (prime_from_str s : ℝ) := by norm_cast
+  rw [prime_pow]
+  exact ne_of_gt (Real.rpow_pos_of_pos hx (q : ℝ))
+
 end Units.Dimension.PrimeScale
