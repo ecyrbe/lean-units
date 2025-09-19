@@ -23,6 +23,10 @@ variable {δ : Type} [AddCommGroup δ] [Setoid δ]
 -- here d, d₁, d₂, d₃ can be any dimensions or units in δ
 variable {d d₁ d₂ d₃ d₄ : δ}
 
+theorem dim_eq_dim {d : δ} [HasDimension δ] (q : Quantity d α) :
+  𝒟 q = 𝒟 d := by rfl
+
+
 
 theorem eq_imp_equiv {μ} [Setoid μ] {u1 u2 : μ} (h : u1 = u2) : u1 ≈ u2 := by
   rw [h]
@@ -72,6 +76,8 @@ theorem val_sub (q₁ q₂ : Quantity d α) : (q₁ - q₂).val = q₁.val - q�
 
 @[simp]
 theorem val_smul [SMul α α] (n : α) (q : Quantity d α) : (n • q).val = n • q.val := rfl
+
+theorem smul_def [SMul α α] (n : α) (q : Quantity d α) : (n • q) = ⟨n • q.val⟩ := rfl
 
 instance instAddGroup : AddGroup (Quantity d α) where
   zero := Zero.zero
@@ -386,6 +392,11 @@ instance instModule : Module α (Quantity d α) where
   zero_smul q := by simp [←Formal.toFormal_inj]
   mul_smul c1 c2 q := by simp [←Formal.toFormal_inj]; ring
   smul_zero c := by simp [←Formal.toFormal_inj]
+
+instance instMulAction : MulAction α (Quantity d α) where
+  smul := (· • ·)
+  one_smul := by simp only [one_smul, implies_true]
+  mul_smul := by simp only [mul_smul, implies_true]
 
 @[simp]
 theorem val_nsmul (c : ℕ) (q : Quantity d α) : (c • q).val = c * q.val := by
