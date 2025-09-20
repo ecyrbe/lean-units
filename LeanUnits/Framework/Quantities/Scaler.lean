@@ -28,7 +28,7 @@ We can derive that scale_inv scales back to the original value because scale is 
 theorem Scaler.scale_inv_scale_cancel {M : Type} [Scaler M] (m : M) :
   Scaler.scale_inv (Scaler.scale m) = m := by
   apply_fun Scaler.scale
-  · rw [Scaler.scale_scale_inv_cancel (Scaler.scale m)]
+  · rw [Scaler.scale_scale_inv_cancel]
   · exact Scaler.scale_inj
 
 /--
