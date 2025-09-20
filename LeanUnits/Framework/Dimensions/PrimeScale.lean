@@ -63,9 +63,7 @@ theorem prime_from_str_prime (s : String) : (prime_from_str s).Prime := by
   simp only [prime_from_str, Nat.prime_nth_prime]
 
 theorem prime_from_str_inj : Function.Injective prime_from_str := by
-  intro s1 s2 h
-  have h_enc : string_to_nat s1 = string_to_nat s2 := Nat.nth_injective Nat.infinite_setOf_prime h
-  exact string_to_nat_inj h_enc
+  exact Function.Injective.comp (Nat.nth_injective Nat.infinite_setOf_prime) string_to_nat_inj
 
 theorem prime_from_str_ne_zero (s : String) : prime_from_str s ≠ 0 := by
   exact Nat.Prime.ne_zero (prime_from_str_prime s)
