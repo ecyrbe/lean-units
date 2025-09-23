@@ -6,7 +6,7 @@ namespace Units
 
 abbrev Imperial (units : Unit) := Quantity units Float
 
-@[inline] def F₀ : Imperial Unit.fahrenheit := ⟨1.0⟩ -- 1 degree Fahrenheit
+@[inline] def ℉ : Imperial Unit.fahrenheit := ⟨1.0⟩ -- 1 degree Fahrenheit
 
 -- length
 @[inline] def inch : Imperial Unit.inch := ⟨1.0⟩ -- 1 inch

@@ -22,6 +22,6 @@ def_derived_unit pint := "pt" from quart with scale (1/2)
 def_derived_unit cup := "cup" from pint with scale (1/2)
 def_derived_unit fluid_ounce := "fl oz" from gallon with scale (1/128)
 -- temperature
-def_derived_unit fahrenheit := "°F" from kelvin with scale (5/9) + translate (45967 / 100 * 5/9)
+def_derived_unit fahrenheit := "℉" from kelvin with scale (5/9) + translate (45967 / 100 * 5/9)
 
 end Units.Unit

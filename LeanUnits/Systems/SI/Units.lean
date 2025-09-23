@@ -35,6 +35,6 @@ def_derived_unit becquerel := "Bq" from second⁻¹
 def_derived_unit gray := "Gy" from joule / kilogram
 def_derived_unit sievert := "Sv" from joule / kilogram
 def_derived_unit katal := "kat" from mole * second
-def_derived_unit celsius := "°C" from kelvin with translate (27315/100)
+def_derived_unit celsius := "℃" from kelvin with translate (27315/100)
 
 end Units.Unit

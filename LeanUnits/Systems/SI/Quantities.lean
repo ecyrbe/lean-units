@@ -32,7 +32,7 @@ set_option linter.style.commandStart false
 @[inline] def Wb : SI Unit.weber := ⟨1.0⟩ -- 1 weber
 @[inline] def T : SI Unit.tesla := ⟨1.0⟩ -- 1 tesla
 @[inline] def H : SI Unit.henry := ⟨1.0⟩ -- 1 henry
-@[inline] def C₀ : SI Unit.celsius := ⟨1.0⟩ -- 1 degree Celsius
+@[inline] def ℃ : SI Unit.celsius := ⟨1.0⟩ -- 1 degree Celsius
 @[inline] def lm : SI Unit.lumen := ⟨1.0⟩ -- 1 lumen
 @[inline] def lx : SI Unit.lux := ⟨1.0⟩ -- 1 lux
 @[inline] def Bq : SI Unit.becquerel := ⟨1.0⟩ -- 1 becquerel
@@ -62,7 +62,7 @@ define_si_prefixes F
 define_si_prefixes Wb
 define_si_prefixes T
 define_si_prefixes H
-define_si_prefixes C₀
+define_si_prefixes ℃
 define_si_prefixes lm
 define_si_prefixes lx
 define_si_prefixes Bq

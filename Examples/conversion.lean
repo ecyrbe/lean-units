@@ -88,7 +88,7 @@ def distance_to_alpha_centauri : SI light_year := 4.367 • ly
 
 -- temperature conversion
 
-def human_body_temp := 37.8 • C₀
+def human_body_temp := 37.8 • ℃
 
 #eval human_body_temp
 #eval human_body_temp.units
