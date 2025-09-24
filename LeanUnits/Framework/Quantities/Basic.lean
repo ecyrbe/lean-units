@@ -17,7 +17,7 @@ namespace Quantity
 variable {d d₁ d₂ : δ}
 
 unsafe instance [Repr α] : Repr (Quantity d α) where
-  reprPrec q _ := s!"{repr q.val} ({repr d})"
+  reprPrec q _ := s!"{repr q.val} • {repr d}"
 
 unsafe instance [Repr α] : ToString (Quantity d α) where
   toString q := reprStr q
