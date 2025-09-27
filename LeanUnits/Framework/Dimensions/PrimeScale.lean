@@ -120,7 +120,7 @@ theorem prime_pow_inj_right (s : String) (q1 q2 : ℚ) :
     exact_mod_cast hq'
   · intro hq; simp [hq]
 
-theorem prime_pow_inj_nat (s1 s2 : String) {n1 n2 : ℕ} (h : n1 ≠ 0) (h' : n2 ≠ 0) :
+theorem prime_pow_inj_nat (s1 s2 : String) {n1 n2 : ℕ} (h1 : n1 ≠ 0) (h2 : n2 ≠ 0) :
     prime_pow s1 n1 = prime_pow s2 n2 → s1 = s2 ∧ n1 = n2 := by
   intro H
   set q1' := (n1-1) with hq1'
@@ -138,23 +138,24 @@ theorem prime_pow_inj_nat (s1 s2 : String) {n1 n2 : ℕ} (h : n1 ≠ 0) (h' : n2
   have := Nat.Prime.pow_inj (prime_from_str_prime s1) (prime_from_str_prime s2) H'
   exact this.imp (fun h => prime_from_str_inj h) (fun h => by rw [hq1, hq2, h])
 
-theorem prime_pow_inj_int (s1 s2 : String) {z1 z2 : ℤ} (h : z1 ≠ 0) (h' : z2 ≠ 0) :
+theorem prime_pow_inj_int (s1 s2 : String) {z1 z2 : ℤ} (h1 : z1 ≠ 0) (h2 : z2 ≠ 0) :
   prime_pow s1 z1 = prime_pow s2 z2 → s1 = s2 ∧ z1 = z2 := by
   cases z1 with
   | ofNat n1 =>
     cases z2 with
     | ofNat n2 =>
       have h1 : n1 ≠ 0 := by
-        intro hn; rw [hn] at h; contradiction
+        intro hn; rw [hn] at h1; contradiction
       have h2 : n2 ≠ 0 := by
-        intro hn; rw [hn] at h'; contradiction
+        intro hn; rw [hn] at h2; contradiction
       have H := prime_pow_inj_nat s1 s2 h1 h2
       have hp1 : prime_pow s1 ↑n1 = prime_pow s1 ↑(Int.ofNat n1) := by rfl
       have hp2 : prime_pow s2 ↑n2 = prime_pow s2 ↑(Int.ofNat n2) := by rfl
       rw [hp1, hp2] at H
       intro hEq
       have ⟨hs, hnats⟩ := H hEq
-      exact ⟨hs, by simpa using congrArg Int.ofNat hnats⟩
+      have hn : Int.ofNat n1 = Int.ofNat n2 := by rw [hnats]
+      exact ⟨hs, hn⟩
     | negSucc n2 =>
     -- prove not possible (left >1, right <1)
       intro hEq
@@ -164,21 +165,20 @@ theorem prime_pow_inj_int (s1 s2 : String) {z1 z2 : ℤ} (h : z1 ≠ 0) (h' : z2
         have : (1 : ℕ) < prime_from_str s1 := Nat.Prime.one_lt (prime_from_str_prime s1)
         norm_cast
       have hn1 : n1 ≠ 0 := by
-        intro hn; rw [hn] at h; contradiction
+        intro hn; rw [hn] at h1; contradiction
       have left_gt1 : 1 < prime_pow s1 ↑n1 := by
         rw [prime_pow]
         exact Real.one_lt_rpow hp1_gt1 (Nat.cast_pos.mpr (Nat.pos_of_ne_zero hn1))
       have hp2 : 0 < prime_from_str s2 := Nat.pos_of_ne_zero (prime_from_str_ne_zero s2)
       have hp2R : 0 < (prime_from_str s2 : ℝ) := by norm_cast
       have hp2_gt1 : 1 < (prime_from_str s2 : ℝ) := by
-        have : (1 : ℕ) < prime_from_str s2 := Nat.Prime.one_lt (prime_from_str_prime s2)
+        have : 1 < prime_from_str s2 := Nat.Prime.one_lt (prime_from_str_prime s2)
         norm_cast
       have right_lt1 : prime_pow s2 ↑(Int.negSucc n2) < 1 := by
         have : (((Int.negSucc n2): ℚ) : ℝ) = - (n2 + 1 : ℝ) := by norm_cast
         rw [prime_pow, this, Real.rpow_neg (le_of_lt hp2R)]
         -- show the positive power is > 1, hence its inverse is < 1
-        have pow_pos : 0 < (prime_from_str s2 : ℝ) ^ (n2 + 1 : ℝ) :=
-          Real.rpow_pos_of_pos hp2R (n2 + 1 : ℝ)
+        have pow_pos : 0 < (prime_from_str s2 : ℝ) ^ (n2 + 1 : ℝ) := by positivity
         have pow_gt_one : 1 < (prime_from_str s2 : ℝ) ^ (n2 + 1 : ℝ) :=
           Real.one_lt_rpow hp2_gt1 (by norm_cast; exact Nat.zero_lt_succ n2)
         -- multiply 1 < x by x⁻¹ > 0 to get x⁻¹ < 1
@@ -215,7 +215,7 @@ theorem prime_pow_inj_int (s1 s2 : String) {z1 z2 : ℤ} (h : z1 ≠ 0) (h' : z2
         have : (1 : ℕ) < prime_from_str s2 := Nat.Prime.one_lt (prime_from_str_prime s2)
         norm_cast
       have hn2 : n2 ≠ 0 := by
-        intro hn; rw [hn] at h'; contradiction
+        intro hn; rw [hn] at h2; contradiction
       have right_gt1 : 1 < prime_pow s2 ↑n2 := by
         rw [prime_pow]
         exact Real.one_lt_rpow hp2_gt1 (Nat.cast_pos.mpr (Nat.pos_of_ne_zero hn2))
