@@ -385,4 +385,23 @@ theorem prime_pow_pos {s : String} {q : ℚ} :
   have hx : 0 < (prime_from_str s : ℝ) := by exact_mod_cast prime_from_str_pos s
   apply Real.rpow_pos_of_pos hx
 
+theorem prime_pow_eq_one {s : String} {q : ℚ} (hq : q = 0) :
+  prime_pow s q = 1 := by rw [hq, prime_pow_zero]
+
+theorem prime_pow_ne_one {s : String} {q : ℚ} (hq : q ≠ 0) :
+  prime_pow s q ≠ 1 := by
+  by_contra h
+  rw [(@prime_pow_zero s).symm] at h
+  have hq' := (prime_pow_inj_right s q 0).mp h
+  contradiction
+
+theorem prime_pow_eq_one_iff {s : String} {q : ℚ} :
+  prime_pow s q = 1 ↔ q = 0 := by
+  constructor
+  · intro h
+    by_contra hq
+    have h1 := @prime_pow_ne_one s q hq
+    contradiction
+  · exact prime_pow_eq_one
+
 end Units.Dimension.PrimeScale
