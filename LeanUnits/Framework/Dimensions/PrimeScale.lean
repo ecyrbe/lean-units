@@ -69,6 +69,12 @@ theorem prime_from_str_inj : Function.Injective prime_from_str := by
 theorem prime_from_str_ne_zero (s : String) : prime_from_str s ≠ 0 := by
   exact Nat.Prime.ne_zero (prime_from_str_prime s)
 
+theorem prime_from_str_pos (s : String) : 0 < prime_from_str s := by
+  exact Nat.Prime.pos (prime_from_str_prime s)
+
+theorem one_le_prime_from_str (s : String) : 1 ≤ prime_from_str s := by
+  exact Nat.Prime.one_le (prime_from_str_prime s)
+
 noncomputable def prime_pow (s : String) (q : ℚ) : ℝ :=
   (prime_from_str s : ℝ ) ^ (q: ℝ)
 
@@ -361,5 +367,22 @@ theorem prime_pow_ne_zero {s : String} (q : ℚ) : prime_pow s q ≠ 0 := by
   have hx : 0 < (prime_from_str s : ℝ) := by norm_cast
   rw [prime_pow]
   exact ne_of_gt (Real.rpow_pos_of_pos hx (q : ℝ))
+
+theorem one_le_prime_pow {s : String} {q : ℚ} (hq : 0 ≤ q) :
+  1 ≤ prime_pow s q := by
+  have hx : 1 ≤ (prime_from_str s : ℝ) := by exact_mod_cast one_le_prime_from_str s
+  apply Real.one_le_rpow hx
+  norm_cast
+
+theorem prime_pow_le_one {s : String} {q : ℚ} (hq : q ≤ 0) :
+  prime_pow s q ≤ 1 := by
+  have hx : 1 ≤ (prime_from_str s : ℝ) := by exact_mod_cast one_le_prime_from_str s
+  apply Real.rpow_le_one_of_one_le_of_nonpos hx
+  norm_cast
+
+theorem prime_pow_pos {s : String} {q : ℚ} :
+  0 < prime_pow s q := by
+  have hx : 0 < (prime_from_str s : ℝ) := by exact_mod_cast prime_from_str_pos s
+  apply Real.rpow_pos_of_pos hx
 
 end Units.Dimension.PrimeScale
