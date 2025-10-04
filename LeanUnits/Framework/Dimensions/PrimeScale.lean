@@ -166,8 +166,9 @@ theorem prime_pow_inj_int (s1 s2 : String) {z1 z2 : ℤ} (h1 : z1 ≠ 0) (h2 : z
         have hn : Int.ofNat n1 = Int.ofNat n2 := by rw [hnats]
         exact ⟨hs, hn⟩
       | negSucc n2 =>
-      -- prove not possible (left >1, right <1)
         intro hEq
+        -- prove not possible (left >1, right <1)
+        exfalso
         have hp1 : 0 < prime_from_str s1 := Nat.pos_of_ne_zero (prime_from_str_ne_zero s1)
         have hp1R : 0 < (prime_from_str s1 : ℝ) := by norm_cast
         have hp1_gt1 : 1 < (prime_from_str s1 : ℝ) := by
@@ -195,12 +196,13 @@ theorem prime_pow_inj_int (s1 s2 : String) {z1 z2 : ℤ} (h1 : z1 ≠ 0) (h2 : z
           simp [mul_comm, mul_inv_cancel₀ (ne_of_gt pow_pos)] at h
           exact h
         have : (1 : ℝ) < 1 := left_gt1.trans (hEq.trans_lt right_lt1)
-        exact False.elim (lt_irrefl (1 : ℝ) this)
+        exact lt_irrefl (1 : ℝ) this
     | negSucc n1 =>
       cases z2 with
       | ofNat n2 =>
-        -- prove not possible (left <1, right >1)
         intro hEq
+        -- prove not possible (left <1, right >1)
+        exfalso
         have hp1 : 0 < prime_from_str s1 := Nat.pos_of_ne_zero (prime_from_str_ne_zero s1)
         have hp1R : 0 < (prime_from_str s1 : ℝ) := by norm_cast
         have hp1_gt1 : 1 < (prime_from_str s1 : ℝ) := by
@@ -233,7 +235,7 @@ theorem prime_pow_inj_int (s1 s2 : String) {z1 z2 : ℤ} (h1 : z1 ≠ 0) (h2 : z
           have h1 : (1 : ℝ) < prime_pow s1 ↑(Int.negSucc n1) := by
             simpa using (lt_of_lt_of_eq right_gt1 hEq.symm)
           exact lt_trans h1 left_lt1
-        exact False.elim (lt_irrefl (1 : ℝ) this)
+        exact lt_irrefl (1 : ℝ) this
       | negSucc n2 =>
         intro hEq
         have hq1 : ((Int.negSucc n1 : ℚ)) = -((n1 + 1 : ℕ) : ℚ) := by norm_cast
@@ -403,5 +405,97 @@ theorem prime_pow_eq_one_iff {s : String} {q : ℚ} :
     have h1 := @prime_pow_ne_one s q hq
     contradiction
   · exact prime_pow_eq_one
+
+theorem prime_pow_mul_prime_pow_eq_one_iff {s1 s2 : String} {q1 q2 : ℚ} :
+  prime_pow s1 q1 * prime_pow s2 q2 = 1 ↔ (s1 = s2 ∧ q1 = -q2) ∨ (q1 = 0 ∧ q2 = 0) := by
+  constructor
+  · intro h
+    by_cases hq1 : q1 = 0
+    · right
+      exact ⟨hq1, (prime_pow_eq_one_iff.mp (by rw [hq1, prime_pow_zero] at h; simpa using h))⟩
+    by_cases hq2 : q2 = 0
+    · right
+      exact ⟨(prime_pow_eq_one_iff.mp (by rw [hq2, prime_pow_zero] at h; simpa using h)), hq2⟩
+    left
+    have hInv : prime_pow s1 q1 = (prime_pow s2 q2)⁻¹ := eq_inv_of_mul_eq_one_left h
+    have hNeg : prime_pow s1 q1 = prime_pow s2 (-q2) := by
+      rw [←prime_pow_neg] at hInv; exact hInv
+    replace hq2 : -q2 ≠ 0 := by exact neg_ne_zero.mpr hq2
+    exact (prime_pow_inj s1 s2 hq1 hq2).mp hNeg
+  · intro h
+    cases h with
+    | inl h =>
+      obtain ⟨hs, hq⟩ := h
+      rw [hs, hq, prime_pow_neg, inv_mul_cancel₀]
+      apply prime_pow_ne_zero
+    | inr h =>
+      obtain ⟨hq1, hq2⟩ := h
+      rw [hq1, hq2, prime_pow_zero, one_mul]
+      exact prime_pow_zero
+
+theorem diff_prime_pow_mul_prime_pow_eq_one_iff {s1 s2 : String} {q1 q2 : ℚ}
+  (h : s1 ≠ s2) :
+  prime_pow s1 q1 * prime_pow s2 q2 = 1 ↔ (q1 = 0 ∧ q2 = 0) := by
+  constructor
+  · intro hEq
+    rcases (prime_pow_mul_prime_pow_eq_one_iff).mp hEq with ⟨hs, _⟩ | hzero
+    · contradiction
+    · exact hzero
+  · intro ⟨hq1, hq2⟩
+    simp only [hq1, hq2, prime_pow_zero, one_mul]
+
+
+/--
+For a finite set of distinct strings (hence distinct underlying primes),
+the product of `prime_pow s (q s)` over the finset is `1` iff every exponent is `0`.
+This generalizes `diff_prime_pow_mul_prime_pow_eq_one_iff` from two factors to any number
+of (pairwise distinct) factors, which holds automatically because we range over a `Finset String`.
+-/
+theorem prod_prime_pow_eq_one_iff
+  (S : Finset String) (q : String → ℚ) :
+  (∏ s ∈ S, prime_pow s (q s)) = 1 ↔ ∀ s ∈ S, q s = 0 := by
+  refine S.induction_on ?hbase ?hstep
+  · simp only [Finset.prod_empty, Finset.notMem_empty, IsEmpty.forall_iff, implies_true]
+  · intro a S ha hIH
+    have hprod :
+      (∏ s ∈ insert a S, prime_pow s (q s))
+        = prime_pow a (q a) * (∏ s ∈ S, prime_pow s (q s)) := by
+      simp [Finset.prod_insert, ha]
+    constructor
+    · intro h
+      -- rewrite the product over insert
+      simp [hprod] at h
+      -- handle the head factor
+      by_cases hqa : q a = 0
+      · -- reduce to IH
+        have hS : (∏ s ∈ S, prime_pow s (q s)) = 1 := by
+          simpa [hqa, prime_pow_zero] using h
+        have hAll := (hIH.mp hS)
+        intro s hs
+        by_cases hs' : s = a
+        · subst hs'; simp [hqa]
+        · exact hAll s (by simpa [hs'] using hs)
+      · -- q a ≠ 0; deduce contradiction unless all remaining exponents are 0
+        -- From the equation: prime_pow a (q a) * P = 1
+        -- get: P = prime_pow a (-q a)
+        have hP :
+          (∏ s ∈ S, prime_pow s (q s)) = prime_pow a (-q a) := by
+          -- From prime_pow a (q a) * (∏ ...) = 1, isolate the product over S
+          have hP' :
+              (∏ s ∈ S, prime_pow s (q s)) = (prime_pow a (q a))⁻¹ := by
+              rw [mul_comm] at h
+              exact eq_inv_of_mul_eq_one_left h
+          simpa [prime_pow_neg] using hP'
+        rw [h] at hprod
+        exfalso
+        have false : False := sorry
+        assumption
+    · intro hAll
+      -- reverse direction: if all exponents are zero, product is 1
+      simp only [hprod, Finset.mem_insert, true_or, hAll, prime_pow_zero, one_mul]
+      rw [hIH]
+      intro s hs
+      exact hAll s (Finset.mem_insert.mpr (Or.inr hs))
+
 
 end Units.Dimension.PrimeScale

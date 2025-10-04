@@ -296,4 +296,48 @@ theorem scaler_zpow (d : Dimension) (n : ℤ) :
   rw [HPow.hPow, instHPow]
   simp [scaler_zsmul]
 
+/--
+If the prime scale of a dimension is 1, then the dimension must be the dimensionless dimension (0).
+This is the crucial lemma for proving the injectivity of `PrimeScale`.
+-/
+lemma scaler_eq_one_iff_empty (d : Dimension) :
+  d.PrimeScale = 1 ↔ d._impl.support = ∅ := by
+  unfold PrimeScale
+  constructor
+  · -- Show that if the product is 1, the support must be 0.
+    unfold DFinsupp.prod
+    intro h
+    rw [prod_prime_pow_eq_one_iff d._impl.support d._impl] at h
+    apply Finset.eq_empty_iff_forall_notMem.mpr
+    intro x hx
+    have hx' : d._impl x ≠ 0 := DFinsupp.mem_support_iff.mp hx
+    have hx0 : d._impl x = 0 := h x hx
+    contradiction
+  · -- Show that if the dimension is 0, its prime scale is 1.
+    intro h_zero
+    rw [DFinsupp.support_eq_empty] at h_zero
+    rw [h_zero, DFinsupp.prod_zero_index]
+
+lemma scaler_eq_one_iff_zero (d : Dimension) :
+  d.PrimeScale = 1 ↔ d = 0 := by
+  rw [scaler_eq_one_iff_empty, DFinsupp.support_eq_empty, Dimension.ext_iff]
+  rfl
+
+/--
+The `PrimeScale` function is injective. This means that if two dimensions have the same
+prime scale, they must be the same dimension.
+-/
+theorem scaler_inj : Function.Injective PrimeScale := by
+  intro d1 d2 h
+  -- To show `d1 = d2`, it's equivalent to show `d1 - d2 = 0`.
+  -- We can use our helper lemma `prod_eq_one_iff_zero` on the dimension `d1 - d2`.
+  have h_diff : PrimeScale (d1 - d2) = 1 := by
+    rw [scaler_sub, h, div_self]
+    -- We need to ensure `PrimeScale d2` is not zero to divide.
+    exact scaler_ne_zero
+  -- From equality of prime scales, show that (d1 - d2) is zero.
+  have h_sub_zero : (d1 - d2) = 0 := by
+    exact (scaler_eq_one_iff_zero (d1 - d2)).mp h_diff
+  exact sub_eq_zero.mp h_sub_zero
+
 end Units.Dimension.PrimeScale
