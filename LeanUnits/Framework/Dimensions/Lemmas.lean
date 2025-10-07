@@ -310,8 +310,8 @@ lemma scaler_eq_one_iff_empty (d : Dimension) :
     rw [prod_prime_pow_eq_one_iff d._impl.support d._impl] at h
     apply Finset.eq_empty_iff_forall_notMem.mpr
     intro x hx
-    have hx' : d._impl x ≠ 0 := DFinsupp.mem_support_iff.mp hx
-    have hx0 : d._impl x = 0 := h x hx
+    have hx_ne_0 : d._impl x ≠ 0 := DFinsupp.mem_support_iff.mp hx
+    have hx_eq_0 : d._impl x = 0 := h x hx
     contradiction
   · -- Show that if the dimension is 0, its prime scale is 1.
     intro h_zero
