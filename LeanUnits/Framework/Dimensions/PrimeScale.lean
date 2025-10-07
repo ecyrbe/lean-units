@@ -7,6 +7,7 @@ import Mathlib.Data.Nat.Nth
 import Mathlib.NumberTheory.PrimeCounting
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import LeanUnits.Framework.Utils
+import LeanUnits.Framework.Dimensions.Prime
 
 namespace Units.Dimension.PrimeScale
 /--
@@ -444,58 +445,12 @@ theorem diff_prime_pow_mul_prime_pow_eq_one_iff {s1 s2 : String} {q1 q2 : ℚ}
   · intro ⟨hq1, hq2⟩
     simp only [hq1, hq2, prime_pow_zero, one_mul]
 
-
-/--
-For a finite set of distinct strings (hence distinct underlying primes),
-the product of `prime_pow s (q s)` over the finset is `1` iff every exponent is `0`.
-This generalizes `diff_prime_pow_mul_prime_pow_eq_one_iff` from two factors to any number
-of (pairwise distinct) factors, which holds automatically because we range over a `Finset String`.
--/
 theorem prod_prime_pow_eq_one_iff
   (S : Finset String) (q : String → ℚ) :
   (∏ s ∈ S, prime_pow s (q s)) = 1 ↔ ∀ s ∈ S, q s = 0 := by
-  refine S.induction_on ?hbase ?hstep
-  · simp only [Finset.prod_empty, Finset.notMem_empty, IsEmpty.forall_iff, implies_true]
-  · intro a S ha hIH
-    have hprod :
-      (∏ s ∈ insert a S, prime_pow s (q s))
-        = prime_pow a (q a) * (∏ s ∈ S, prime_pow s (q s)) := by
-      simp [Finset.prod_insert, ha]
-    constructor
-    · intro h
-      -- rewrite the product over insert
-      simp [hprod] at h
-      -- handle the head factor
-      by_cases hqa : q a = 0
-      · -- reduce to IH
-        have hS : (∏ s ∈ S, prime_pow s (q s)) = 1 := by
-          simpa [hqa, prime_pow_zero] using h
-        have hAll := (hIH.mp hS)
-        intro s hs
-        by_cases hs' : s = a
-        · subst hs'; simp [hqa]
-        · exact hAll s (by simpa [hs'] using hs)
-      · -- q a ≠ 0; deduce contradiction unless all remaining exponents are 0
-        -- From the equation: prime_pow a (q a) * P = 1
-        -- get: P = prime_pow a (-q a)
-        have hP :
-          (∏ s ∈ S, prime_pow s (q s)) = prime_pow a (-q a) := by
-          -- From prime_pow a (q a) * (∏ ...) = 1, isolate the product over S
-          have hP' :
-              (∏ s ∈ S, prime_pow s (q s)) = (prime_pow a (q a))⁻¹ := by
-              rw [mul_comm] at h
-              exact eq_inv_of_mul_eq_one_left h
-          simpa [prime_pow_neg] using hP'
-        rw [h] at hprod
-        exfalso
-        have false : False := sorry
-        assumption
-    · intro hAll
-      -- reverse direction: if all exponents are zero, product is 1
-      simp only [hprod, Finset.mem_insert, true_or, hAll, prime_pow_zero, one_mul]
-      rw [hIH]
-      intro s hs
-      exact hAll s (Finset.mem_insert.mpr (Or.inr hs))
-
+  unfold prime_pow
+  have h_all_prime : ∀ s ∈ S, (prime_from_str s).Prime := by
+    intro s hs; exact prime_from_str_prime s
+  exact q_prod_prime_pow_eq_one_iff q h_all_prime prime_from_str_inj
 
 end Units.Dimension.PrimeScale
