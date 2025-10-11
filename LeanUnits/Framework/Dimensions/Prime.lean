@@ -277,8 +277,74 @@ theorem q_prod_prime_pow_eq_one_iff
     (h_primes : ∀ s ∈ S, Nat.Prime (f_prime s))
     (h_f_prime_inj : Function.Injective f_prime) :
     ((∏ s ∈ S, (f_prime s : ℝ) ^ (f_exp s: ℝ)) = 1) ↔ (∀ p ∈ S, f_exp p = 0) := by
-  let f_den := fun s => (f_exp s).den
-  let pdenom_prod := ∏ s ∈ S, f_den s
-  let f_exp_int := fun s => (f_exp s * pdenom_prod)
-  --have h_int_iff := z_prod_prime_pow_eq_one_iff (f_prime:=f_prime) h_primes h_f_prime_inj
-  sorry
+  constructor
+  · intro h_prod s hs
+    set prime_pow := fun s => (f_prime s : ℝ) ^ (f_exp s: ℝ)
+    let f_den := fun s => (f_exp s).den
+    let D := ∏ s ∈ S, f_den s
+    have prime_pow_exp_D :∀ s∈S, (prime_pow s) ^ D = (f_prime s : ℝ) ^ ((f_exp s * D: ℚ):ℝ) := by
+      intro s hs
+      rw [Rat.cast_mul, Rat.cast_natCast, Real.rpow_mul, Real.rpow_natCast]
+      have h_pos: 0 < f_prime s := Nat.Prime.pos (h_primes s hs)
+      have h_cast_pos : (0:ℝ) < (f_prime s : ℝ) := by exact_mod_cast h_pos
+      exact le_of_lt h_cast_pos
+    have h_exp_int : ∀ s ∈ S, (f_exp s * D) = (f_exp s * D).num := by
+      intro s hs
+      set q : ℚ := f_exp s
+      have hdvd : q.den ∣ D := by
+        simpa [D, q, f_den] using Finset.dvd_prod_of_mem (f := f_den) hs
+      have hDcast : (D : ℚ) = ((q.den * (D / q.den) : ℕ) : ℚ) := by
+        have hnat : q.den * (D / q.den) = D := Nat.mul_div_cancel' hdvd
+        exact_mod_cast hnat.symm
+      have hzq : (q : ℚ) * D = ((q.num * (D / q.den : ℕ) : ℤ) : ℚ) := by
+        calc
+        (q : ℚ) * D
+          = (q : ℚ) * ((q.den * (D / q.den) : ℕ) : ℚ) := by rw [hDcast]
+        _ = ((q : ℚ) * (q.den : ℚ)) * (D / q.den) := by grind
+        _ = (q.num : ℚ) * (D / q.den) := by rw [Rat.mul_den_eq_num, div_eq_mul_inv]
+        _ = ((q.num * (D / q.den : ℕ) : ℤ) : ℚ) := by norm_cast
+      have hnum : ((q : ℚ) * D).num = q.num * (D / q.den : ℕ) := by
+        simpa [hzq] using Rat.num_intCast (q.num * (D / q.den : ℕ) : ℤ)
+      have : (q : ℚ) * D = (((q : ℚ) * D).num : ℚ) := by
+        simpa [hnum] using hzq
+      simpa [q] using this
+    have h_prime_pow_exp_D' :
+      ∀ s ∈ S, (prime_pow s) ^ D = (f_prime s : ℝ) ^ ((f_exp s * D).num : ℝ) := by
+      intro s hs
+      rw [prime_pow_exp_D s hs]
+      rw (occs:=[1]) [h_exp_int s hs]
+      have h_cast: (((f_exp s * D).num:ℚ):ℝ) = ((f_exp s * D).num:ℝ) := by norm_cast
+      rw [h_cast]
+    have h_prod_int : (∏ s ∈ S, prime_pow s) ^ D = ∏ s ∈ S, prime_pow s ^ D := by
+      rw [Finset.prod_pow]
+    rw [h_prod,one_pow] at h_prod_int
+    have h_prod_int' :
+      ∏ s ∈ S, prime_pow s ^ D = ((∏ s ∈ S, (f_prime s ) ^ (f_exp s * D).num):ℝ) := by
+      refine Finset.prod_congr rfl ?_
+      intro s hs
+      exact_mod_cast h_prime_pow_exp_D' s hs
+    rw [h_prod_int'] at h_prod_int
+    have h_f_exp_D_num_eq_zero: ∀ s ∈ S, (f_exp s * D).num = 0 := by
+      apply (z_prod_prime_pow_eq_one_iff f_prime (fun s => (f_exp s * D).num)
+        h_primes h_f_prime_inj).mp h_prod_int.symm
+    have hD_ne_zero_nat : D ≠ 0 := by
+      apply Finset.prod_ne_zero_iff.mpr
+      intro t ht
+      dsimp [f_den]
+      exact ne_of_gt (Rat.den_pos (f_exp t))
+    have hD_ne_zero_q : (D : ℚ) ≠ 0 := by exact_mod_cast hD_ne_zero_nat
+    have h_f_exp_imp: ∀ s ∈ S, (f_exp s * D).num = 0 → f_exp s = 0 := by
+      intro s hs hnum
+      have hmul0 : f_exp s * (D : ℚ) = 0 := by
+          simpa [hnum] using (h_exp_int s hs)
+      rcases mul_eq_zero.mp hmul0 with h | h
+      · exact h
+      · contradiction
+    exact h_f_exp_imp s hs (h_f_exp_D_num_eq_zero s hs)
+  · intro h_all
+    apply Finset.prod_eq_one
+    intro s hs
+    have h_pow: (f_prime s : ℝ) ^ ((0: ℚ): ℝ) = (f_prime s: ℝ) ^ (0: ℝ) := by
+      have : (0: ℚ) = (0: ℝ) := by norm_cast
+      rw [this]
+    rw [h_all s hs,h_pow, Real.rpow_zero]
