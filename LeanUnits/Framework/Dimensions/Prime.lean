@@ -300,14 +300,12 @@ theorem q_prod_prime_pow_eq_one_iff
         calc
         (q : ℚ) * D
           = (q : ℚ) * ((q.den * (D / q.den) : ℕ) : ℚ) := by rw [hDcast]
-        _ = ((q : ℚ) * (q.den : ℚ)) * (D / q.den) := by grind
+        _ = ((q : ℚ) * (q.den : ℚ)) * (D / q.den) := by grind only [cases Or]
         _ = (q.num : ℚ) * (D / q.den) := by rw [Rat.mul_den_eq_num, div_eq_mul_inv]
         _ = ((q.num * (D / q.den : ℕ) : ℤ) : ℚ) := by norm_cast
       have hnum : ((q : ℚ) * D).num = q.num * (D / q.den : ℕ) := by
         simpa [hzq] using Rat.num_intCast (q.num * (D / q.den : ℕ) : ℤ)
-      have : (q : ℚ) * D = (((q : ℚ) * D).num : ℚ) := by
-        simpa [hnum] using hzq
-      simpa [q] using this
+      simpa [hnum] using hzq
     have h_prime_pow_exp_D' :
       ∀ s ∈ S, (prime_pow s) ^ D = (f_prime s : ℝ) ^ ((f_exp s * D).num : ℝ) := by
       intro s hs
@@ -330,7 +328,6 @@ theorem q_prod_prime_pow_eq_one_iff
     have hD_ne_zero_nat : D ≠ 0 := by
       apply Finset.prod_ne_zero_iff.mpr
       intro t ht
-      dsimp [f_den]
       exact ne_of_gt (Rat.den_pos (f_exp t))
     have hD_ne_zero_q : (D : ℚ) ≠ 0 := by exact_mod_cast hD_ne_zero_nat
     have h_f_exp_imp: ∀ s ∈ S, (f_exp s * D).num = 0 → f_exp s = 0 := by
