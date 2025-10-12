@@ -16,10 +16,10 @@ namespace Quantity
 -- ### Operations on Quantities
 variable {d d₁ d₂ : δ}
 
-unsafe instance [Repr α] : Repr (Quantity d α) where
+instance [Repr α] : Repr (Quantity d α) where
   reprPrec q _ := s!"{repr q.val} • {repr d}"
 
-unsafe instance [Repr α] : ToString (Quantity d α) where
+instance [Repr α] : ToString (Quantity d α) where
   toString q := reprStr q
 
 instance [Zero α] : Zero (Quantity d α) where

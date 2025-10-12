@@ -122,9 +122,9 @@ def defineDerivedUnit (s : String) (u : Unit)
 section Repr
 open Lean Parser Term
 
-unsafe instance : Repr Unit where
+instance : Repr Unit where
   reprPrec f _ :=
-    let vals := f._impl.support'.unquot.val.map (fun i => (i,(f._impl i)))
+    let vals := unsafe f._impl.support'.unquot.val.map (fun i => (i,(f._impl i)))
       |>.unquot
       |>.filter (·.2 != 0)
       |>.dedup
