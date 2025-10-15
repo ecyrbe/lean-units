@@ -57,15 +57,82 @@ theorem string_to_nat_inj : Function.Injective string_to_nat := by
   have h_list : s1.toList = s2.toList := List.map_injective_iff.mpr dig_inj hmaps
   exact String.ext h_list -- abuse of definitional equality
 
+-- The least prime > n (no recursion, so trivially terminating).
+def next_prime (n : ℕ) : Nat.Primes :=
+  let prime := Nat.find (Nat.exists_infinite_primes n)
+  have hprime : Nat.Prime prime := (Nat.find_spec (Nat.exists_infinite_primes n)).2
+  ⟨prime, hprime⟩
 
-noncomputable def prime_from_str (s : String) : Nat :=
-  Nat.nth Nat.Prime (string_to_nat s)
+theorem next_prime_gt (n : ℕ) : n ≤ (next_prime n).1 := by
+  exact (Nat.find_spec (Nat.exists_infinite_primes n)).1
+
+def nth_prime (n : Nat) : Nat.Primes :=
+  let rec find (count : Nat) (nth: Nat.Primes) : Nat.Primes :=
+    if count == 0 then
+      nth
+    else
+      find (count - 1) (next_prime (nth+1))
+  termination_by count
+  decreasing_by
+    norm_num
+    rename_i h
+    rw [beq_iff_eq] at h
+    exact Nat.zero_lt_of_ne_zero h
+  find n ⟨2, Nat.prime_two⟩
+
+def nth_prime_nat (n : ℕ) : ℕ := nth_prime n
+
+theorem nth_prime_nat_prime (n : ℕ) : (nth_prime_nat n).Prime := by
+  exact (nth_prime n).2
+
+theorem nth_prime_strictmono : StrictMono nth_prime_nat := by
+  apply strictMono_nat_of_lt_succ
+  intro n
+  unfold nth_prime_nat nth_prime
+  generalize s : (⟨2, Nat.prime_two⟩ : Nat.Primes) = start
+  have hstep :
+      ∀ k (p : Nat.Primes),
+         (nth_prime.find k p).1 < (nth_prime.find (k+1) p).1 := by
+    intro k p
+    induction k generalizing p with
+    | zero =>
+        have hlt :
+            (p : Nat) < (next_prime ((p : Nat) + 1)).1 :=
+          lt_of_lt_of_le (Nat.lt_succ_self (p : Nat)) (next_prime_gt ((p : Nat) + 1))
+        simpa [nth_prime.find, Nat.succ_eq_add_one] using hlt
+    | succ k ih =>
+        rw (occs:=[2]) [nth_prime.find]
+        rw [nth_prime.find]
+        simpa [Nat.succ_eq_add_one] using ih (next_prime ((p : Nat) + 1))
+  exact hstep n start
+
+theorem nth_prime_nat_inj : Function.Injective nth_prime_nat :=
+  nth_prime_strictmono.injective
+
+def prime_from_str (s : String) : Nat :=
+  nth_prime_nat (string_to_nat s)
+
+-- uncomment to see the prime numbers assigned to the base dimensions
+-- #eval prime_from_str "L" -- 397
+-- theorem L_397 : prime_from_str "L" = 397 := by decide +native
+-- #eval prime_from_str "T" -- 443
+-- theorem T_443 : prime_from_str "T" = 443 := by decide +native
+-- #eval prime_from_str "M" -- 401
+-- theorem M_401 : prime_from_str "M" = 401 := by decide +native
+-- #eval prime_from_str "I" -- 379
+-- theorem I_379 : prime_from_str "I" = 379 := by decide +native
+-- #eval prime_from_str "K" -- 389
+-- theorem K_389 : prime_from_str "K" = 389 := by decide +native
+-- #eval prime_from_str "N" -- 409
+-- theorem N_409 : prime_from_str "N" = 409 := by decide +native
+-- #eval prime_from_str "J" -- 383
+-- theorem J_383 : prime_from_str "J" = 383 := by decide +native
 
 theorem prime_from_str_prime (s : String) : (prime_from_str s).Prime := by
-  simp only [prime_from_str, Nat.prime_nth_prime]
+  apply nth_prime_nat_prime
 
 theorem prime_from_str_inj : Function.Injective prime_from_str := by
-  exact Function.Injective.comp (Nat.nth_injective Nat.infinite_setOf_prime) string_to_nat_inj
+  exact Function.Injective.comp nth_prime_nat_inj string_to_nat_inj
 
 theorem prime_from_str_ne_zero (s : String) : prime_from_str s ≠ 0 := by
   exact Nat.Prime.ne_zero (prime_from_str_prime s)
