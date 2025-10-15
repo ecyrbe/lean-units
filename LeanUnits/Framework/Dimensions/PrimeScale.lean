@@ -11,32 +11,35 @@ import LeanUnits.Framework.Dimensions.Prime
 
 namespace Units.Dimension.PrimeScale
 /--
-encode_string map different strings to different natural numbers
+Encode a string to ℕ
+Making sure the encoding is injective.
 -/
-def string_to_nat (s : String) : Nat :=
+def string_to_nat (s : String) : ℕ :=
   (s.toList).foldl (fun h c => h * (UInt32.size+1) + (c.toNat + 1)) 0
 
-def digits (n : Nat) : List Nat :=
+/--
+Helper function to get the digits of a natural number in base 2^32.
+-/
+def digits (n : ℕ) : List ℕ :=
   let B := UInt32.size + 1
   if n = 0 then [] else digits (n / B) ++ [n % B]
 termination_by n
 decreasing_by exact Nat.div_lt_self (Nat.pos_of_ne_zero ‹n ≠ 0›) (by decide)
 
--- proof that different strings are mapped to different natural numbers
 theorem string_to_nat_inj : Function.Injective string_to_nat := by
   intro s1 s2 h
-  let B : Nat := UInt32.size + 1
-  let dig (c : Char) : Nat := c.toNat + 1
-  let encList (cs : List Char) : Nat := cs.foldl (fun h c => h * B + dig c) 0
+  let B : ℕ := UInt32.size + 1
+  let dig (c : Char) : ℕ := c.toNat + 1
+  let encList (cs : List Char) : ℕ := cs.foldl (fun h c => h * B + dig c) 0
   have encode_eq (s : String) : string_to_nat s = encList s.toList := by rfl
   have base_pos : 0 < B := by decide
   have dig_lt_base (c : Char) : dig c < B := Nat.succ_lt_succ (UInt32.toNat_lt c.val)
   have enc_append (cs : List Char) (c : Char) :
       encList (cs ++ [c]) = encList cs * B + dig c := by
     simp [encList, List.foldl_append, B, dig]
-  have mod_of_qmul_add {q r : Nat} (hr : r < B) : (q * B + r) % B = r := by
+  have mod_of_qmul_add {q r : ℕ} (hr : r < B) : (q * B + r) % B = r := by
     rw [Nat.add_mod, Nat.mul_mod_left, Nat.mod_eq_of_lt hr, zero_add, Nat.mod_eq_of_lt hr]
-  have div_of_qmul_add {q r : Nat} (hr : r < B) : ( q * B + r) / B = q := by
+  have div_of_qmul_add {q r : ℕ} (hr : r < B) : ( q * B + r) / B = q := by
     rw [mul_comm, Nat.mul_add_div base_pos q r, Nat.div_eq_of_lt hr, add_zero]
   -- The digits we decode from an encoded list cs are exactly the mapped digits
   have digits_enc (cs : List Char) : digits (encList cs) = cs.map dig := by
@@ -57,7 +60,9 @@ theorem string_to_nat_inj : Function.Injective string_to_nat := by
   have h_list : s1.toList = s2.toList := List.map_injective_iff.mpr dig_inj hmaps
   exact String.ext h_list -- abuse of definitional equality
 
--- The least prime > n (no recursion, so trivially terminating).
+/--
+Get the next Nat.Primes after n.
+-/
 def next_prime (n : ℕ) : Nat.Primes :=
   let prime := Nat.find (Nat.exists_infinite_primes n)
   have hprime : Nat.Prime prime := (Nat.find_spec (Nat.exists_infinite_primes n)).2
@@ -66,20 +71,26 @@ def next_prime (n : ℕ) : Nat.Primes :=
 theorem next_prime_gt (n : ℕ) : n ≤ (next_prime n).1 := by
   exact (Nat.find_spec (Nat.exists_infinite_primes n)).1
 
-def nth_prime (n : Nat) : Nat.Primes :=
-  let rec find (count : Nat) (nth: Nat.Primes) : Nat.Primes :=
-    if count == 0 then
-      nth
-    else
-      find (count - 1) (next_prime (nth+1))
-  termination_by count
-  decreasing_by
-    norm_num
-    rename_i h
-    rw [beq_iff_eq] at h
-    exact Nat.zero_lt_of_ne_zero h
-  find n ⟨2, Nat.prime_two⟩
+/--
+Get the n-th Nat.Primes (0-indexed).
+For example, nth_prime 0 = 2, nth_prime 1 = 3, nth_prime 2 = 5, etc.
+-/
+def nth_prime (n : ℕ) (nth : Nat.Primes := ⟨2, Nat.prime_two⟩) : Nat.Primes :=
+  if n == 0 then
+    nth
+  else
+    nth_prime (n - 1) (next_prime (nth+1))
+termination_by n
+decreasing_by
+  refine Nat.sub_one_lt ?_
+  rename_i h
+  rw [beq_iff_eq] at h
+  assumption
 
+/--
+Get the n-th Nat prime number (0-indexed).
+For example, nth_prime 0 = 2, nth_prime 1 = 3, nth_prime 2 = 5, etc.
+-/
 def nth_prime_nat (n : ℕ) : ℕ := nth_prime n
 
 theorem nth_prime_nat_prime (n : ℕ) : (nth_prime_nat n).Prime := by
@@ -88,28 +99,30 @@ theorem nth_prime_nat_prime (n : ℕ) : (nth_prime_nat n).Prime := by
 theorem nth_prime_strictmono : StrictMono nth_prime_nat := by
   apply strictMono_nat_of_lt_succ
   intro n
-  unfold nth_prime_nat nth_prime
+  unfold nth_prime_nat
   generalize s : (⟨2, Nat.prime_two⟩ : Nat.Primes) = start
-  have hstep :
-      ∀ k (p : Nat.Primes),
-         (nth_prime.find k p).1 < (nth_prime.find (k+1) p).1 := by
+  have hstep : ∀ k (p : Nat.Primes), (nth_prime k p).1 < (nth_prime (k+1) p).1 := by
     intro k p
     induction k generalizing p with
     | zero =>
-        have hlt :
-            (p : Nat) < (next_prime ((p : Nat) + 1)).1 :=
-          lt_of_lt_of_le (Nat.lt_succ_self (p : Nat)) (next_prime_gt ((p : Nat) + 1))
-        simpa [nth_prime.find, Nat.succ_eq_add_one] using hlt
+        have hlt : p < (next_prime (p + 1)).1 :=
+          lt_of_lt_of_le (Nat.lt_succ_self p) (next_prime_gt (p + 1))
+        simpa [nth_prime] using hlt
     | succ k ih =>
-        rw (occs:=[2]) [nth_prime.find]
-        rw [nth_prime.find]
-        simpa [Nat.succ_eq_add_one] using ih (next_prime ((p : Nat) + 1))
+        rw (occs:=[2]) [nth_prime]
+        rw [nth_prime]
+        exact ih (next_prime ((p : Nat) + 1))
   exact hstep n start
 
 theorem nth_prime_nat_inj : Function.Injective nth_prime_nat :=
   nth_prime_strictmono.injective
 
-def prime_from_str (s : String) : Nat :=
+/--
+Get the prime number associated to a string.
+This allows us to assign a unique prime number to each base dimension represented by a string.
+We use it to construct the PrimeScale of a dimension.
+-/
+def prime_from_str (s : String) : ℕ :=
   nth_prime_nat (string_to_nat s)
 
 -- uncomment to see the prime numbers assigned to the base dimensions
@@ -143,6 +156,10 @@ theorem prime_from_str_pos (s : String) : 0 < prime_from_str s := by
 theorem one_le_prime_from_str (s : String) : 1 ≤ prime_from_str s := by
   exact Nat.Prime.one_le (prime_from_str_prime s)
 
+/--
+Compute the prime expnentiation for a given string and rational number.
+It's used to compute the PrimeScale of a dimension.
+-/
 noncomputable def prime_pow (s : String) (q : ℚ) : ℝ :=
   (prime_from_str s : ℝ ) ^ (q: ℝ)
 
