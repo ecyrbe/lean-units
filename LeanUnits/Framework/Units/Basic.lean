@@ -1,6 +1,6 @@
 import LeanUnits.Framework.Dimensions.Basic
 import LeanUnits.Framework.Conversions.Basic
-import LeanUnits.Framework.Utils
+import LeanUnits.Framework.Utils.Format
 import Mathlib.Data.DFinsupp.Defs
 import Mathlib.Data.DFinsupp.BigOperators
 import Batteries.Data.Rat

@@ -1,4 +1,3 @@
-import LeanUnits.Framework.Utils
 import Batteries.Data.Rat
 import Mathlib.Data.Rat.Defs
 import Mathlib.Data.Rat.Init

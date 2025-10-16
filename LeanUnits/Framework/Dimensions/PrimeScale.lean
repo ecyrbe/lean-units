@@ -6,7 +6,7 @@ import Mathlib.Data.Nat.Prime.Int
 import Mathlib.Data.Nat.Nth
 import Mathlib.NumberTheory.PrimeCounting
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
-import LeanUnits.Framework.Utils
+import LeanUnits.Framework.Utils.Nat
 import LeanUnits.Framework.Dimensions.Prime
 
 namespace Units.Dimension.PrimeScale
@@ -64,12 +64,12 @@ theorem string_to_nat_inj : Function.Injective string_to_nat := by
 Get the next Nat.Primes after n.
 -/
 def next_prime (n : ℕ) : Nat.Primes :=
-  let prime := Nat.find (Nat.exists_infinite_primes n)
-  have hprime : Nat.Prime prime := (Nat.find_spec (Nat.exists_infinite_primes n)).2
+  let prime := NatFind.find (Nat.exists_infinite_primes n)
+  have hprime : Nat.Prime prime := (NatFind.find_spec (Nat.exists_infinite_primes n)).2
   ⟨prime, hprime⟩
 
 theorem next_prime_gt (n : ℕ) : n ≤ (next_prime n).1 := by
-  exact (Nat.find_spec (Nat.exists_infinite_primes n)).1
+  exact (NatFind.find_spec (Nat.exists_infinite_primes n)).1
 
 /--
 Get the n-th Nat.Primes (0-indexed).
@@ -114,6 +114,7 @@ We use it to construct the PrimeScale of a dimension.
 -/
 def prime_from_str (s : String) : ℕ :=
   nth_prime_nat (string_to_nat s)
+
 
 -- uncomment to see the prime numbers assigned to the base dimensions
 -- #eval prime_from_str "L" -- 397

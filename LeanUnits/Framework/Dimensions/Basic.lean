@@ -7,6 +7,7 @@ import Mathlib.Data.Rat.Init
 import Mathlib.Data.Rat.Lemmas
 import Mathlib.Algebra.Group.TransferInstance
 import LeanUnits.Framework.Dimensions.PrimeScale
+import LeanUnits.Framework.Utils.Format
 
 namespace Units
 
@@ -55,6 +56,27 @@ A dimension is a base dimension if it corresponds to a single fundamental dimens
 represented by a string identifier and has an exponent of 1.
 -/
 def IsBase (d : Dimension) : Prop := ∃ s : String, d = ofString s
+
+def bases (d : Dimension) : List String :=
+  unsafe d._impl.support'.unquot.val.unquot
+  |>.filter (fun s => d._impl s ≠ 0)
+  |>.dedup
+  |>.mergeSort (fun a b => a < b)
+
+def IsBase' (d : Dimension) :=
+  match d.bases with
+  | [s] => d._impl s == 1
+  | _   => false
+
+def base_name (d : Dimension) (h : d.IsBase') : String :=
+  have h': d.bases ≠ [] := by
+    intro h''
+    unfold IsBase' at h
+    rw [h''] at h
+    simp only at h
+    contradiction
+  d.bases.head h'
+
 
 /--
 A dimension is a single dimension if it corresponds to a single fundamental dimension,
@@ -186,15 +208,11 @@ open Lean Parser Term
 
 instance : Repr Dimension where
   reprPrec f _ :=
-    let vals := unsafe f._impl.support'.unquot.val.map (fun i => (i,(f._impl i)))
-      |>.unquot
-      |>.filter (·.2 != 0)
-      |>.dedup
-      |>.mergeSort (fun a b => a.1 < b.1)
-    if vals.length = 0 then
+    let bases := f.bases
+    if bases.length = 0 then
       "∅"
     else
-      let parts : List String := vals.map (fun a => formatExp a.1 a.2)
+      let parts : List String := bases.map (fun a => formatExp a (f._impl a))
       f!"{String.intercalate "•" parts}"
 
 instance : ToString Dimension where
