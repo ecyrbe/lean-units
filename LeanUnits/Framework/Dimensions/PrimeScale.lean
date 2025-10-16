@@ -75,17 +75,11 @@ theorem next_prime_gt (n : ℕ) : n ≤ (next_prime n).1 := by
 Get the n-th Nat.Primes (0-indexed).
 For example, nth_prime 0 = 2, nth_prime 1 = 3, nth_prime 2 = 5, etc.
 -/
-def nth_prime (n : ℕ) (nth : Nat.Primes := ⟨2, Nat.prime_two⟩) : Nat.Primes :=
-  if n == 0 then
-    nth
-  else
-    nth_prime (n - 1) (next_prime (nth+1))
-termination_by n
-decreasing_by
-  refine Nat.sub_one_lt ?_
-  rename_i h
-  rw [beq_iff_eq] at h
-  assumption
+def nth_prime (n : ℕ) : Nat.Primes :=
+  go ⟨2, Nat.prime_two⟩ n where
+  go
+  | nth, 0 => nth
+  | nth, n' + 1 => go (next_prime (nth + 1)) n'
 
 /--
 Get the n-th Nat prime number (0-indexed).
@@ -99,20 +93,16 @@ theorem nth_prime_nat_prime (n : ℕ) : (nth_prime_nat n).Prime := by
 theorem nth_prime_strictmono : StrictMono nth_prime_nat := by
   apply strictMono_nat_of_lt_succ
   intro n
-  unfold nth_prime_nat
-  generalize s : (⟨2, Nat.prime_two⟩ : Nat.Primes) = start
-  have hstep : ∀ k (p : Nat.Primes), (nth_prime k p).1 < (nth_prime (k+1) p).1 := by
+  have hstep : ∀ k (p : Nat.Primes), (nth_prime.go p k).1 < (nth_prime.go p (k+1)).1 := by
     intro k p
     induction k generalizing p with
     | zero =>
-        have hlt : p < (next_prime (p + 1)).1 :=
-          lt_of_lt_of_le (Nat.lt_succ_self p) (next_prime_gt (p + 1))
-        simpa [nth_prime] using hlt
+        simpa [nth_prime] using next_prime_gt (p + 1)
     | succ k ih =>
-        rw (occs:=[2]) [nth_prime]
-        rw [nth_prime]
-        exact ih (next_prime ((p : Nat) + 1))
-  exact hstep n start
+        rw (occs:=[2]) [nth_prime.go]
+        rw [nth_prime.go]
+        exact ih (next_prime (p + 1))
+  exact hstep n ⟨2, Nat.prime_two⟩
 
 theorem nth_prime_nat_inj : Function.Injective nth_prime_nat :=
   nth_prime_strictmono.injective
