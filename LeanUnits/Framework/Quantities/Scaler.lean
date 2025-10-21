@@ -81,12 +81,14 @@ with the `Module α M` instance on `M`, and is continuous.
 class ContinuousLinearScaler (M : Type) [AddCommMonoid M] [Module α M] [TopologicalSpace M]
   extends LinearScaler (α := α) M where
   scale_cont : Continuous scale
+  scale_inv_cont : Continuous scale_inv
 
 /--
 A quantity is a MulScaler if it has a Dimension.
 -/
 @[simp]
-noncomputable instance [HasDimension δ] : MulScaler (α:=ℝ) (Quantity d ℝ)  where
+noncomputable instance instMulScalerQuantity [HasDimension δ] :
+  MulScaler (α:=ℝ) (Quantity d ℝ)  where
   scale q := ⟨(𝒟 q).PrimeScale * q.val⟩
   scale_inv q := ⟨q.val/ (𝒟 q).PrimeScale⟩
   scale_inj := by
@@ -105,8 +107,17 @@ noncomputable instance [HasDimension δ] : MulScaler (α:=ℝ) (Quantity d ℝ) 
     ring
 
 @[simp]
-lemma Scaler.scale_apply [HasDimension δ] (q : Quantity d ℝ) :
-  scale q = ⟨(𝒟 q).PrimeScale * q.val⟩ := rfl
+lemma MulScaler.scale_apply [HasDimension δ] (q : Quantity d ℝ) :
+  Scaler.scale q = ⟨(𝒟 q).PrimeScale * q.val⟩ := rfl
+
+lemma MulScaler.scale_inv_apply [HasDimension δ] (q : Quantity d ℝ) :
+  Scaler.scale_inv q = ⟨q.val / (𝒟 q).PrimeScale⟩ := rfl
+
+lemma MulScaler.scale_def [HasDimension δ] :
+  Scaler.scale  = fun q : Quantity d ℝ => ⟨(𝒟 q).PrimeScale * q.val⟩ := rfl
+
+lemma MulScaler.scale_inv_def [HasDimension δ] :
+  Scaler.scale_inv = fun q : Quantity d ℝ => ⟨q.val / (𝒟 q).PrimeScale⟩ := rfl
 
 @[simp]
 noncomputable instance instScalerFunOut {M1 M2 : Type} [Scaler M2] : Scaler (M1 → M2) where
@@ -168,14 +179,15 @@ noncomputable instance instMulScalerFunBi
         funext m1
         simpa using (MulScaler.scale_smul r (f (Scaler.scale_inv m1)))
 
-noncomputable instance [HasDimension δ] : LinearScaler (α:=ℝ) (Quantity d ℝ) where
+noncomputable instance instLinearScalerQuantity [HasDimension δ] :
+  LinearScaler (α:=ℝ) (Quantity d ℝ) where
   scale_add m1 m2 := by
-    simp only [instMulScalerRealOfHasDimension, Scaler.scale_apply, ←val_inj,
+    simp only [instMulScalerQuantity, MulScaler.scale_apply, ←val_inj,
       val_add, Distrib.left_distrib]
     nth_rw 1 [dim_add_eq_dim_left']
     rw [dim_add_eq_dim_right']
 
-noncomputable instance {M1 M2 : Type} [AddCommMonoid M1] [Module α M1]
+noncomputable instance instLinearScalerLinearMap {M1 M2 : Type} [AddCommMonoid M1] [Module α M1]
     [AddCommMonoid M2] [Module α M2] [LinearScaler (α := α) M2] :
     LinearScaler (α:=α) (M1 →ₗ[α] M2) where
   scale f := {
@@ -208,6 +220,30 @@ noncomputable instance {M1 M2 : Type} [AddCommMonoid M1] [Module α M1]
     ext m1
     simp [MulScaler.scale_smul]
 
+noncomputable instance instContinuousLinearScalerQuantity
+  [HasDimension δ] [TopologicalSpace (Quantity d ℝ)] [ContinuousConstSMul ℝ (Quantity d ℝ)] :
+  ContinuousLinearScaler (α:=ℝ) (Quantity d ℝ) where
+  scale_cont := by
+    rw [MulScaler.scale_def]
+    conv =>
+      enter [1,q]
+      rw [dim_eq_dim]
+    change Continuous fun q : Quantity d ℝ => (𝒟 d).PrimeScale • q
+    apply Continuous.const_smul
+    exact continuous_id'
+  scale_inv_cont := by
+    rw [MulScaler.scale_inv_def]
+    conv =>
+      enter [1,q]
+      rw [dim_eq_dim, div_eq_mul_inv, _root_.mul_comm]
+    change Continuous fun q : Quantity d ℝ => Real.instInv.inv (𝒟 d).PrimeScale • q
+    apply Continuous.const_smul
+    exact continuous_id'
+
+/--
+A quantity is dimensionally correct if scaling it does not change its value.
+So for example a dimensionless quantity is dimensionally correct.
+-/
 def IsDimensionallyCorrect {M : Type} [Scaler M] (m : M) : Prop :=
   Scaler.scale m = m
 
