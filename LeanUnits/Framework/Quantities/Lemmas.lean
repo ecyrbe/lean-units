@@ -26,7 +26,23 @@ variable {d d₁ d₂ d₃ d₄ : δ}
 theorem dim_eq_dim {d : δ} [HasDimension δ] (q : Quantity d α) :
   𝒟 q = 𝒟 d := by rfl
 
+theorem dim_add_eq_dim_left [HasDimension δ] (q₁ : Quantity d₁ α)
+  (q₂ : Quantity d₂ α) (h : d₁ = d₂ := by module) :
+  𝒟 (q₁ + q₂.cast (eq_imp_equiv h.symm)) = 𝒟 q₁ := by
+  subst h
+  rfl
 
+theorem dim_add_eq_dim_left' [HasDimension δ] (q1 q2 : Quantity d α) : 𝒟 (q1 + q2) = 𝒟 q1 := by
+  rfl
+
+theorem dim_add_eq_dim_right {d₁ d₂ : δ} [HasDimension δ] (q₁ : Quantity d₁ α)
+  (q₂ : Quantity d₂ α) (h : d₁ = d₂ := by module) :
+  𝒟 (q₁.cast (eq_imp_equiv h) + q₂) = 𝒟 q₂ := by
+  subst h
+  rfl
+
+theorem dim_add_eq_dim_right' [HasDimension δ] (q1 q2 : Quantity d α) : 𝒟 (q1 + q2) = 𝒟 q2 := by
+  rfl
 
 theorem eq_imp_equiv {μ} [Setoid μ] {u1 u2 : μ} (h : u1 = u2) : u1 ≈ u2 := by
   rw [h]
