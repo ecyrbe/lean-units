@@ -117,6 +117,8 @@ def prime_from_str (s : String) : ℕ :=
 
 
 -- uncomment to see the prime numbers assigned to the base dimensions
+-- don't try to eval strings with more than 1 character,
+-- it will take a while, like hours if not days
 -- #eval prime_from_str "L" -- 397
 -- theorem L_397 : prime_from_str "L" = 397 := by decide +native
 -- #eval prime_from_str "T" -- 443
@@ -131,6 +133,8 @@ def prime_from_str (s : String) : ℕ :=
 -- theorem N_409 : prime_from_str "N" = 409 := by decide +native
 -- #eval prime_from_str "J" -- 383
 -- theorem J_383 : prime_from_str "J" = 383 := by decide +native
+-- #eval prime_from_str "θ" -- 7529
+-- theorem θ_7529 : prime_from_str "θ" = 7529 := by decide +native
 
 theorem prime_from_str_prime (s : String) : (prime_from_str s).Prime := by
   apply nth_prime_nat_prime
