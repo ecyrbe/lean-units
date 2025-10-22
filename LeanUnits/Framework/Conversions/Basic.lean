@@ -2,6 +2,7 @@ import Batteries.Data.Rat
 import Mathlib.Data.Rat.Defs
 import Mathlib.Data.Rat.Init
 import Mathlib.Data.Rat.Lemmas
+import LeanUnits.Framework.SimpSets
 
 namespace Units
 
@@ -61,17 +62,22 @@ def inv (c : Conversion) : Conversion :=
 
 def div (c1 c2 : Conversion) : Conversion := mul c1 (inv c2)
 
-@[simp]
 instance : Mul Conversion where
   mul := mul
 
-@[simp]
 instance : Div Conversion where
   div := div
 
-@[simp]
 instance : Inv Conversion where
   inv := inv
+
+lemma mul_def (c1 c2 : Conversion) :
+  c1 * c2 = mul c1 c2 := rfl
+
+lemma inv_def (c : Conversion) :
+  c⁻¹ = inv c := rfl
+
+lemma div_def (c1 c2 : Conversion) : c1 / c2 = mul c1 (inv c2) := rfl
 
 /--
 Apply the conversion to a value x
@@ -224,6 +230,14 @@ instance : AddCommGroup Conversion  where
   zsmul_zero' := zsmul_zero'
   zsmul_succ' := zsmul_succ'
   zsmul_neg' := zsmul_neg'
+
+@[conv_set]
+lemma zero_div_zero :
+  (0: Conversion) / (0: Conversion) = 0 := by
+  have h_zero: (0: Conversion) = identity := rfl
+  rw [div_def,mul, inv]
+  simp only [one_div,h_zero,identity,one_mul, inv_one,zero_mul, neg_zero, zero_div, Rat.zero_add]
+
 
 end Conversion
 

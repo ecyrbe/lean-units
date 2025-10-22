@@ -17,8 +17,8 @@ by simplifying using the lemmas tagged with the attributes
 `dimension_set`, `derived_unit_set` or `base_unit_set`.
 -/
 macro "simp_dim" : tactic =>
-  `(tactic| simp [𝒟,HasDimension.dimension,instHMul, instHDiv, instHPow,
-      derived_unit_set, base_unit_set, dimension_set] )
+  `(tactic| simp [𝒟, HasDimension.dimension,
+     dimension_set, unit_set, base_unit_set, derived_unit_set])
 
 /--
 Helper tactic that tries to prove equalities or equivalences between dimensions or units.
@@ -32,13 +32,13 @@ macro "auto_equiv" : tactic =>
              module
              trace s!"✅ Formaly proved equality"
            | apply eq_imp_equiv
-             dsimp [instHMul, instHDiv, instHPow, dimension_set, derived_unit_set]
+             dsimp [dimension_set, unit_set, derived_unit_set]
              module
              trace s!"✅ Formaly proved equality"
            | try (dsimp [HasEquiv.Equiv]
                   constructor
-                  · simp [instHMul, instHDiv, instHPow, derived_unit_set]; module
-                  · simp [instHMul, instHDiv, instHPow, derived_unit_set, base_unit_set]
+                  · simp [derived_unit_set, unit_set, dimension_set]; module
+                  · simp [derived_unit_set, unit_set, base_unit_set, conv_set]
                   trace s!"✅ Formaly proved equivalence")))
 
 /--
@@ -52,8 +52,8 @@ It tries the following strategies in order:
 macro "auto_dim" : tactic =>
   `(tactic|
     (first | rfl
-           | try simp [𝒟,HasDimension.dimension, instHMul, instHDiv, instHPow,
-                      HasEquiv.Equiv, derived_unit_set]
+           | try simp [𝒟,HasDimension.dimension,
+                      HasEquiv.Equiv,dimension_set, unit_set, derived_unit_set]
              try module
     ))
 

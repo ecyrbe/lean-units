@@ -1,6 +1,20 @@
 import LeanUnits.Framework.Dimensions.Basic
+import LeanUnits.Framework.SimpSets
 
 namespace Units.Dimension
+
+@[dimension_set]
+theorem mul_eq_add (d1 d2 : Dimension) : d1 * d2 = d1 + d2 := rfl
+@[dimension_set]
+theorem div_eq_sub (d1 d2 : Dimension) : d1 / d2 = d1 - d2 := rfl
+@[dimension_set]
+theorem inv_eq_neg (d : Dimension) : d⁻¹ = -d := rfl
+@[dimension_set]
+theorem qpow_eq_qsmul (d : Dimension) (q : ℚ) :  d ^ q = q • d := rfl
+@[dimension_set]
+theorem zpow_eq_zsmul (d : Dimension) (n : ℤ) :  d ^ n = n • d := rfl
+@[dimension_set]
+theorem npow_eq_nsmul (d : Dimension) (n : ℕ) :  d ^ n = n • d := rfl
 
 /--
 Negation of a non-zero dimension is non-zero.
@@ -244,8 +258,7 @@ theorem scaler_add (d1 d2 : Dimension) : PrimeScale (d1 + d2) = PrimeScale d1 * 
   exact DFinsupp.prod_add_index @prime_pow_zero @prime_pow_add
 
 theorem scaler_mul (d1 d2 : Dimension) : PrimeScale (d1 * d2) = PrimeScale d1 * PrimeScale d2 := by
-  rw [HMul.hMul, instHMul]
-  simp [scaler_add]
+  simp [dimension_set, scaler_add]
 
 theorem scaler_neg' (d : Dimension) :
   PrimeScale (-d) = d._impl.prod (fun i q => prime_pow i (-q))  := by
@@ -262,8 +275,7 @@ theorem scaler_neg (d : Dimension) :
 
 theorem scaler_inv (d : Dimension) :
   PrimeScale (d⁻¹) = (PrimeScale d)⁻¹ := by
-  rw [Inv.inv, instInv]
-  simp [scaler_neg]
+  simp [dimension_set, scaler_neg]
 
 theorem scaler_sub (d1 d2 : Dimension) :
   PrimeScale (d1 - d2) = PrimeScale d1 / PrimeScale d2 := by
@@ -271,8 +283,7 @@ theorem scaler_sub (d1 d2 : Dimension) :
 
 theorem scaler_div (d1 d2 : Dimension) :
   PrimeScale (d1 / d2) = PrimeScale d1 / PrimeScale d2 := by
-  rw [HDiv.hDiv, instHDiv]
-  simp [scaler_sub]
+  simp [dimension_set, scaler_sub]
 
 theorem scaler_nsmul (d : Dimension) (n : ℕ) :
   PrimeScale (n • d) = (PrimeScale d) ^ n := by
@@ -282,8 +293,7 @@ theorem scaler_nsmul (d : Dimension) (n : ℕ) :
 
 theorem scaler_npow (d : Dimension) (n : ℕ) :
   PrimeScale (d ^ n) = (PrimeScale d) ^ n := by
-  rw [HPow.hPow, instHPow]
-  simp [scaler_nsmul]
+  simp [dimension_set, scaler_nsmul]
 
 theorem scaler_zsmul (d : Dimension) (n : ℤ) :
   PrimeScale (n • d) = (PrimeScale d) ^ n := by
@@ -293,8 +303,7 @@ theorem scaler_zsmul (d : Dimension) (n : ℤ) :
 
 theorem scaler_zpow (d : Dimension) (n : ℤ) :
   PrimeScale (d ^ n) = (PrimeScale d) ^ n := by
-  rw [HPow.hPow, instHPow]
-  simp [scaler_zsmul]
+  simp [dimension_set, scaler_zsmul]
 
 /--
 If the prime scale of a dimension is 1, then the dimension must be the dimensionless dimension (0).

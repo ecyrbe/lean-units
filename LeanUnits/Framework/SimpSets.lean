@@ -10,6 +10,15 @@ initialize SimpDimensionSet : SimpExtension ←
   registerSimpAttr `dimension_set
     "definitions and lemmas for dimension simplification"
 
+initialize SimpConvSet : SimpExtension ←
+  registerSimpAttr `conv_set
+    "definitions and lemmas for conversion simplification"
+
+
+initialize SimpUnitSet : SimpExtension ←
+  registerSimpAttr `unit_set
+    "definitions and lemmas for units simplification"
+
 initialize SimpBaseUnitSet : SimpExtension ←
   registerSimpAttr `base_unit_set
     "definitions and lemmas for base units simplification"

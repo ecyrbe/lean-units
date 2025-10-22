@@ -175,27 +175,21 @@ instance instDecidableEquivDimension (a b : Dimension) : Decidable (a ≈ b) := 
 instance : One Dimension where
   one := 0
 
-@[simp]
 instance : Mul Dimension where
   mul u1 u2 := u1 + u2
 
-@[simp]
 instance : Inv Dimension where
   inv u := -u
 
-@[simp]
 instance : Div Dimension where
   div u1 u2 := u1 - u2
 
-@[simp]
 instance : Pow Dimension ℕ where
   pow u q := q • u
 
-@[simp]
 instance : Pow Dimension ℤ where
   pow u n := n • u
 
-@[simp]
 instance : Pow Dimension ℚ where
   pow u n := n • u
 

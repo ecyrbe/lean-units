@@ -45,27 +45,21 @@ instance instAddCommGroup : AddCommGroup Unit :=
   Unit.instEquiv.addCommGroup
 
 -- implement convenient syntax for units, because addition is confusing
-@[simp]
 instance : One Unit where
   one := 0
 
-@[simp]
 instance : Mul Unit where
   mul u1 u2 := u1 + u2
 
-@[simp]
 instance : Inv Unit where
   inv u := -u
 
-@[simp]
 instance : Div Unit where
   div u1 u2 := u1 - u2
 
-@[simp]
 instance : Pow Unit ℕ where
   pow u q := q • u
 
-@[simp]
 instance : Pow Unit ℤ where
   pow u n := n • u
 
