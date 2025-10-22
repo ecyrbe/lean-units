@@ -90,7 +90,7 @@ A quantity is a MulScaler if it has a Dimension.
 noncomputable instance instMulScalerQuantity [HasDimension δ] :
   MulScaler (α:=ℝ) (Quantity d ℝ)  where
   scale q := ⟨(𝒟 q).PrimeScale * q.val⟩
-  scale_inv q := ⟨q.val/ (𝒟 q).PrimeScale⟩
+  scale_inv q := ⟨q.val / (𝒟 q).PrimeScale⟩
   scale_inj := by
     intro q1 q2 h
     simp only [dim_eq_dim, ← val_inj, mul_eq_mul_left_iff] at h
@@ -182,10 +182,8 @@ noncomputable instance instMulScalerFunBi
 noncomputable instance instLinearScalerQuantity [HasDimension δ] :
   LinearScaler (α:=ℝ) (Quantity d ℝ) where
   scale_add m1 m2 := by
-    simp only [instMulScalerQuantity, MulScaler.scale_apply, ←val_inj,
-      val_add, Distrib.left_distrib]
-    nth_rw 1 [dim_add_eq_dim_left']
-    rw [dim_add_eq_dim_right']
+    simp only [instMulScalerQuantity, MulScaler.scale_apply, ←val_inj, val_add,
+      Distrib.left_distrib, ←dim_add_eq_dim_left' m1 m2, ←dim_add_eq_dim_right' m1 m2]
 
 noncomputable instance instLinearScalerLinearMap {M1 M2 : Type} [AddCommMonoid M1] [Module α M1]
     [AddCommMonoid M2] [Module α M2] [LinearScaler (α := α) M2] :
@@ -241,7 +239,7 @@ noncomputable instance instContinuousLinearScalerQuantity
     exact continuous_id'
 
 /--
-A quantity is dimensionally correct if scaling it does not change its value.
+A Scaler is dimensionally correct if scaling it does not change its value.
 So for example a dimensionless quantity is dimensionally correct.
 -/
 def IsDimensionallyCorrect {M : Type} [Scaler M] (m : M) : Prop :=
