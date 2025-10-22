@@ -1,5 +1,6 @@
 import LeanUnits.Framework.Units.Basic
 import LeanUnits.Framework.Quantities.Lemmas
+import LeanUnits.Framework.Quantities.Scaler
 import LeanUnits.Systems.Formal
 import LeanUnits.Systems.SI.Units
 import Mathlib.Data.Real.Basic
@@ -30,6 +31,28 @@ theorem not_kepler_third_law_dim_check
     ¬ 𝒟 T = 𝒟 ((4•π^2) • (a³/ (G *(M + m))))  := by
     simp_dim
     decide +kernel
+
+def NewtonsSecondWithDim' (m : WithDim Dimension.Mass) (F : WithDim Dimension.Force)
+    (a : WithDim Dimension.Acceleration) : Prop :=
+    F = (m * a)
+
+lemma newtonsSecondWithDim'_isDimensionallyCorrect :
+    Quantity.IsDimensionallyCorrect NewtonsSecondWithDim' := by
+        funext m F a
+        unfold NewtonsSecondWithDim'
+        simp_dim
+        rw [Quantity.smul_mul_smul,inv_eq_one_div,inv_eq_one_div,inv_eq_one_div,
+            ←mul_div_mul_comm,one_mul, ←Dimension.PrimeScale.scaler_add]
+        constructor
+        · intro h
+          apply congrArg
+            ((Dimension.Mass + (Dimension.Length - 2 • Dimension.Time)).PrimeScale • · ) at h
+          rw [← inv_eq_one_div,smul_smul,smul_smul,mul_inv_cancel₀] at h
+          · repeat rw [one_smul] at h
+            assumption
+          · exact Dimension.PrimeScale.scaler_ne_zero
+        · intro h
+          rw [h]
 
 theorem e_equal_mc2 (E : WithDim Dimension.Energy) (m : WithDim Dimension.Mass) :
     E =  ↑(m * c²) := by

@@ -106,7 +106,6 @@ noncomputable instance instMulScalerQuantity [HasDimension δ] :
     simp only [smul_def, _root_.smul_eq_mul, dim_eq_dim, ← val_inj]
     ring
 
-@[simp]
 lemma MulScaler.scale_apply [HasDimension δ] (q : Quantity d ℝ) :
   Scaler.scale q = ⟨(𝒟 q).PrimeScale * q.val⟩ := rfl
 
@@ -118,6 +117,17 @@ lemma MulScaler.scale_def [HasDimension δ] :
 
 lemma MulScaler.scale_inv_def [HasDimension δ] :
   Scaler.scale_inv = fun q : Quantity d ℝ => ⟨q.val / (𝒟 q).PrimeScale⟩ := rfl
+
+@[simp]
+lemma MulScaler.scale_eq_primescale_smul [HasDimension δ] (q : Quantity d ℝ) :
+  Scaler.scale q = (𝒟 d).PrimeScale • q := by
+  simp only [MulScaler.scale_apply, smul_def, _root_.smul_eq_mul, dim_eq_dim]
+
+@[simp]
+lemma MulScaler.scale_inv_eq_primescale_inv_smul [HasDimension δ] (q : Quantity d ℝ) :
+  Scaler.scale_inv q = Real.instInv.inv (𝒟 d).PrimeScale • q := by
+  simp only [MulScaler.scale_inv_apply, smul_def, _root_.smul_eq_mul, _root_.div_eq_mul_inv,
+    _root_.mul_comm, dim_eq_dim]
 
 @[simp]
 noncomputable instance instScalerFunOut {M1 M2 : Type} [Scaler M2] : Scaler (M1 → M2) where
