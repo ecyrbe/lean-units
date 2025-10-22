@@ -43,15 +43,9 @@ lemma newtonsSecondWithDim'_isDimensionallyCorrect :
         simp_dim
         repeat rw [←Dimension.PrimeScale.scaler_neg]
         rw [Quantity.smul_mul_smul, ←Dimension.PrimeScale.scaler_add, ←neg_add]
-        constructor
-        · intro h
-          apply congrArg
-            ((Dimension.Mass + (Dimension.Length - 2 • Dimension.Time)).PrimeScale • · ) at h
-          repeat rw [smul_smul, ←Dimension.PrimeScale.scaler_add,
-            add_neg_cancel, Dimension.PrimeScale.scaler_zero, one_smul] at h
-          assumption
-        · intro h
-          rw [h]
+        apply Quantity.smul_inj
+        exact Dimension.PrimeScale.scaler_ne_zero
+
 
 theorem e_equal_mc2 (E : WithDim Dimension.Energy) (m : WithDim Dimension.Mass) :
     E =  ↑(m * c²) := by

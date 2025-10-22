@@ -437,67 +437,67 @@ theorem toFormal_mul (q₁ : Quantity d₁ α) (q₂ : Quantity d₂ α) :
   ((q₁ * q₂:Quantity (d₁+d₂) α):Formal δ α) = (q₁:Formal δ α) * (q₂:Formal δ α) := by
   simp [Formal.toFormal, AddMonoidAlgebra.single_mul_single]
 
-theorem mul_one (a : Quantity d₁ α) (h : d₁ = d₁ + d₂ := by module) :
+protected theorem mul_one (a : Quantity d₁ α) (h : d₁ = d₁ + d₂ := by module) :
   a * (1: Quantity (d₂:δ) α) = a.cast (eq_imp_equiv h) := by
   rw [←val_inj,val_mul, val_one,_root_.mul_one]
   rfl
 
-theorem mul_one' (a : Quantity d α) :
+protected theorem mul_one' (a : Quantity d α) :
   a * (1: Quantity (0:δ) α) = ↑a := by
-  rw [mul_one]
+  rw [Quantity.mul_one]
 
-theorem one_mul (a : Quantity d₂ α) (h : d₂ = d₁ + d₂ := by module) :
+protected theorem one_mul (a : Quantity d₂ α) (h : d₂ = d₁ + d₂ := by module) :
   (1: Quantity (d₁:δ) α) * a = a.cast (eq_imp_equiv h) := by
   rw [← val_inj, val_mul, val_one, _root_.one_mul]
   rfl
 
-theorem one_mul' (a : Quantity d α) :
+protected theorem one_mul' (a : Quantity d α) :
   (1: Quantity (0:δ) α) * a = ↑a := by
-  rw [one_mul]
+  rw [Quantity.one_mul]
 
-theorem mul_zero (a : Quantity d₁ α) (h : d₁ = d₁ + d₂ := by module) :
+protected theorem mul_zero (a : Quantity d₁ α) (h : d₁ = d₁ + d₂ := by module) :
   a * (0: Quantity (d₂:δ) α) = (0: Quantity d₁ α).cast (eq_imp_equiv h) := by
   rw [← val_inj, val_mul, val_zero, MulZeroClass.mul_zero]
   rfl
 
-theorem mul_zero' (a : Quantity d α) :
+protected theorem mul_zero' (a : Quantity d α) :
   a * (0: Quantity (0:δ) α) = ↑(0: Quantity d α) := by
-  rw [mul_zero]
+  rw [Quantity.mul_zero]
 
-theorem zero_mul (a : Quantity d₂ α) (h : d₂ = d₁ + d₂ := by module) :
+protected theorem zero_mul (a : Quantity d₂ α) (h : d₂ = d₁ + d₂ := by module) :
   (0: Quantity (d₁:δ) α) * a = (0: Quantity d₂ α).cast (eq_imp_equiv h) := by
   rw [← val_inj, val_mul, val_zero, MulZeroClass.zero_mul]
   rfl
 
-theorem zero_mul' (a : Quantity d α) :
+protected theorem zero_mul' (a : Quantity d α) :
   (0: Quantity (0:δ) α) * a = ↑(0: Quantity d α) := by
-  rw [zero_mul]
+  rw [Quantity.zero_mul]
 
-theorem mul_eq_zero {a : Quantity d₁ α} {b : Quantity d₂ α} :
+protected theorem mul_eq_zero {a : Quantity d₁ α} {b : Quantity d₂ α} :
   a * b = 0 ↔ a = 0 ∨ b = 0 := by
   simp only [← val_inj, val_mul, val_zero, _root_.mul_eq_zero]
 
 @[simp]
-theorem mul_inv_cancel (a : Quantity d α) [h : NeZero a] :
+protected theorem mul_inv_cancel (a : Quantity d α) [h : NeZero a] :
   a * a⁻¹ = ↑(1: Quantity (0:δ) α) := by
   rw [neZero_iff] at h
   rw [← val_inj, val_mul, val_inv, cast_val, val_one]
   exact mul_inv_cancel₀ h
 
 @[simp]
-theorem inv_mul_cancel (a : Quantity d α) [h : NeZero a] :
+protected theorem inv_mul_cancel (a : Quantity d α) [h : NeZero a] :
   a⁻¹ * a = ↑(1: Quantity (0:δ) α) := by
   rw [neZero_iff] at h
   rw [← val_inj, val_mul, val_inv, cast_val, val_one]
   exact inv_mul_cancel₀ h
 
-theorem mul_comm (a : Quantity d₁ α) (b : Quantity d₂ α) :
+protected theorem mul_comm (a : Quantity d₁ α) (b : Quantity d₂ α) :
   a * b = ↑(b * a) := by
   rw [←Formal.toFormal_inj, Formal.toFormal_cast]
   repeat rw [toFormal_mul]
   ring
 
-theorem mul_assoc (a : Quantity d₁ α) (b : Quantity d₂ α) (c : Quantity d₃ α) :
+protected theorem mul_assoc (a : Quantity d₁ α) (b : Quantity d₂ α) (c : Quantity d₃ α) :
   a * (b * c) = ↑((a * b) * c) := by
   rw [←Formal.toFormal_inj, Formal.toFormal_cast]
   repeat rw [toFormal_mul]
@@ -505,12 +505,12 @@ theorem mul_assoc (a : Quantity d₁ α) (b : Quantity d₂ α) (c : Quantity d�
 
 theorem conj_eq_self (a : Quantity d₁ α) (b : Quantity d₂ α) [h : NeZero a] :
   a⁻¹ * b * a = ↑b := by
-  rw [mul_comm, mul_assoc, mul_inv_cancel, ← Formal.toFormal_inj]
+  rw [Quantity.mul_comm, Quantity.mul_assoc, Quantity.mul_inv_cancel, ← Formal.toFormal_inj]
   simp
 
 theorem conj_eq_self' (a : Quantity d₁ α) (b : Quantity d₂ α) [h : NeZero a] :
   a * b * a⁻¹ = ↑b := by
-  rw [mul_comm, mul_assoc, inv_mul_cancel, ← Formal.toFormal_inj]
+  rw [Quantity.mul_comm, Quantity.mul_assoc, Quantity.inv_mul_cancel, ← Formal.toFormal_inj]
   simp
 
 theorem left_distrib (a : Quantity d₁ α) (b c : Quantity d₂ α) :
@@ -533,10 +533,21 @@ theorem sq_add (a b : Quantity d α) : (a + b)² = a² + ↑(2 • a * b) + b² 
   rw [Formal.toFormal_cast, toFormal_mul, toFormal_nsmul, Nat.cast_ofNat]
   ring
 
-theorem smul_mul_smul (c1 c2 : α) (q1 : Quantity d₁ α) (q2 : Quantity d₂ α) :
+protected theorem smul_mul_smul (c1 c2 : α) (q1 : Quantity d₁ α) (q2 : Quantity d₂ α) :
   (c1 • q1) * (c2 • q2) = (c1 * c2) • (q1 * q2) := by
   simp [← Formal.toFormal_inj]
   ring
+
+theorem smul_inj (c : α) (q1 q2 : Quantity d α) (h_ne_zero : c ≠ 0) :
+  (c • q1) = (c • q2) ↔ q1 = q2 := by
+  constructor
+  · intro h
+    apply congrArg ((1/c) • ·) at h
+    repeat rw [smul_smul] at h
+    rw [mul_comm,mul_one_div,div_self h_ne_zero,one_smul,one_smul] at h
+    exact h
+  · intro h
+    rw [h]
 
 @[simp]
 theorem dim_def [HasDimension δ] (q : Quantity d α) : q.dimension = HasDimension.dimension d := rfl
