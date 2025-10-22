@@ -41,15 +41,15 @@ lemma newtonsSecondWithDim'_isDimensionallyCorrect :
         funext m F a
         unfold NewtonsSecondWithDim'
         simp_dim
-        rw [Quantity.smul_mul_smul,inv_eq_one_div,inv_eq_one_div,inv_eq_one_div,
-            ←mul_div_mul_comm,one_mul, ←Dimension.PrimeScale.scaler_add]
+        repeat rw [←Dimension.PrimeScale.scaler_neg]
+        rw [Quantity.smul_mul_smul, ←Dimension.PrimeScale.scaler_add, ←neg_add]
         constructor
         · intro h
           apply congrArg
             ((Dimension.Mass + (Dimension.Length - 2 • Dimension.Time)).PrimeScale • · ) at h
-          rw [← inv_eq_one_div,smul_inv_smul₀,smul_inv_smul₀] at h
-          · assumption
-          all_goals exact Dimension.PrimeScale.scaler_ne_zero
+          repeat rw [smul_smul, ←Dimension.PrimeScale.scaler_add,
+            add_neg_cancel, Dimension.PrimeScale.scaler_zero, one_smul] at h
+          assumption
         · intro h
           rw [h]
 
