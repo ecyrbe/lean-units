@@ -47,10 +47,9 @@ lemma newtonsSecondWithDim'_isDimensionallyCorrect :
         · intro h
           apply congrArg
             ((Dimension.Mass + (Dimension.Length - 2 • Dimension.Time)).PrimeScale • · ) at h
-          rw [← inv_eq_one_div,smul_smul,smul_smul,mul_inv_cancel₀] at h
-          · repeat rw [one_smul] at h
-            assumption
-          · exact Dimension.PrimeScale.scaler_ne_zero
+          rw [← inv_eq_one_div,smul_inv_smul₀,smul_inv_smul₀] at h
+          · assumption
+          all_goals exact Dimension.PrimeScale.scaler_ne_zero
         · intro h
           rw [h]
 
