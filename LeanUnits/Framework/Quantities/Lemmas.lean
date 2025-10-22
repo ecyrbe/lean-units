@@ -533,6 +533,11 @@ theorem sq_add (a b : Quantity d α) : (a + b)² = a² + ↑(2 • a * b) + b² 
   rw [Formal.toFormal_cast, toFormal_mul, toFormal_nsmul, Nat.cast_ofNat]
   ring
 
+theorem smul_mul_smul (c1 c2 : α) (q1 : Quantity d₁ α) (q2 : Quantity d₂ α) :
+  (c1 • q1) * (c2 • q2) = (c1 * c2) • (q1 * q2) := by
+  simp [← Formal.toFormal_inj]
+  ring
+
 @[simp]
 theorem dim_def [HasDimension δ] (q : Quantity d α) : q.dimension = HasDimension.dimension d := rfl
 
