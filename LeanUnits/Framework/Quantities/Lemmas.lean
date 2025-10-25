@@ -95,13 +95,16 @@ theorem val_smul [SMul α α] (n : α) (q : Quantity d α) : (n • q).val = n �
 
 theorem smul_def [SMul α α] (n : α) (q : Quantity d α) : (n • q) = ⟨n • q.val⟩ := rfl
 
+theorem val_smul_eq_mul (n : α) (q : Quantity d α) : n • q.val = n * q.val := by
+  rw [_root_.smul_eq_mul]
+
 instance instAddGroup : AddGroup (Quantity d α) where
   zero := Zero.zero
   add := Add.add
   neg := Neg.neg
   sub := Sub.sub
-  nsmul n q := { val := n • q.val }
-  zsmul n q := { val := n • q.val }
+  nsmul := nsmul
+  zsmul := zsmul
   zero_add := by
     intro q
     rw [← val_inj]
@@ -124,25 +127,25 @@ instance instAddGroup : AddGroup (Quantity d α) where
     simp only [val_add, val_neg, neg_add_cancel, val_zero]
   nsmul_zero := by
     intro a
-    rw [← val_inj]
+    rw [nsmul, ← val_inj]
     simp only [zero_nsmul, val_zero]
   nsmul_succ := by
     intro n a
-    rw [← val_inj]
+    rw [nsmul, nsmul, ← val_inj]
     simp only [nsmul_eq_mul, Nat.cast_add, Nat.cast_one, add_mul, one_mul, val_add]
   zsmul_zero' := by
     intro a
-    rw [← val_inj]
+    rw [zsmul, ← val_inj]
     simp only [zero_smul, val_zero]
   zsmul_succ' := by
     intro n a
-    rw [← val_inj]
+    rw [zsmul, zsmul, ← val_inj]
     simp only [zsmul_eq_mul, Int.cast_natCast, val_add,Nat.cast_succ, add_mul,
     val_add,add_mul, zsmul_eq_mul, Int.cast_add, Int.cast_natCast, Nat.succ_eq_add_one]
     ring
   zsmul_neg' := by
     intro n a
-    rw [← val_inj]
+    rw [zsmul, zsmul, ← val_inj]
     simp only [Int.negSucc_eq, zsmul_eq_mul, Int.cast_add, Int.cast_neg,
       Int.cast_natCast, Nat.succ_eq_add_one, Nat.cast_add, val_neg, neg_mul,Nat.cast_one]
 
@@ -164,15 +167,15 @@ theorem val_div [Div α] (q₁ : Quantity d₁ α) (q₂ : Quantity d₂ α) :
 theorem val_inv [Inv α] (q : Quantity d α) : (q⁻¹).val = Inv.inv q.val := rfl
 
 @[simp]
-theorem val_npow [Pow α ℕ] (q : Quantity d α) (n : ℕ) :
+theorem val_npow (q : Quantity d α) (n : ℕ) :
   (q.npow n).val = q.val ^ n := rfl
 
 @[simp]
-theorem val_zpow [Pow α ℤ] (q : Quantity d α) (n : ℤ) :
+theorem val_zpow (q : Quantity d α) (n : ℤ) :
   (q.zpow n).val = q.val ^ n := rfl
 
 @[simp]
-theorem Scalar.val_pow (q : Quantity d α) (n : ℕ) :
+theorem val_pow (q : Quantity d α) (n : ℕ) :
   (q ^ᵈ n).val = q.val ^ n := rfl
 
 @[coe]
