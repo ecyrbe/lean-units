@@ -541,7 +541,7 @@ protected theorem smul_mul_smul (c1 c2 : α) (q1 : Quantity d₁ α) (q2 : Quant
   simp [← Formal.toFormal_inj]
   ring
 
-theorem smul_inj (c : α) (q1 q2 : Quantity d α) (h_ne_zero : c ≠ 0) :
+theorem smul_inj {c : α} {q1 q2 : Quantity d α} (h_ne_zero : c ≠ 0) :
   (c • q1) = (c • q2) ↔ q1 = q2 := by
   constructor
   · intro h

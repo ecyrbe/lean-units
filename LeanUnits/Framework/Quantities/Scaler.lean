@@ -92,7 +92,7 @@ noncomputable instance instMulScalerQuantity [HasDimension δ] :
   scale_inv q := Real.instInv.inv (𝒟 d).PrimeScale • q
   scale_inj := by
     intro q1 q2 h
-    exact (Quantity.smul_inj (𝒟 d).PrimeScale q1 q2 Dimension.PrimeScale.scaler_ne_zero).mp h
+    exact (Quantity.smul_inj Dimension.PrimeScale.scaler_ne_zero).mp h
   scale_scale_inv_cancel q := by
     exact smul_inv_smul₀ Dimension.PrimeScale.scaler_ne_zero q
   scale_smul := by
