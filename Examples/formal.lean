@@ -48,7 +48,7 @@ lemma newtons_second_law_dim_check
 
 lemma newtons_second_law_isDimensionallyCorrect :
     Quantity.IsDimensionallyCorrect newtons_second_law := by
-    funext m F a
+    funext F m a
     unfold newtons_second_law
     simp_dim
     repeat rw [←Dimension.PrimeScale.scaler_neg]
@@ -57,14 +57,14 @@ lemma newtons_second_law_isDimensionallyCorrect :
     exact Dimension.PrimeScale.scaler_ne_zero
 
 def einstein_mass_energy_equivalence_val
-    (m : WithDim Dimension.Mass)
     (E : WithDim Dimension.Energy)
+    (m : WithDim Dimension.Mass)
     (c : WithDim Dimension.Speed) : Prop :=
   E.val = m.val * c.val ^ 2
 
 lemma einstein_mass_energy_equivalence_isDimensionallyCorrect :
     Quantity.IsDimensionallyCorrect einstein_mass_energy_equivalence_val := by
-        funext m E c
+        funext E m c
         unfold einstein_mass_energy_equivalence_val
         simp_dim
         have h_m : (Real.instInv.inv Dimension.Mass.PrimeScale) * m.val =
@@ -88,12 +88,14 @@ lemma einstein_mass_energy_equivalence_isDimensionallyCorrect :
 
 def einstein_mass_energy_equivalence
     (E : WithDim Dimension.Energy)
-    (m : WithDim Dimension.Mass) : Prop :=
+    (m : WithDim Dimension.Mass)
+    (c : WithDim Dimension.Speed) : Prop :=
     E =  ↑(m * c²)
 
 lemma einstein_mass_energy_equivalence_dim_check
     (E : WithDim Dimension.Energy)
-    (m : WithDim Dimension.Mass) :
+    (m : WithDim Dimension.Mass)
+    (c : WithDim Dimension.Speed) :
     𝒟 E = 𝒟 (m * c²) := by
     simp_dim
     module
