@@ -39,6 +39,13 @@ def newtons_second_law
     (a : WithDim Dimension.Acceleration) : Prop :=
     F = m * a
 
+lemma newtons_second_law_dim_check
+    (F : WithDim Dimension.Force)
+    (m : WithDim Dimension.Mass)
+    (a : WithDim Dimension.Acceleration) :
+    𝒟 F =  𝒟 (m * a) := by
+    simp_dim
+
 lemma newtons_second_law_isDimensionallyCorrect :
     Quantity.IsDimensionallyCorrect newtons_second_law := by
     funext m F a
@@ -83,6 +90,13 @@ def einstein_mass_energy_equivalence
     (E : WithDim Dimension.Energy)
     (m : WithDim Dimension.Mass) : Prop :=
     E =  ↑(m * c²)
+
+lemma einstein_mass_energy_equivalence_dim_check
+    (E : WithDim Dimension.Energy)
+    (m : WithDim Dimension.Mass) :
+    𝒟 E = 𝒟 (m * c²) := by
+    simp_dim
+    module
 
 theorem not_e_equal_mc_dim_check (E : WithDim Dimension.Energy) (m : WithDim Dimension.Mass) :
    ¬ 𝒟 E =  𝒟 (m * c) := by
