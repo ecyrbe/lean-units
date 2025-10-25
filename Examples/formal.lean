@@ -15,10 +15,11 @@ section WithDim
 variable (G : WithDim (Dimension.Length ^ 3 / (Dimension.Mass * Dimension.Time ^ 2)))
 variable (c : WithDim Dimension.Speed)
 
-theorem kepler_third_law
-    (T : WithDim Dimension.Time) (a : WithDim Dimension.Length) (M m : WithDim Dimension.Mass) :
-    T² =  (4•π^2) • ↑(a³/ (G *(M + m)))  := by
-  sorry
+def kepler_third_law
+    (T : WithDim Dimension.Time)
+    (a : WithDim Dimension.Length)
+    (M m : WithDim Dimension.Mass) : Prop :=
+    T² =  (4•π^2) • ↑(a³/ (G *(M + m)))
 
 theorem kepler_third_law_dim_check
     (T : WithDim Dimension.Time) (a : WithDim Dimension.Length) (M m : WithDim Dimension.Mass) :
@@ -32,24 +33,56 @@ theorem not_kepler_third_law_dim_check
     simp_dim
     decide +kernel
 
-def NewtonsSecondWithDim' (m : WithDim Dimension.Mass) (F : WithDim Dimension.Force)
+def newtons_second_law
+    (F : WithDim Dimension.Force)
+    (m : WithDim Dimension.Mass)
     (a : WithDim Dimension.Acceleration) : Prop :=
-    F = (m * a)
+    F = m * a
 
-lemma newtonsSecondWithDim'_isDimensionallyCorrect :
-    Quantity.IsDimensionallyCorrect NewtonsSecondWithDim' := by
-        funext m F a
-        unfold NewtonsSecondWithDim'
+lemma newtons_second_law_isDimensionallyCorrect :
+    Quantity.IsDimensionallyCorrect newtons_second_law := by
+    funext m F a
+    unfold newtons_second_law
+    simp_dim
+    repeat rw [←Dimension.PrimeScale.scaler_neg]
+    rw [Quantity.smul_mul_smul, ←Dimension.PrimeScale.scaler_add, ←neg_add]
+    apply smul_right_inj
+    exact Dimension.PrimeScale.scaler_ne_zero
+
+def einstein_mass_energy_equivalence_val
+    (m : WithDim Dimension.Mass)
+    (E : WithDim Dimension.Energy)
+    (c : WithDim Dimension.Speed) : Prop :=
+  E.val = m.val * c.val ^ 2
+
+lemma einstein_mass_energy_equivalence_isDimensionallyCorrect :
+    Quantity.IsDimensionallyCorrect einstein_mass_energy_equivalence_val := by
+        funext m E c
+        unfold einstein_mass_energy_equivalence_val
         simp_dim
+        have h_m : (Real.instInv.inv Dimension.Mass.PrimeScale) * m.val =
+            (Real.instInv.inv Dimension.Mass.PrimeScale) • m.val := by
+          rw [Quantity.val_smul_eq_mul]
+        have h_c : ((Real.instInv.inv (Dimension.Length - Dimension.Time).PrimeScale) * c.val) ^ 2 =
+            (Real.instInv.inv (Dimension.Length - Dimension.Time).PrimeScale)^2 • c.val ^ 2 := by
+            rw [←smul_pow, Quantity.val_smul_eq_mul]
+        rw [←Quantity.val_smul_eq_mul , h_m, h_c,_root_.smul_mul_smul]
         repeat rw [←Dimension.PrimeScale.scaler_neg]
-        rw [Quantity.smul_mul_smul, ←Dimension.PrimeScale.scaler_add, ←neg_add]
-        apply Quantity.smul_inj
+        rw [←Dimension.PrimeScale.scaler_nsmul, ←Dimension.PrimeScale.scaler_add ]
+        have h_p1 : -(Dimension.Mass + (Dimension.Length - 2 • Dimension.Time) + Dimension.Length) =
+            -(Dimension.Mass + 2 • (Dimension.Length - Dimension.Time)) := by
+            module
+        have h_p2 : -Dimension.Mass + 2 • -(Dimension.Length - Dimension.Time) =
+            -(Dimension.Mass + 2 • (Dimension.Length - Dimension.Time)) := by
+            module
+        rw [h_p1, h_p2]
+        apply smul_right_inj
         exact Dimension.PrimeScale.scaler_ne_zero
 
-
-theorem e_equal_mc2 (E : WithDim Dimension.Energy) (m : WithDim Dimension.Mass) :
-    E =  ↑(m * c²) := by
-    sorry
+def einstein_mass_energy_equivalence
+    (E : WithDim Dimension.Energy)
+    (m : WithDim Dimension.Mass) : Prop :=
+    E =  ↑(m * c²)
 
 theorem not_e_equal_mc_dim_check (E : WithDim Dimension.Energy) (m : WithDim Dimension.Mass) :
    ¬ 𝒟 E =  𝒟 (m * c) := by
