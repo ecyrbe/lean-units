@@ -86,7 +86,6 @@ class ContinuousLinearScaler (M : Type) [AddCommMonoid M] [Module α M] [Topolog
 /--
 A quantity is a MulScaler if it has a Dimension.
 -/
-@[simp]
 noncomputable instance instMulScalerQuantity [HasDimension δ] :
   MulScaler (α:=ℝ) (Quantity d ℝ)  where
   scale q := ⟨(𝒟 q).PrimeScale * q.val⟩
@@ -106,30 +105,29 @@ noncomputable instance instMulScalerQuantity [HasDimension δ] :
     simp only [smul_def, _root_.smul_eq_mul, dim_eq_dim, ← val_inj]
     ring
 
-lemma MulScaler.scale_apply [HasDimension δ] (q : Quantity d ℝ) :
+lemma MulScaler.scale_def [HasDimension δ] (q : Quantity d ℝ) :
   Scaler.scale q = ⟨(𝒟 q).PrimeScale * q.val⟩ := rfl
 
-lemma MulScaler.scale_inv_apply [HasDimension δ] (q : Quantity d ℝ) :
+lemma MulScaler.scale_inv_def [HasDimension δ] (q : Quantity d ℝ) :
   Scaler.scale_inv q = ⟨q.val / (𝒟 q).PrimeScale⟩ := rfl
 
-lemma MulScaler.scale_def [HasDimension δ] :
+lemma MulScaler.scale_def' [HasDimension δ] :
   Scaler.scale  = fun q : Quantity d ℝ => ⟨(𝒟 q).PrimeScale * q.val⟩ := rfl
 
-lemma MulScaler.scale_inv_def [HasDimension δ] :
+lemma MulScaler.scale_inv_def' [HasDimension δ] :
   Scaler.scale_inv = fun q : Quantity d ℝ => ⟨q.val / (𝒟 q).PrimeScale⟩ := rfl
 
 @[simp]
 lemma MulScaler.scale_eq_primescale_smul [HasDimension δ] (q : Quantity d ℝ) :
   Scaler.scale q = (𝒟 d).PrimeScale • q := by
-  simp only [MulScaler.scale_apply, smul_def, _root_.smul_eq_mul, dim_eq_dim]
+  simp only [MulScaler.scale_def, smul_def, _root_.smul_eq_mul, dim_eq_dim]
 
 @[simp]
 lemma MulScaler.scale_inv_eq_primescale_inv_smul [HasDimension δ] (q : Quantity d ℝ) :
   Scaler.scale_inv q = Real.instInv.inv (𝒟 d).PrimeScale • q := by
-  simp only [MulScaler.scale_inv_apply, smul_def, _root_.smul_eq_mul, _root_.div_eq_mul_inv,
+  simp only [MulScaler.scale_inv_def, smul_def, _root_.smul_eq_mul, _root_.div_eq_mul_inv,
     _root_.mul_comm, dim_eq_dim]
 
-@[simp]
 noncomputable instance instScalerFunOut {M1 M2 : Type} [Scaler M2] : Scaler (M1 → M2) where
   scale f m1 := Scaler.scale (f m1)
   scale_inv f m1 := Scaler.scale_inv (f m1)
@@ -143,10 +141,13 @@ noncomputable instance instScalerFunOut {M1 M2 : Type} [Scaler M2] : Scaler (M1 
     apply Scaler.scale_scale_inv_cancel
 
 @[simp]
-lemma Scaler.scale_apply_fun_right {M1 M2 : Type} [Scaler M2] (f : M1 → M2) (m1 : M1) :
+lemma Scaler.scale_fun_out_def {M1 M2 : Type} [Scaler M2] (f : M1 → M2) (m1 : M1) :
     (scale f) m1 = scale (f m1) := rfl
 
 @[simp]
+lemma Scaler.scale_inv_fun_out_def {M1 M2 : Type} [Scaler M2] (f : M1 → M2) (m1 : M1) :
+    (scale_inv f) m1 = scale_inv (f m1) := rfl
+
 noncomputable instance instScalerFunIn {M1 M2 : Type} [Scaler M1] :
     Scaler (M1 → M2) where
   scale f m1 := f (Scaler.scale_inv m1)
@@ -160,10 +161,13 @@ noncomputable instance instScalerFunIn {M1 M2 : Type} [Scaler M1] :
     rw [Scaler.scale_scale_inv_cancel m1]
 
 @[simp]
-lemma Scaler.scale_apply_fun_left {M1 M2 : Type} [Scaler M1] (f : M1 → M2) (m1 : M1) :
+lemma Scaler.scale_fun_in_def {M1 M2 : Type} [Scaler M1] (f : M1 → M2) (m1 : M1) :
     (scale f) m1 = f (scale_inv m1) := rfl
 
 @[simp]
+lemma Scaler.scale_inv_fun_in_def {M1 M2 : Type} [Scaler M1] (f : M1 → M2) (m1 : M1) :
+    (scale_inv f) m1 = f (scale m1) := rfl
+
 noncomputable instance instScalerFunBi {M1 M2 : Type} [Scaler M1] [Scaler M2] :
     Scaler (M1 → M2) where
   scale f m1 := Scaler.scale (f (Scaler.scale_inv m1))
@@ -178,10 +182,13 @@ noncomputable instance instScalerFunBi {M1 M2 : Type} [Scaler M1] [Scaler M2] :
     repeat rw [Scaler.scale_scale_inv_cancel]
 
 @[simp]
-lemma Scaler.scale_apply_fun {M1 M2 : Type} [Scaler M1] [Scaler M2] (f : M1 → M2) (m1 : M1) :
+lemma Scaler.scale_fun_def {M1 M2 : Type} [Scaler M1] [Scaler M2] (f : M1 → M2) (m1 : M1) :
     (scale f) m1 = scale (f (scale_inv m1)) := rfl
 
 @[simp]
+lemma Scaler.scale_inv_fun_def {M1 M2 : Type} [Scaler M1] [Scaler M2] (f : M1 → M2) (m1 : M1) :
+    (scale_inv f) m1 = scale_inv (f (scale m1)) := rfl
+
 noncomputable instance instMulScalerFunBi
   {M1 M2 : Type} [Scaler M1] [MulAction α M2] [MulScaler (α := α) M2] :
     MulScaler (α:=α) (M1 → M2) where
@@ -192,7 +199,7 @@ noncomputable instance instMulScalerFunBi
 noncomputable instance instLinearScalerQuantity [HasDimension δ] :
   LinearScaler (α:=ℝ) (Quantity d ℝ) where
   scale_add m1 m2 := by
-    simp only [instMulScalerQuantity, MulScaler.scale_apply, ←val_inj, val_add,
+    simp only [instMulScalerQuantity, MulScaler.scale_def, ←val_inj, val_add,
       Distrib.left_distrib, ←dim_add_eq_dim_left' m1 m2, ←dim_add_eq_dim_right' m1 m2]
 
 noncomputable instance instLinearScalerLinearMap {M1 M2 : Type} [AddCommMonoid M1] [Module α M1]
@@ -232,7 +239,7 @@ noncomputable instance instContinuousLinearScalerQuantity
   [HasDimension δ] [TopologicalSpace (Quantity d ℝ)] [ContinuousConstSMul ℝ (Quantity d ℝ)] :
   ContinuousLinearScaler (α:=ℝ) (Quantity d ℝ) where
   scale_cont := by
-    rw [MulScaler.scale_def]
+    rw [MulScaler.scale_def']
     conv =>
       enter [1,q]
       rw [dim_eq_dim]
@@ -240,7 +247,7 @@ noncomputable instance instContinuousLinearScalerQuantity
     apply Continuous.const_smul
     exact continuous_id'
   scale_inv_cont := by
-    rw [MulScaler.scale_inv_def]
+    rw [MulScaler.scale_inv_def']
     conv =>
       enter [1,q]
       rw [dim_eq_dim, div_eq_mul_inv, _root_.mul_comm]
