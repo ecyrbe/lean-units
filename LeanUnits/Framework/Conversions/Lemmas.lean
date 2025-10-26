@@ -1,7 +1,8 @@
-import LeanUnits.Framework.Conversions.Basic
 import Batteries.Data.Rat
 import Mathlib.Data.Rat.Lemmas
 import Mathlib.Tactic
+import LeanUnits.Framework.Conversions.Basic
+import LeanUnits.Framework.Utils.Rat
 
 namespace Units.Conversion
 
@@ -88,31 +89,25 @@ theorem factor_zsmul {c : Conversion} (s : ℤ) : (s • c).factor = c.factor ^ 
 theorem factor_div_self_cancel {c : Conversion} : (c/c).factor = 1 := by
   rw [factor_div, div_self c.factor_ne_zero]
 
-theorem scalable_apply {α} [RatCast α] [Field α]
-  (c : Conversion) (x : α) (h : Scalable c)
-  (h_coe_zero : (0 : ℚ) = (0 : α) := by norm_cast) :
+theorem scalable_apply {α} [RatCast α] [Field α] [RatCastClass α]
+  (c : Conversion) (x : α) (h : Scalable c) :
   c.apply x = x * c.factor := by
   unfold Scalable at h
-  simp only [apply, h, h_coe_zero, _root_.add_zero]
+  simp only [apply, h, RatCastClass.zero_cast, _root_.add_zero]
 
-theorem scalable_convert {α} [RatCast α] [Field α]
-  (c1 c2 : Conversion) (x : α) (h1 : Scalable c1) (h2 : Scalable c2)
-  (h_coe_zero : (0 : ℚ) = (0 : α) := by norm_cast) :
+theorem scalable_convert {α} [RatCast α] [Field α] [RatCastClass α]
+  (c1 c2 : Conversion) (x : α) (h1 : Scalable c1) (h2 : Scalable c2) :
   convert c1 c2 x = x * ↑(c1.factor/c2.factor) := by
-  simp only [convert, scalable_apply, scalable_div, h1, h2, h_coe_zero, factor_div]
+  simp only [convert, scalable_apply, scalable_div, h1, h2, factor_div]
 
-theorem scalable_convert_same_eq_id {α} [RatCast α] [Field α]
-  (c : Conversion) (x : α) (h : Scalable c)
-  (h_coe_zero : (0 : ℚ) = (0 : α) := by norm_cast)
-  (h_coe_one : (1 : ℚ) = (1 : α) := by norm_cast) :
+theorem scalable_convert_same_eq_id {α} [RatCast α] [Field α] [RatCastClass α]
+  (c : Conversion) (x : α) (h : Scalable c) :
   convert c c x = x := by
-  simp only [scalable_convert, h, h_coe_zero, div_self c.factor_ne_zero, h_coe_one, mul_one]
+  simp only [scalable_convert, h, div_self c.factor_ne_zero, RatCastClass.one_cast, mul_one]
 
-theorem convert_zero_eq_id {α} [RatCast α] [Field α] (x : α)
-  (h_coe_zero : (0 : ℚ) = (0 : α) := by norm_cast)
-  (h_coe_one : (1 : ℚ) = (1 : α) := by norm_cast) :
+theorem convert_zero_eq_id {α} [RatCast α] [Field α] [RatCastClass α] (x : α) :
   convert 0 0 x = x := by
-  simp only [scalable_convert_same_eq_id, scalable_zero, h_coe_zero, h_coe_one]
+  simp only [scalable_convert_same_eq_id, scalable_zero]
 
 -- Some useful specializations for Real
 
