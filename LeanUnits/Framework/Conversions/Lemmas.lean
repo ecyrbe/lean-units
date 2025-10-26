@@ -39,13 +39,13 @@ theorem scalable_zsmul {c : Conversion} (s : ℤ) (h : Scalable c) : Scalable (s
 theorem scalable_mul {c1 c2 : Conversion} (h1 : Scalable c1) (h2 : Scalable c2) :
   Scalable (c1 * c2) := by
   unfold Scalable at *
-  rw [HMul.hMul,instHMul, Mul.mul]
+  rw [HMul.hMul,instHMul, Mul.mul,instMul]
   simp [mul, h1, h2]
 
 theorem scalable_div {c1 c2 : Conversion} (h1 : Scalable c1) (h2 : Scalable c2) :
   Scalable (c1 / c2) := by
   unfold Scalable at *
-  rw [HDiv.hDiv,instHDiv, Div.div]
+  rw [HDiv.hDiv,instHDiv, Div.div,instDiv]
   simp [div,mul, inv, h1, h2]
 
 theorem scalable_inv {c : Conversion} (h : Scalable c) : Scalable (c⁻¹) := by
@@ -55,13 +55,13 @@ theorem scalable_inv {c : Conversion} (h : Scalable c) : Scalable (c⁻¹) := by
 theorem scalable_add_eq_mul {c1 c2 : Conversion} (h1 : Scalable c1) (h2 : Scalable c2) :
   c1 + c2 = c1 * c2 := by
   unfold Scalable at *
-  rw [HAdd.hAdd,instHAdd, Add.add,instAdd, HMul.hMul,instHMul, Mul.mul]
+  rw [HAdd.hAdd,instHAdd, Add.add,instAdd, HMul.hMul,instHMul, Mul.mul, instMul]
   simp [add, mul, h1, h2]
 
 theorem scalable_sub_eq_div {c1 c2 : Conversion} (h1 : Scalable c1) (h2 : Scalable c2) :
   c1 - c2 = c1 / c2 := by
   unfold Scalable at *
-  rw [HSub.hSub,instHSub, Sub.sub,instSub, HDiv.hDiv,instHDiv, Div.div]
+  rw [HSub.hSub,instHSub, Sub.sub,instSub, HDiv.hDiv,instHDiv, Div.div, instDiv]
   simp [sub, div, inv,mul, h1, h2]
   rfl
 
@@ -69,7 +69,7 @@ theorem factor_zero : (0 : Conversion).factor = 1 := by rfl
 
 theorem factor_div {c1 c2 : Conversion} :
   (c1 / c2).factor = c1.factor / c2.factor := by
-  rw [HDiv.hDiv,instHDiv, Div.div]
+  rw [HDiv.hDiv,instHDiv, Div.div, instDiv]
   simp [div, mul, inv]
   rfl
 
